@@ -22,9 +22,9 @@ read astpp_dbname
 mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname < astpp-current.sql
 
 echo "";
-read -n 1 -p "Press 0 For Asterisk & Press 1 For Freeswitch [Default:1]: ";
+read -n 1 -p "Press 0 For Freeswitch & Press 1 For Asterisk [Default:0]: ";
 echo 
-if [ $REPLY = "0" ]; then
+if [ $REPLY = "1" ]; then
       
     mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname -e "
     update system set value=0 where name='softswitch';
@@ -147,7 +147,7 @@ else
 	    fscdrdb_username=$astpp_username;
 	    fscdrdb_password=$astpp_password;
 	fi
-	mysql --user=$fscdrdb_username --password=$fscdrdb_password --host=$fscdrdb_hostname $fscdrdb_dbname < fscdrdb-current.sql
+	mysql --user=$fscdrdb_username --password=$fscdrdb_password --host=$fscdrdb_hostname $fscdrdb_dbname < freeswitchcdrdb-current.sql
 	
 	mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname -e "
 	update system set value='$fscdrdb_hostname' where name='cdr_dbhost';update system set value='$fscdrdb_dbname' where name='cdr_dbname'; 
@@ -188,7 +188,7 @@ else
 	    fs_username=$astpp_username;
 	    fs_password=$astpp_password;
 	fi
-	mysql --user=$fs_username --password=$fs_password --host=$fs_hostname $fs_dbname < ../freeswitch/contrib/mysql-5.0.sql
+	mysql --user=$fs_username --password=$fs_password --host=$fs_hostname $fs_dbname < freeswitch-current.sql
 	mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname -e "update system set value='1' where name='users_dids_freeswitch';update system set value='$fs_hostname' where name='freeswitch_dbhost';update system set value='$fs_dbname' where name='freeswitch_dbname';update system set value='$fs_username' where name='freeswitch_dbuser';update system set value='$fs_password' where name='freeswitch_dbpass';";
     fi        
 fi

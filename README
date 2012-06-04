@@ -1,18 +1,45 @@
-This is ASTPP, the Asterisk and Freeswitch Postpaid, Prepaid billing and account
-management program.  The homepage for this software is
-found @ www.astpp.org.  It was started shortly after ASTCC
-was released and has been under development since.
+Open source VoIP billing and calling system
+
+ASTPP is a mature Scalable/Clustering Open Source VoIP billing solution for Freeswitch and Asterisk. It supports pre-paid and post-paid billing
+with call rating, credit control and call reporting. It also provides many other features such as calling cards, least cost routing (LCR), did management, 
+resellers, callbacks, etc. ASTPP can be deployed with Opensips to offer a distributed Telco VoIP Billing infrastructure. We are also able to integrate with OSCommerce 
+to provide a Web store for your users to purchase calling cards and sign up for VoIP accounts. We support multiple currencies for each account type with
+real-time update using Yahoo Finance. 
+
+Please visit www.astpp.org for detailed information regarding features and functionalties.
 
 Credits:
-Mark Spencer (mark@digium.com) originally wrote ASTCC.  We
-initially reused a lot of code from that software.  ASTPP
-has been almost entirely rewritten to clean up copyright 
-issues.  The makefile is the only file which has not been
-replaced
+
+Mark Spencer
+Company: Digium
+Email: mark@digium.com
+Originally wrote ASTCC. 
+
+Name: Darren Wiebe
+Company: Aleph Communications
+Email: darren@aleph-com.net
+Founder of ASTPP Open Source VoIP Billing 
+ASTPP was born from ASTCC, however Darren has almost entirely rewritten ASTPP to clean up copyright issues.
+The makefile is the only file which has not been replaced.
+
+Name: Prinasen Chetty
+Company: ASTPP VoIP Billing
+Email: prinasen@astpp.org
+Current lead developer and maintainer of ASTPP.
+Prinasen has taken over the development from Darren Wiebe and since then and has released V1.6 and V1.7, where we have rewritten the entire 
+GUI from scratch in PHP using Codeigniter MVC framework. Prinasen will be leading the way forward of ASTPP and further developing the project.
+
+Name: Samir Doshi
+Company: ASTPP VoIP Billing
+Email: samir@astpp.org
+Major contributor towards ASTPP. Samir has been actively involved in ASTPP since Version 1.6 and has brought upon many patchs and introduced
+new functionalities. Samir is now part of ASTPPs core team.
+
 
 Please visit the ASTPP website @  http://www.astpp.org
 
-Darren Wiebe
-darren@aleph-com.net
+ASTPP Support :
+Please email us at info@astpp.org for support.
 
-
+ASTPP Team
+info@astpp.org
