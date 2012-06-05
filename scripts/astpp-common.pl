@@ -17,7 +17,7 @@ use DBI;
 use warnings;
 use Locale::gettext_pp qw(:locale_h);
 use Mail::Sendmail;
-use FreeSWITCH::Client;
+# use FreeSWITCH::Client;
 
 $ENV{LANGUAGE} = "en";    # de, es, br - whatever
 print STDERR "Interface language is set to: " . $ENV{LANGUAGE} . "\n";
