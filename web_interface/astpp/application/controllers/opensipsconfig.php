@@ -58,11 +58,11 @@ class Opensipsconfig extends CI_Controller {
     }
 
     /**
-     * -------Here we write code for controller opensipsconfig functions opensipdevices------
+     * -------Here we write code for controller opensipsconfig functions opensipsdevices------
      * @action: Add, Edit, Delete opensips devices
      */
     function opensipdevice($action=false, $id=false) {
-        $data['app_name'] = 'ASTPP - Open Source Billing Solution | Opensip  Config | Open Sip Devices';
+        $data['app_name'] = 'ASTPP - Open Source Billing Solution | Opensips  Config | Opensips Devices';
         $data['username'] = $this->session->userdata('user_name');
         $data['page_title'] = 'OPENSIPS DEVICES';
         $data['cur_menu_no'] = 9;
@@ -101,7 +101,6 @@ class Opensipsconfig extends CI_Controller {
                     $errors .= "Password is required<br />";
 
                 if ($errors == "") {
-//                    echo "bhaviok";
                     $this->opensips_model->update_opensip($id, $_POST, $id);
                     $this->session->set_userdata('astpp_notification', 'Opensips updated successfully!');
                     redirect(base_url() . 'opensipsconfig/opensipdevice');
@@ -130,8 +129,8 @@ class Opensipsconfig extends CI_Controller {
     }
 
     /**
-     * -------Here we write code for controller switchconfig functions fssipdevices_grid------
-     * Listing of fssip devices data through php function json_encode
+     * -------Here we write code for controller switchconfig functions opensipsdevice_grid------
+     * Listing of opensips devices data through php function json_encode
      */
     function opensipdevice_grid() {
         $json_data = array();
@@ -222,7 +221,6 @@ class Opensipsconfig extends CI_Controller {
             $this->load->view('view_opensips_dispatcher_add', $data);
         }
         elseif ($action == 'edit') {
-//            exit; 
             if (!empty($_POST)) {
                 $errors = "";
              if (trim($_POST['destination']) == "")
