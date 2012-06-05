@@ -97,6 +97,9 @@ if( !function_exists( 'validate_access' ) )
 				elseif($controller=="accounting"){
 				      $admin_pages = array('get_action_buttons_taxes','account_taxes','account_taxes_grid','valid_account_tax','invoice_list','account_invoice_grid','get_action_buttons_invoice','get_account_details','search','clearsearchfilter','search_taxes','clearsearchfilter_taxes');
                                 }
+                                elseif($controller=="opensipsconfig"){
+					$admin_pages = array('opensipdevice','opensipdevice_grid','get_action_buttons','dispatcher','dispatcher_grid','get_action_button_dispatcher');
+				}
 				else{
 					$admin_pages = array();
 				}

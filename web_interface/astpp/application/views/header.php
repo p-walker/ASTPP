@@ -551,7 +551,7 @@
                         <?}?>
                         <li><a href="<?php echo base_url();?>switchconfig/acl_list/"><img src="<?=base_url()?>menu_icons/SwitchConfig/AccessControlList(ACL).png" border="0" width="16" height="16" />&nbsp;&nbsp;Access Control List</a></li>
                     </ul>  
-              </div>  
+              </div>                              
               
                <div class="col_1">
             
@@ -564,6 +564,19 @@
                     </ul>  
                 
              </div> 
+             
+             <?php if((Common_model::$global_config['system_config']['opensips']) == '1')
+                 {?>
+                     <div class="col_1">            
+                <h3>Opensips Config Alfa</h3>
+		      <ul>
+ 			
+                        <li><a href="<?php echo base_url();?>opensipsconfig/opensipdevice/"><img src="<?=base_url()?>menu_icons/OpensipsConfig/Devices.png" border="0" width="16" height="16" />&nbsp;&nbsp;Opensips Devices</a></li>
+                        <li><a href="<?php echo base_url();?>opensipsconfig/dispatcher/"><img src="<?=base_url()?>menu_icons/OpensipsConfig/Dispatcher.png" border="0" width="16" height="16" />&nbsp;&nbsp;Dispatcher List</a></li>
+                      
+                    </ul>  
+              </div> 
+                     <?}?>
          </div>
     </li>
    
