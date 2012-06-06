@@ -40,7 +40,7 @@ class Opensipsconfig extends CI_Controller {
     public function _remap($method, $params = array())
     {
 	    $logintype = $this->session->userdata('logintype');
-	    $access_control = validate_access($logintype,$method, "accounts");
+	    $access_control = validate_access($logintype,$method, "opensipsconfig");
 	    if ($access_control){
 		    return call_user_func_array(array($this, $method), $params);			 
 	    //$this->$method();
