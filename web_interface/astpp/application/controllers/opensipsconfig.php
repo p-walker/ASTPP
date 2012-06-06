@@ -192,7 +192,7 @@ class Opensipsconfig extends CI_Controller {
 
         $data['app_name'] = 'ASTPP - Open Source Billing Solution | Opensip  Config | Dispatcher';
         $data['username'] = $this->session->userdata('user_name');
-        $data['page_title'] = 'Dispatcher';
+        $data['page_title'] = 'Dispatcher List';
         $data['cur_menu_no'] = 9;
         if ($action === false)
             $action = "list";

@@ -426,7 +426,7 @@ sub fs_dialplan_xml_bridge() {
 	
 	$dialstring .= "<action application=\"set\" data=\"calltype=STANDARD\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"outbound_route=" . $arg{route_id} . "\"/>\n";
-	$dialstring .= "<action application=\"set\" data=\"trunk=" . $trunkdata->{path} . "\"/>\n";
+	$dialstring .= "<action application=\"set\" data=\"trunk=" . $trunkdata->{name} . "\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"provider=" . $trunkdata->{provider} . "\"/>\n";	
 	$dialstring .= "<action application=\"bridge\" data=\"";
 	if ( $trunkdata->{tech} eq "Zap" ) {
