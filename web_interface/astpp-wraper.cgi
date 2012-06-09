@@ -370,17 +370,17 @@ sub logout() {
 sub build_menu() {
 	my (@items) = @_;
 	my @menu_list;
-	my $template = HTML::Template->new(
-	        filename          => '/var/lib/astpp/templates/sub_menu.tpl',
-	        die_on_bad_params => $config->{template_die_on_bad_params}
-	);
+# 	my $template = HTML::Template->new(
+# 	        filename          => '/var/lib/astpp/templates/sub_menu.tpl',
+# 	        die_on_bad_params => $config->{template_die_on_bad_params}
+# 	);
 	foreach my $tmp (@items) {
 		my %row;
 	        $row{value} = $tmp;
 	        push( @menu_list,  \%row );
 	}
-        $template->param( menu => \@menu_list );
-	return $template->output;
+#         $template->param( menu => \@menu_list );
+# 	return $template->output;
 }
 
 
@@ -3244,10 +3244,10 @@ sub build_process_payment() {
 
     my ( $status, $body, $number, $reseller );
 
-    my $template = HTML::Template->new(
-        filename => '/var/lib/astpp/templates/account-process-payment.tpl',
-        die_on_bad_params => $config->{template_die_on_bad_params}
-    );
+#     my $template = HTML::Template->new(
+#         filename => '/var/lib/astpp/templates/account-process-payment.tpl',
+#         die_on_bad_params => $config->{template_die_on_bad_params}
+#     );
 
 
     return gettext("Database not configured!") unless $astpp_db;
@@ -6268,11 +6268,11 @@ sub build_add_booth() {
 
 sub build_remove_booth() {
 
-    my $template = HTML::Template->new(
-        filename          => '/var/lib/astpp/templates/booth-remove.tpl',
-        die_on_bad_params => $config->{template_die_on_bad_params}
-
-    );
+#     my $template = HTML::Template->new(
+#         filename          => '/var/lib/astpp/templates/booth-remove.tpl',
+#         die_on_bad_params => $config->{template_die_on_bad_params}
+# 
+#     );
 
     my ( @booth_list, $accountinfo );
 
@@ -6399,11 +6399,11 @@ sub build_remove_booth() {
     );
 
 
-    $template->param( status => $status );
+#     $template->param( status => $status );
 
-    $template->param( booths => $booths );
+#     $template->param( booths => $booths );
 
-    return $template->output;
+#     return $template->output;
 
 }
 
@@ -6607,12 +6607,12 @@ sub build_list_booths() {
     }
 
 
-    my $template = HTML::Template::Expr->new(
-        filename          => '/var/lib/astpp/templates/booths-list.tpl',
-        die_on_bad_params => $config->{template_die_on_bad_params}
-    );
-    $template->param( booth_list => \@booths );
-    return $template->output;
+#     my $template = HTML::Template::Expr->new(
+#         filename          => '/var/lib/astpp/templates/booths-list.tpl',
+#         die_on_bad_params => $config->{template_die_on_bad_params}
+#     );
+#     $template->param( booth_list => \@booths );
+#     return $template->output;
 }
 
 
@@ -6819,29 +6819,29 @@ sub build_view_booth() {
     }
 
 
-    my $template = HTML::Template->new(
-        filename          => '/var/lib/astpp/templates/booth-view.tpl',
-        die_on_bad_params => $config->{template_die_on_bad_params}
-    );
-
-
-
-    $template->param( booth_name => $params->{booth_name} );
+#     my $template = HTML::Template->new(
+#         filename          => '/var/lib/astpp/templates/booth-view.tpl',
+#         die_on_bad_params => $config->{template_die_on_bad_params}
+#     );
+# 
+# 
+# 
+#     $template->param( booth_name => $params->{booth_name} );
     my $balance = $ASTPP->accountbalance( account => $params->{booth_name} ) / 1;
 
     my $unrated =
      &count_unrated_cdrs_account( $config, $cdr_db, $accountinfo->{number},
         $accountinfo->{cc} );
     $ASTPP->debug( user => $param->{username}, debug => $balance );
-    $template->param( unrated_cdrs  => $unrated );
-    $template->param( booths        => $booths );
-    $template->param( balance       => $balance );
-    $template->param( cdr_list      => \@cdrs );
-    $template->param( sip_username  => $sip_login->{name} );
-    $template->param( sip_password  => $sip_login->{secret} );
-    $template->param( iax2_username => $iax2_login->{name} );
-    $template->param( iax2_password => $iax2_login->{secret} );
-    return $template->output;
+#     $template->param( unrated_cdrs  => $unrated );
+#     $template->param( booths        => $booths );
+#     $template->param( balance       => $balance );
+#     $template->param( cdr_list      => \@cdrs );
+#     $template->param( sip_username  => $sip_login->{name} );
+#     $template->param( sip_password  => $sip_login->{secret} );
+#     $template->param( iax2_username => $iax2_login->{name} );
+#     $template->param( iax2_password => $iax2_login->{secret} );
+#     return $template->output;
 }
 
 
@@ -6855,10 +6855,10 @@ if ( !$config->{template_die_on_bad_params} ) {
     $config->{template_die_on_bad_params} = 0;
 }
 
-my $template = HTML::Template->new(
-    filename          => '/var/lib/astpp/templates/main.tpl',
-    die_on_bad_params => $config->{template_die_on_bad_params}
-);
+# my $template = HTML::Template->new(
+#     filename          => '/var/lib/astpp/templates/main.tpl',
+#     die_on_bad_params => $config->{template_die_on_bad_params}
+# );
 
 my $log_call = "astpp-wraper.cgi,";
 
