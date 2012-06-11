@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<title>ASTPP - Open Source Voip Billing Solution</title>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+	<script type="text/javascript" src="<?php echo base_url();?>js/google_jquery.js"></script>
     <script type="text/javascript" src="<?php echo base_url();?>js/ui/ui.datepicker.js"></script>
 	
 <!--	<script type="text/javascript" src="/js/ui/ui.tabs.js"></script>-->
