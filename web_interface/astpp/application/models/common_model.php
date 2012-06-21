@@ -278,6 +278,7 @@ class Common_model extends CI_Model
 		$trunks = $this->list_trunks();
 		foreach ($trunks as $elem)
 		{
+			$ret_html .= "<option value=''>--Select Trunk--</option>";
 			$ret_html .= '<option value="'.$elem.'"';
 			if($elem == $default)
 				$ret_html .= 'selected="selected"';
@@ -725,7 +726,7 @@ class Common_model extends CI_Model
 	
 	function format_currency($amount)
 	{
-	    return money_format('%.2n', $amount);
+	    return money_format('%.'.Common_model::$global_config['system_config']['decimalpoints'].'n', $amount);
 	}
 	
 	function money_format($format, $number)

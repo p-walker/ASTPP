@@ -1527,3 +1527,39 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `taxes_to_accounts_view`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `taxes_to_accounts_view` AS select `taxes_to_accounts`.`id` AS `id`,`taxes_to_accounts`.`accountid` AS `accountid`,`taxes`.`taxes_id` AS `taxes_id`,`taxes`.`taxes_priority` AS `taxes_priority`,`taxes`.`taxes_amount` AS `taxes_amount`,`taxes`.`taxes_rate` AS `taxes_rate`,`taxes`.`taxes_description` AS `taxes_description` from (`taxes_to_accounts` join `taxes`) where (`taxes`.`taxes_id` = `taxes_to_accounts`.`taxes_id`);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `callingcard_cdrs`
+--
+DROP TABLE IF EXISTS `callingcard_cdrs`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `callingcard_cdrs` AS select `callingcardcdrs`.`id` AS `id`,`callingcardcdrs`.`cardnumber` AS `cardnumber`,`callingcardcdrs`.`clid` AS `clid`,`callingcardcdrs`.`destination` AS `destination`,`callingcardcdrs`.`disposition` AS `disposition`,`callingcardcdrs`.`callstart` AS `callstart`,`callingcardcdrs`.`seconds` AS `seconds`,`callingcardcdrs`.`debit` AS `debit`,`callingcardcdrs`.`credit` AS `credit`,`callingcardcdrs`.`status` AS `status`,`callingcardcdrs`.`uniqueid` AS `uniqueid`,`callingcardcdrs`.`notes` AS `notes`,`callingcardcdrs`.`pricelist` AS `pricelist`,`callingcardcdrs`.`pattern` AS `pattern`,(select `callingcardbrands`.`reseller` from (`callingcards` join `callingcardbrands`) where ((`callingcardbrands`.`name` = `callingcards`.`brand`) and (`callingcards`.`cardnumber` = `callingcardcdrs`.`cardnumber`))) AS `reseller`,(select `callingcards`.`account` from `callingcards` where (`callingcards`.`cardnumber` = `callingcardcdrs`.`cardnumber`)) AS `account` from `callingcardcdrs`;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `customer_cdrs`
+--
+DROP TABLE IF EXISTS `customer_cdrs`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `customer_cdrs` AS select `a`.`accountid` AS `accountid`,`a`.`cc` AS `cc`,`a`.`number` AS `number`,`a`.`reseller` AS `reseller`,`b`.`id` AS `cdr_id`,`b`.`uniqueid` AS `uniqueid`,`b`.`callerid` AS `callerid`,`b`.`callednum` AS `callednum`,`b`.`billseconds` AS `billseconds`,`b`.`trunk` AS `trunk`,`b`.`disposition` AS `disposition`,`b`.`callstart` AS `callstart`,`b`.`debit` AS `debit`,`b`.`credit` AS `credit`,`b`.`status` AS `status`,replace(substr(substring_index(`b`.`notes`,'|',2),(length(substring_index(`b`.`notes`,'|',1)) + 1)),'|','') AS `notes`,`b`.`provider` AS `provider`,`b`.`cost` AS `cost`,`b`.`pricelist` AS `pricelist`,`b`.`pattern` AS `pattern`,`b`.`calltype` AS `calltype` from (`accounts` `a` join `cdrs` `b`) where ((`a`.`number` = `b`.`cardnum`) and (`a`.`type` = 0) and (`b`.`uniqueid` <> '') and (`b`.`uniqueid` <> '0') and (`b`.`uniqueid` <> '1') and (`b`.`uniqueid` <> 'N/A'));
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `provider_cdrs`
+--
+DROP TABLE IF EXISTS `provider_cdrs`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `provider_cdrs` AS select `a`.`accountid` AS `accountid`,`a`.`cc` AS `cc`,`a`.`number` AS `number`,`b`.`id` AS `cdr_id`,`b`.`uniqueid` AS `uniqueid`,`b`.`callerid` AS `callerid`,`b`.`callednum` AS `callednum`,`b`.`billseconds` AS `billseconds`,`b`.`trunk` AS `trunk`,`b`.`disposition` AS `disposition`,`b`.`callstart` AS `callstart`,`b`.`debit` AS `debit`,`b`.`credit` AS `credit`,`b`.`status` AS `status`,`b`.`notes` AS `notes`,`b`.`provider` AS `provider`,`b`.`cost` AS `cost`,`b`.`pricelist` AS `pricelist`,`b`.`pattern` AS `pattern`,`b`.`calltype` AS `calltype` from (`accounts` `a` join `cdrs` `b`) where ((`a`.`number` = `b`.`cardnum`) and (`a`.`type` = 3) and (`b`.`uniqueid` <> '') and (`b`.`uniqueid` <> '0') and (`b`.`uniqueid` <> '1') and (`b`.`uniqueid` <> 'N/A'));
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `reseller_cdrs`
+--
+DROP TABLE IF EXISTS `reseller_cdrs`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reseller_cdrs` AS select `a`.`accountid` AS `accountid`,`a`.`cc` AS `cc`,`a`.`number` AS `number`,`a`.`reseller` AS `reseller`,`b`.`id` AS `cdr_id`,`b`.`uniqueid` AS `uniqueid`,`b`.`callerid` AS `callerid`,`b`.`callednum` AS `callednum`,`b`.`billseconds` AS `billseconds`,`b`.`trunk` AS `trunk`,`b`.`disposition` AS `disposition`,`b`.`callstart` AS `callstart`,`b`.`debit` AS `debit`,`b`.`credit` AS `credit`,`b`.`status` AS `status`,replace(substr(substring_index(`b`.`notes`,'|',2),(length(substring_index(`b`.`notes`,'|',1)) + 1)),'|','') AS `notes`,`b`.`provider` AS `provider`,`b`.`cost` AS `cost`,`b`.`pricelist` AS `pricelist`,`b`.`pattern` AS `pattern`,`b`.`calltype` AS `calltype` from (`accounts` `a` join `cdrs` `b`) where ((`a`.`number` = `b`.`cardnum`) and (`a`.`type` = 1) and (`b`.`uniqueid` <> '0') and (`b`.`uniqueid` <> '1') and (`b`.`uniqueid` <> '') and (`b`.`uniqueid` <> 'N/A'));

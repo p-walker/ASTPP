@@ -1,4 +1,4 @@
-<? extend('master.php') ?>
+<? extend('user_master.php') ?>
 
 	<? startblock('extra_head') ?>
 
@@ -22,24 +22,19 @@ $(document).ready(function() {
 	$("#search_bar").toggle(showOrHide);
 	
 $("#flex1").flexigrid({
-    url: "<?php echo base_url();?>callingcards/brands_cdrs_grid/",
+    url: "<?php echo base_url();?>userReports/myccReport_grid/",
     method: 'GET',
     dataType: 'json',
 	colModel : [
 <!--        {display: '<input type="checkbox" onclick="toggleChecked(this.checked)">', name: '', width: 20, align: 'center'},\
 -->
-		
-        {display: 'Date', name: 'province', width: 130, sortable: false, align: 'center'},
-        {display: 'CallerID', name: 'city', width: 100, sortable: false, align: 'center'},
-        {display: 'Dest', name: 'provider', width: 80, sortable: false, align: 'center'},
-	{display: 'Card Number', name: 'Number', width: 100, sortable: false, align: 'center'},
+	{display: 'Date', name: 'province', width: 130, sortable: false, align: 'center'},
+	{display: 'CallerID', name: 'city', width: 130, sortable: false, align: 'center'},
+	{display: 'Called Number', name: 'provider', width: 130, sortable: false, align: 'center'},
+	{display: 'Card Number', name: 'Number', width: 100, sortable: false, align: 'center'},        
         {display: 'BillSec', name: 'status', width: 70, sortable: false, align: 'center'},
-        {display: 'Disposition', name: 'calls', width: 120, sortable: false, align: 'center'},
-        {display: 'Debit', name: 'vm', width: 80, sortable: false, align: 'center'},
-//         {display: 'Credit', name: 'failed', width: 80, sortable: false, align: 'center'},
-        {display: 'Notes', name: 'na', width: 120, sortable: false, align: 'center'},
-        {display: 'Pricelist', name: 'minutes', width: 80, sortable: false, align: 'center'},
-        {display: 'Pattern', name: 'xfers', width: 100, sortable: false, align: 'center'},
+        {display: 'Disposition', name: 'calls', width: 130, sortable: false, align: 'center'},
+        {display: 'Debit', name: 'vm', width: 80, sortable: false, align: 'center'}
 		],
     buttons : [
 		{name: 'Refresh', bclass: 'reload', onpress : reload_button},
@@ -73,13 +68,13 @@ $("#flex1").flexigrid({
 
 
 $("#callingcard_cdrs_search").click(function(){
-	$.ajax({type:'POST', url: '<?=base_url()?>callingcards/brands_cdrs_search', data:$('#search_form6').serialize(), success: function(response) {
+	$.ajax({type:'POST', url: '<?=base_url()?>userReports/myccReport_search', data:$('#search_form6').serialize(), success: function(response) {
     $('#flex1').flexReload();
 }});
 	});
 	
 	$("#id_reset").click(function(){
-		$.ajax({url:'<?=base_url()?>callingcards/clearsearchfilter_brands_cdrs', success:function(){
+		$.ajax({url:'<?=base_url()?>userReports/clearsearchfilter_myccReports', success:function(){
 		$('#flex1').flexReload();	}
 		});
 	});
@@ -92,11 +87,11 @@ $("#show_search").click(function(){
 
 function add_button()
 {
-    window.location = '/callingcards/add/';
+    window.location = '/userReports/add/';
 }
 function clear_filter()
 {
-	window.location = '<?php echo base_url();?>callingcards/clearsearchfilter_brands_cdrs/';
+	window.location = '<?php echo base_url();?>userReports/clearsearchfilter_myccReports/';
 }
 
 function delete_button()
@@ -130,7 +125,7 @@ function reload_button()
 		$("#calling_card_cdr_to_date").datetimepicker({ dateFormat: 'yy-mm-dd' });			
 	  });
 	  </script> 
-          <form action="<?=base_url()?>callingcards/brands_cdrs_search" id="search_form6" name="form6" method="POST" enctype="multipart/form-data" style="display:block">
+          <form action="<?=base_url()?>userReports/clearsearchfilter_myccReports" id="search_form6" name="form6" method="POST" enctype="multipart/form-data" style="display:block">
             <input type="hidden" name="ajax_search" value="1">
          <input type="hidden" name="advance_search" value="1">
          <ul style="list-style:none;">
@@ -231,45 +226,7 @@ function reload_button()
                           </select>                          
                      </span>
                      </div>
-                     
-                    <!-- <div class="float-left" style="width:30%">
-                 	 <span>
-                     <label>Credit:</label>
-               		 <input size="20" class="text field" name="credit"> &nbsp;
-                     <select name="credit_operator" class="field select" style="width:132px;">
-                     <option value="1">is equal to</option>
-                     <option value="2">is not equal to</option>
-                     <option value="3">greater than</option>
-                     <option value="4">less than</option>
-                     <option value="5">greather or equal than</option>
-                     <option value="6">less or equal than</option>
-                     </select>
-                     </span>
-                     </div>-->
                 </li>
-            
-           		<li>
-                	 <div class="float-left" style="width:30%">
-                 	 <span>
-                      <label >Pricelist :</label>
-              <?=form_select_default('pricelist',@$pricelist,"",array("class"=>"select field", "style"=>"width:307px;"), '--Select PriceList--');?>	
-                     </span>
-                     </div>	
-                      <div class="float-left" style="width:30%">
-                 	 <span>
-                       <label >Pattern:</label>
-            		   <input size="20" class="text field" name="pattern"> &nbsp;
-                       <select name="pattern_operator" class="field select">
-                       <option value="1">contains</option>
-                       <option value="2">doesn't contain</option>
-                       <option value="3">is equal to</option>
-                       <option value="4">is not equal to</option>
-                       </select>	
-                     </span>
-                     </div>	
-                </li>
-            
-               
              
           </fieldset>
          </ul>
@@ -292,7 +249,7 @@ function reload_button()
     </form>
     </div>
 </div>
-<div style="float:right;"><strong><a href="/callingcards/export_cc_cdr_xls">Export XLS <img src="/images/file_tree/xls.png" alt='XLS'/></a> | <a href="/callingcards/export_cc_cdr_pdf">Export PDF <img src="/images/file_tree/pdf.png" alt='PDF'/></a></strong></div>
+<div style="float:right;"><strong><a href="/userReports/export_cc_cdr_xls">Export XLS <img src="/images/file_tree/xls.png" alt='XLS'/></a> | <a href="/userReports/export_cc_cdr_pdf">Export PDF <img src="/images/file_tree/pdf.png" alt='PDF'/></a></strong></div>
 <br/><br/>
 <?php 
 	//echo $form;

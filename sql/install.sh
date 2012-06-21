@@ -1,19 +1,22 @@
 #!/bin/bash
 clear
 echo ""
-echo "-----------------------------"
 echo "Install ASTPP Database"
-echo "Warning : Appropriate database should exist in database."     
-echo "-----------------------------"
+echo "****************** WARNING WARNING  WARNING *****************"
+echo " "
+echo "      	   Please use MySQL Root Credencial          	  "     
+echo "     Appropriate database should exist in database.        "     
+echo ""
+echo "*************************************************************"
 echo ""
 
-echo "Enter ASTPP Hostname : "
+echo "Enter MySQL Hostname : "
 read astpp_hostname
 
-echo "Enter ASTPP UserName : "
+echo "Enter MySQL root UserName : "
 read astpp_username
 
-echo "Enter ASTPP Password : "
+echo "Enter MySQL Password : "
 read astpp_password
 
 echo "Enter ASTPP Database Name : "
@@ -24,7 +27,7 @@ mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $
 echo "";
 read -n 1 -p "Press 0 For Freeswitch & Press 1 For Asterisk [Default:0]: ";
 echo 
-if [ $REPLY = "1" ]; then
+if [ "$REPLY" = "1" ]; then
       
     mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname -e "
     update system set value=0 where name='softswitch';
@@ -34,7 +37,7 @@ if [ $REPLY = "1" ]; then
 #   AsteriskCDRDB installation  
     REPLY="y";
     read -n 1 -p "Do You Want To Install AsteriskCDR? (y/n) [Default:y] : ";
-    if [ $REPLY = "n" ]; then
+    if [ "$REPLY" = "n" ]; then
 	echo "";
     else
 	echo "";
@@ -42,7 +45,7 @@ if [ $REPLY = "1" ]; then
 	read -n 1 -p "Do You Want To Use Same Database Credencial As ASTPP ? (y/n) [Default:y] : ";
 	echo 
 	echo "";
-	if [ $REPLY = "n" ]; then
+	if [ "$REPLY" = "n" ]; then
 	    
 	    echo "Enter Asterisk CDR Hostname : "
 	    read asteriskcdrdb_hostname
@@ -76,13 +79,13 @@ if [ $REPLY = "1" ]; then
   read -n 1 -p "Do You Want To Install Realtime Asterisk Database? (y/n) [Default:y] : ";
   echo 
   
-    if [ $REPLY = "n" ]; then
+    if [ "$REPLY" = "n" ]; then
 	echo "";
     else
-	REPLY="y";
+# 	REPLY="y";
 	read -n 1 -p "Do You Want To Use Same Database Credencial As ASTPP ? (y/n) [Default:y] : ";
 	echo 
-	if [ $REPLY = "n" ]; then
+	if [ "$REPLY" = "n" ]; then
 	  
 	    echo "Enter Asterisk Realtime Hostname : "
 	    read realtime_hostname
@@ -114,18 +117,18 @@ else
     mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname -e "update system set value=1 where name='softswitch';";
 #   Freeswitch CDR installation  
     echo "";
-    REPLY="y";  
+#     REPLY="y";  
     read -n 1 -p "Do You Want To Install FreeswitchCDR? (y/n) [Default:y] : ";
     echo 
-    if [ $REPLY = "n" ]; then
+    if [ "$REPLY" = "n" ]; then
 	echo "";
     else
-	REPLY="y";
+# 	REPLY="y";
 	echo "";  
 	read -n 1 -p "Do You Want To Use Same Database Credencial As ASTPP ? (y/n) [Default:y] : ";
 	echo 
 	echo "";
-	if [ $REPLY = "n" ]; then
+	if [ "$REPLY" = "n" ]; then
 	  
 	    echo "Enter Freeswitch CDR Hostname : "
 	    read fscdrdb_hostname
@@ -155,18 +158,18 @@ else
     fi
 #   Freeswitch database installation  
   echo "";
-  REPLY="y";
+#   REPLY="y";
   read -n 1 -p "Do You Want To Install Freeswitch Database? (y/n) [Default:y] : ";
   echo   
-    if [ $REPLY = "n" ]; then
+    if [ "$REPLY" = "n" ]; then
 	echo "";
     else
 	echo "";
-	REPLY="y";
+# 	REPLY="y";
 	read -n 1 -p "Do You Want To Use Same Database Credencial As ASTPP ? (y/n) [Default:y] : ";
 	echo 
 	echo "";
-	if [ $REPLY = "n" ]; then
+	if [ "$REPLY" = "n" ]; then
 	  
 	    echo "Enter Freeswitch Hostname : "
 	    read fs_hostname

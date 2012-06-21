@@ -1,4 +1,4 @@
-<? extend('master.php') ?>
+<? extend('user_master.php') ?>
 
 	<? startblock('extra_head') ?>
 
@@ -22,24 +22,19 @@ $(document).ready(function() {
 	$("#search_bar").toggle(showOrHide);
 	
 $("#flex1").flexigrid({
-    url: "<?php echo base_url();?>callingcards/brands_cdrs_grid/",
+    url: "<?php echo base_url();?>userReports/myReport_grid/",
     method: 'GET',
     dataType: 'json',
 	colModel : [
 <!--        {display: '<input type="checkbox" onclick="toggleChecked(this.checked)">', name: '', width: 20, align: 'center'},\
 -->
-		
-        {display: 'Date', name: 'province', width: 130, sortable: false, align: 'center'},
-        {display: 'CallerID', name: 'city', width: 100, sortable: false, align: 'center'},
-        {display: 'Dest', name: 'provider', width: 80, sortable: false, align: 'center'},
-	{display: 'Card Number', name: 'Number', width: 100, sortable: false, align: 'center'},
+	{display: 'Date', name: 'Date', width:140, sortable: false, align: 'center'},
+        {display: 'CallerID', name: 'country', width: 130, sortable: false, align: 'center'},
+        {display: 'Called Number', name: 'province', width: 130, sortable: false, align: 'center'},
         {display: 'BillSec', name: 'status', width: 70, sortable: false, align: 'center'},
-        {display: 'Disposition', name: 'calls', width: 120, sortable: false, align: 'center'},
-        {display: 'Debit', name: 'vm', width: 80, sortable: false, align: 'center'},
-//         {display: 'Credit', name: 'failed', width: 80, sortable: false, align: 'center'},
-        {display: 'Notes', name: 'na', width: 120, sortable: false, align: 'center'},
-        {display: 'Pricelist', name: 'minutes', width: 80, sortable: false, align: 'center'},
-        {display: 'Pattern', name: 'xfers', width: 100, sortable: false, align: 'center'},
+        {display: 'Disposition', name: 'calls', width: 150, sortable: false, align: 'center'},
+        {display: 'Debit', name: 'vm', width: 90, sortable: false, align: 'center'},        
+	{display: 'Call Type', name: 'na', width: 100, sortable: false, align: 'center'},
 		],
     buttons : [
 		{name: 'Refresh', bclass: 'reload', onpress : reload_button},
@@ -72,14 +67,14 @@ $("#flex1").flexigrid({
 });
 
 
-$("#callingcard_cdrs_search").click(function(){
-	$.ajax({type:'POST', url: '<?=base_url()?>callingcards/brands_cdrs_search', data:$('#search_form6').serialize(), success: function(response) {
+$("#reseller_cdrs_search").click(function(){
+	$.ajax({type:'POST', url: '<?=base_url()?>userReports/myReport_search', data:$('#form9').serialize(), success: function(response) {
     $('#flex1').flexReload();
 }});
 	});
 	
 	$("#id_reset").click(function(){
-		$.ajax({url:'<?=base_url()?>callingcards/clearsearchfilter_brands_cdrs', success:function(){
+		$.ajax({url:'<?=base_url()?>userReports/clearsearchfilter_myReports', success:function(){
 		$('#flex1').flexReload();	}
 		});
 	});
@@ -96,7 +91,7 @@ function add_button()
 }
 function clear_filter()
 {
-	window.location = '<?php echo base_url();?>callingcards/clearsearchfilter_brands_cdrs/';
+	window.location = '<?php echo base_url();?>userReports/clearsearchfilter_myReports/';
 }
 
 function delete_button()
@@ -126,48 +121,33 @@ function reload_button()
       
               <script>
 	  $(document).ready(function() {
-		$("#calling_card_cdr_from_date").datetimepicker({ dateFormat: 'yy-mm-dd' });		
-		$("#calling_card_cdr_to_date").datetimepicker({ dateFormat: 'yy-mm-dd' });			
+		$("#reseller_cdr_from_date").datetimepicker({ dateFormat: 'yy-mm-dd' });		
+		$("#reseller_cdr_to_date").datetimepicker({ dateFormat: 'yy-mm-dd' });			
 	  });
 	  </script> 
-          <form action="<?=base_url()?>callingcards/brands_cdrs_search" id="search_form6" name="form6" method="POST" enctype="multipart/form-data" style="display:block">
+          <form action="<?=base_url()?>userReports/myReport_search" id="form9" name="form9" method="POST" enctype="multipart/form-data" style="display:block">
             <input type="hidden" name="ajax_search" value="1">
          <input type="hidden" name="advance_search" value="1">
          <ul style="list-style:none;">
           <fieldset  >
-            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Search Calling Card CDR </span></legend>
+            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Search My Call Report </span></legend>
             	<li>
-                	 <div class="float-left" style="width:30%">
-                 	 <span>
-                     	 <label >Card Number:</label>
-           				 <input size="20" class="text field" name="card_number"> &nbsp;
-                         <select name="card_number_operator">
-                         <option value="1">contains</option>
-                         <option value="2">doesn't contain</option>
-                         <option value="3">is equal to</option>
-                         <option value="4">is not equal to</option>
-                         </select>
-                     </span>
-                     </div>
                      
                       <div class="float-left" style="width:30%">
                  	 <span>
                      	   <label> From date & Time :</label>
-           				   <input size="20" class="text field" name="start_date" id="calling_card_cdr_from_date"> &nbsp;<img src="<?=base_url()?>images/calendar.png" border="0"> 
+           				   <input size="20" class="text field" name="start_date" id="reseller_cdr_from_date"> &nbsp;<img src="<?=base_url()?>images/calendar.png" border="0"> 
                      </span>
                      </div>
                      
                       <div class="float-left" style="width:30%">
                  	 <span>
                      	   <label >To date & Time :</label>
-            				<input size="20" class="text field" name="end_date" id="calling_card_cdr_to_date"> &nbsp;<img src="<?=base_url()?>images/calendar.png" border="0">        
+            				<input size="20" class="text field" name="end_date" id="reseller_cdr_to_date"> &nbsp;<img src="<?=base_url()?>images/calendar.png" border="0">        
                      </span>
                      </div>
                      
-                     
-                </li>
-                <li>
-                	 <div class="float-left" style="width:30%">
+                      <div class="float-left" style="width:30%">
                  	 <span>
                       <label >Caller ID:</label>
             		  <input size="20" class="text field" name="caller_id"> &nbsp;
@@ -180,9 +160,13 @@ function reload_button()
                      </span>
                      </div>
                      
+                     
+                </li>
+                <li>
+
                       <div class="float-left" style="width:30%">
                  	 <span>
-                       <label >Dest:</label>
+                       <label >Called Number:</label>
            			   <input size="20" class="text field" name="dest"  > &nbsp;
                        <select name="dest_operator" class="field select">
                        <option value="1">contains</option>
@@ -207,17 +191,15 @@ function reload_button()
                            </select>
                      </span>
                      </div>          
+                     <div class="float-left" style="width:30%">
+                 	 <span>
+                     	 <label>Disposition :</label>
+                  <?=form_disposition('disposition','',array("class"=>"select field" , "style"=>"width:307px;"))?>
+                     </span>
                      
                 </li>
                 <li>
-                	 <div class="float-left" style="width:30%">
-                 	 <span>
-                     	 <label>Disposition :</label>
-                  <?=form_disposition('disposition','NORMAL_CLEARING',array("class"=>"select field" , "style"=>"width:307px;"))?>
-                     </span>
-                     </div>
-                     
-                     <div class="float-left" style="width:30%">
+                	<div class="float-left" style="width:30%">
                  	 <span>
                      	  <label>Debit:</label>
                			  <input size="20" class="text field" name="debit"> &nbsp;
@@ -232,41 +214,17 @@ function reload_button()
                      </span>
                      </div>
                      
-                    <!-- <div class="float-left" style="width:30%">
-                 	 <span>
-                     <label>Credit:</label>
-               		 <input size="20" class="text field" name="credit"> &nbsp;
-                     <select name="credit_operator" class="field select" style="width:132px;">
-                     <option value="1">is equal to</option>
-                     <option value="2">is not equal to</option>
-                     <option value="3">greater than</option>
-                     <option value="4">less than</option>
-                     <option value="5">greather or equal than</option>
-                     <option value="6">less or equal than</option>
-                     </select>
-                     </span>
-                     </div>-->
-                </li>
-            
-           		<li>
-                	 <div class="float-left" style="width:30%">
-                 	 <span>
-                      <label >Pricelist :</label>
-              <?=form_select_default('pricelist',@$pricelist,"",array("class"=>"select field", "style"=>"width:307px;"), '--Select PriceList--');?>	
-                     </span>
-                     </div>	
-                      <div class="float-left" style="width:30%">
-                 	 <span>
-                       <label >Pattern:</label>
-            		   <input size="20" class="text field" name="pattern"> &nbsp;
-                       <select name="pattern_operator" class="field select">
-                       <option value="1">contains</option>
-                       <option value="2">doesn't contain</option>
-                       <option value="3">is equal to</option>
-                       <option value="4">is not equal to</option>
+                     <div class="float-left" style="width:30%">
+			<span>
+                       <label>Call Type:</label>            		   
+                       <select name="calltype" class="field select">
+                       <option value="">--Select Call Type--</option>
+                       <option value="STANDARD">STANDARD</option>
+                       <option value="DID">DID</option>                       
                        </select>	
                      </span>
-                     </div>	
+                     </div>
+                     
                 </li>
             
                
@@ -276,7 +234,7 @@ function reload_button()
          
           <br />
            <input type="button" id="id_reset" class="ui-state-default float-right ui-corner-all ui-button" name="reset" value="Clear Search Filter">&nbsp; 
-        <input type="button" class="ui-state-default float-right ui-corner-all ui-button" name="action" value="Search" id="callingcard_cdrs_search" style="margin-right:22px;" />
+        <input type="button" class="ui-state-default float-right ui-corner-all ui-button" name="action" value="Search" id="reseller_cdrs_search" style="margin-right:22px;" />
         <br><br>
         
         </form>    
@@ -285,14 +243,14 @@ function reload_button()
             </div>
         </div>
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
-    <div class="portlet-header ui-widget-header">Calling Card CDRs<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+    <div class="portlet-header ui-widget-header">My Call Detail Report<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
     <div class="portlet-content">
     <form method="POST" action="del/0/" enctype="multipart/form-data" id="ListForm">    
     <table id="flex1" align="left" style="display:none;"></table>
     </form>
     </div>
 </div>
-<div style="float:right;"><strong><a href="/callingcards/export_cc_cdr_xls">Export XLS <img src="/images/file_tree/xls.png" alt='XLS'/></a> | <a href="/callingcards/export_cc_cdr_pdf">Export PDF <img src="/images/file_tree/pdf.png" alt='PDF'/></a></strong></div>
+<div style="float:right;"><strong><a href="/userReports/export_cdr_user_xls">Export XLS <img src="/images/file_tree/xls.png" alt='XLS'/></a> | <a href="/userReports/export_cdr_user_pdf">Export PDF <img src="/images/file_tree/pdf.png" alt='PDF'/></a></strong></div>
 <br/><br/>
 <?php 
 	//echo $form;

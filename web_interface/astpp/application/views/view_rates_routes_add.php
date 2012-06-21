@@ -19,7 +19,7 @@
             <legend><span style="font-size:14px; font-weight:bold; color:#000;">Routes Information</span></legend>
         <li>
        	<label class="desc">Pattern:</label>
-        <input class="text field medium" value="<?=@$route['pattern']?>" type="text" name="pattern"  size="20" />
+        <input class="text field medium" value="<?=@$route['pattern']?>" type="text" name="pattern"  size="20" /> <b>(Example : ^44.*)</b>
         </li>
         <li>
         <label class="desc">Pricelist(s):</label>

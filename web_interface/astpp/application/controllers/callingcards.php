@@ -425,15 +425,13 @@ class Callingcards extends CI_Controller
 			foreach ($query->result_array() as $row)
 			{
 				$json_data['rows'][] = array('cell'=>array(
-					$row['cardnumber'],
-					$row['uniqueid'],
 					$row['callstart'],
 					$row['clid'],
 					$row['destination'],
+					$row['cardnumber'],
 					$row['seconds'],
 					$row['disposition'],
 					$this->common_model->calculate_currency($row['debit']),
-					$this->common_model->calculate_currency($row['credit']),
 					$row['notes'],
 					$row['pricelist'],
 					$row['pattern']
@@ -819,7 +817,81 @@ class Callingcards extends CI_Controller
 		redirect(base_url().$redirect);		
 	}
 	
+	
+	function export_cc_cdr_xls()
+	{
+	    $query = $this->cc_model->getcdrs('','',false);
+	    $cc_array = array();    	    
+	    $cc_array[] = array("Date","CallerID","Called Number","Card Number","Bill Seconds","Disposition","Debit","Notes","Pricelist","Pattern");
+	   
+	    if($query->num_rows() > 0)
+	    {		
+		foreach ($query->result_array() as $row)
+		{
+		      $cc_array[] = array(
+			  $row['callstart'],
+			  $row['clid'],
+			  $row['destination'],
+			  $row['cardnumber'],
+			  $row['seconds'],
+			  $row['disposition'],
+			  $this->common_model->calculate_currency($row['debit']),
+			  $row['notes'],
+			  $row['pricelist'],
+			  $row['pattern']
+		      );
+		}
+	    }
+	    $this->load->helper('csv');
+	    array_to_csv($cc_array,'CallingCard_CDR_'.date("Y-m-d").'.xls');
+	}
+	
+	function export_cc_cdr_pdf()
+	{
+	    $query = $this->cc_model->getcdrs('','',false);
+	    $cc_array = array();    
+	    $this->load->library('fpdf');
+	    $this->load->library('pdf');
+	    $this->fpdf = new PDF('P','pt');
+	    $this->fpdf->initialize('P','mm','A4');
+	    	    
+	    $this->fpdf->tablewidths = array(25, 25, 21, 18, 10, 30,16, 20, 14, 13);
+	    $cc_array[] = array("Date","CallerID","Called Number","Card Number","Bill Seconds","Disposition","Debit","Notes","Pricelist","Pattern");
+	    if($query->num_rows() > 0)
+	    {				
+		
+		foreach ($query->result_array() as $row)
+		{
+		      $cc_array[] = array(
+			  $row['callstart'],
+			  $row['clid'],
+			  $row['destination'],
+			  $row['cardnumber'],
+			  $row['seconds'],
+			  $row['disposition'],
+			  $this->common_model->calculate_currency($row['debit']),
+			  $row['notes'],
+			  $row['pricelist'],
+			  $row['pattern']
+		      );
+		}
+	    }
+	    
+	    $this->fpdf->AliasNbPages();
+	    $this->fpdf->AddPage();    
+	    
+	    $this->fpdf->SetFont('Arial', '', 15);
+	    $this->fpdf->SetXY(60, 5);
+	    $this->fpdf->Cell(100, 10, "CallingCard CDR Report ".date('Y-m-d'));
+	    	    
+	    $this->fpdf->SetY(20);
+	    $this->fpdf->SetFont('Arial', '', 7);
+	    $this->fpdf->SetFillColor(255, 255, 255);
+	    $this->fpdf->lMargin=2;
+	    
+	    $dimensions = $this->fpdf->export_pdf($cc_array, "5");
+	    $this->fpdf->Output('CallingCard_CDR_'.date("Y-m-d").'.pdf',"D");
+	}
+	
 }
-
-
 ?>

@@ -351,7 +351,7 @@
 					<a href="<?=base_url()?>astpp/dashboard" class="logo" title="<?=$app_name?>" ><?=$app_name?></a>
 					<?php if($logged_in==TRUE):?>
 					<div class="welcome">
-						<span class="note" style="color: black;">Welcome, <a href="#" title="Welcome, <?=$logged_user?>"><?=$logged_user?><? //echo $this->session->userdata('logintype').$this->session->userdata('mode_cur');?></a></span>
+						<span class="note" style="color: black;">Welcome <a href="#" title="Welcome  <?=$logged_user?>"><?=ucfirst($logged_user)?><? //echo $this->session->userdata('logintype').$this->session->userdata('mode_cur');?></a></span>
 						
 						<? if ($this->session->userdata('logintype') == 4){?>
 						<? if ($this->session->userdata('mode_cur') == 'admin'){?>
@@ -518,21 +518,33 @@
     </li>
  
      <li>
-    <a href="#" class="drop_menu">Statistics</a>
+    <a href="#" class="drop_menu">Reports</a>
      <div class="dropdown_3columns">
-         	  <div class="col_1">            
-                <h3>Admin Reports</h3>
+	      
+	      <div class="col_1">            
+                <h3>Call Detail Reports</h3>
                 <ul>
-                  <li><a href="<?php echo base_url();?>adminReports/resellerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>
-                        <li><a href="<?php echo base_url();?>adminReports/providerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ProviderReport.png" border="0" width="16" height="16" />&nbsp;&nbsp;Provider Report</a></li>
+                  <li><a href="<?php echo base_url();?>cdrReports/customerReport/"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" height="16" />&nbsp;&nbsp;Customer Report</a></li>
+                  <li><a href="<?php echo base_url();?>cdrReports/resellerReport/"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>      
+                  <li><a href="<?php echo base_url();?>cdrReports/providerReport/"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" height="16" />&nbsp;&nbsp;Provider Report</a></li>      
                 </ul>
               </div>  
+	      
+	      
               <div class="col_1">            
                 <h3>Switch Reports</h3>
                 <ul>
                  <li><a href="<?php echo base_url();?>statistics/listerrors/"><img src="<?=base_url()?>menu_icons/Statistic/ListErrors.png" border="0" width="16" height="16" />&nbsp;&nbsp;List Errors</a></li>
                         <li><a href="<?php echo base_url();?>statistics/trunkstats/"><img src="<?=base_url()?>menu_icons/Statistic/TrunkStats.png" border="0" width="16" height="16" />&nbsp;&nbsp;Trunk Stats</a></li>
                    	  	<li><a href="<?php echo base_url();?>statistics/viewfscdrs/"><img src="<?=base_url()?>menu_icons/Statistic/ViewFreeSwitch(TM)CDRs.png" border="0" width="16" height="16" />&nbsp;&nbsp;View FreeSwitch CDRs</a></li>
+                </ul>
+              </div>  
+              
+              <div class="col_1">            
+                <h3>Summary Reports</h3>
+                <ul>
+                  <li><a href="<?php echo base_url();?>adminReports/resellerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>
+                        <li><a href="<?php echo base_url();?>adminReports/providerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Provider Report</a></li>
                 </ul>
               </div>  
               
@@ -646,6 +658,7 @@
 								 <ul class="simple">
 										<li><a href="<?php echo base_url();?>callingcards/cclist/"><img src="<?=base_url()?>menu_icons/Modules/CallingCards/ListCards.png" border="0" width="16" height="16" />&nbsp;&nbsp;List Cards</a></li>
 										<li><a href="<?php echo base_url();?>callingcards/brands/"><img src="<?=base_url()?>menu_icons/Modules/CallingCards/CCBand.png" border="0" width="16" height="16" />&nbsp;&nbsp;CC Brands</a></li>
+										<li><a href="<?php echo base_url();?>callingcards/cdrs/"><img src="<?=base_url()?>menu_icons/Modules/CallingCards/CallingCardCDR's.png" border="0" width="16" height="16" />&nbsp;&nbsp;Callingcard CDRs</a></li> 
 															  
 									</ul>  
 								
@@ -697,20 +710,37 @@
 					</li>
 				 
 					 <li>
-					<a href="#" class="drop_menu">Statistics</a>
-					 <div class="dropdown_2columns">
-							  <div class="col_1">            
-								<h3>Reseller Reports</h3>
-								<ul>
-								<li><a href="<?php echo base_url();?>callshops/boothReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;CallShop Report</a></li>
-								  <li><a href="<?php echo base_url();?>adminReports/resellerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>
-								  <li><a href="<?php echo base_url();?>adminReports/userReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ProviderReport.png" border="0" width="16" height="16" />&nbsp;&nbsp;User Report</a></li>
-								</ul>
+					<a href="#" class="drop_menu">Reports & Stats</a>
+					 <div class="dropdown_3columns">
+							   <div class="col_1">            
+								<h3>Call Detail Reports</h3>
+								    <ul>
+								      <!--<li><a href="<?php echo base_url();?>cdrReports/myReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" 	height="16" />&nbsp;&nbsp;My Report</a></li>  -->
+								      <li><a href="<?php echo base_url();?>cdrReports/customerReport/"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" height="16" />&nbsp;&nbsp;Customer Report</a></li>
+								      <li><a href="<?php echo base_url();?>cdrReports/resellerReport/"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>      
+								          
+								    </ul>
+								
 							  </div>  
 								
+							<div class="col_1">            
+								<h3>Summary Reports</h3>
+								<ul>
+								<li><a href="<?php echo base_url();?>adminReports/userReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Customer Report</a></li>
+								<li><a href="<?php echo base_url();?>adminReports/resellerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>
+								<li><a href="<?php echo base_url();?>callshops/boothReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;CallShop Report</a></li>
+								</ul>
+							   </div>	
 							  
 					  </div>        
-					
+					  <!--<div class="col_1">            
+						<h3>Call Detail Reports</h3>
+						<ul>
+						  <li><a href="<?php echo base_url();?>cdrReports/customerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Customer Report</a></li>
+						  <li><a href="<?php echo base_url();?>cdrReports/resellerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Reseller Report</a></li>      
+						  <li><a href="<?php echo base_url();?>cdrReports/providerReport/"><img src="<?=base_url()?>menu_icons/AdminReports/ResellerReports.png" border="0" width="16" height="16" />&nbsp;&nbsp;Provider Report</a></li>      
+						</ul>
+					      </div>  -->
 					</li>
 					<li>
 					<a href="#" class="drop_menu">Systems</a>

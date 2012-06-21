@@ -20,8 +20,11 @@ if( !function_exists( 'validate_access' ) )
 				elseif($controller=="userdid") {
 					$user_pages = array('index', 'manage', 'manage_json', 'import');
 				}
-                               elseif($controller=="accounts"){
+				elseif($controller=="accounts"){
 					$user_pages = array('download_invoice','view_invoice');
+                                }
+                                elseif($controller=="userreports"){
+					$user_pages = array('index','myReport','myReport_grid','myReport_search','clearsearchfilter_myReports','export_cdr_user_xls','export_cdr_user_pdf','myccReport','myccReport_grid','myccReport_search','clearsearchfilter_myccReports','export_cc_cdr_xls','export_cc_cdr_pdf');
                                 }
 				else{
 					$user_pages = array();
@@ -36,7 +39,7 @@ if( !function_exists( 'validate_access' ) )
 					$reseller_pages = array('periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'clearsearchfilter','pricelists', 'pricelists_grid');
 				}
 				elseif($controller=="callingcards"){
-					$reseller_pages = array('add', 'brands', 'brands_add','brands_search', 'clearsearchfilter', 'brands_grid','cdrs','brands_cdrs_search', 'clearsearchfilter_brands_cdrs', 'brands_cdrs_grid', 'cclist', 'refill', 'remove', 'reset_card', 'update_status', 'view', 'cards_search', 'clearsearchfilter_cards', 'manage_json','add_callerid');
+					$reseller_pages = array('add', 'brands', 'brands_add','brands_search', 'clearsearchfilter', 'brands_grid','cdrs','brands_cdrs_search', 'clearsearchfilter_brands_cdrs', 'brands_cdrs_grid', 'cclist', 'refill', 'remove', 'reset_card', 'update_status', 'view', 'cards_search', 'clearsearchfilter_cards', 'manage_json','add_callerid','export_cc_cdr_pdf','export_cc_cdr_xls');
 				}
 				elseif($controller=="callshops"){
 					$reseller_pages = array('add','listAll', 'remove', 'boothReport', 'booths_list', 'manage_booths_json', 'remove_callshop_booth', 'booth_detail', 'booth_action', 'add_booth', 'booth_search', 'clearsearchfilter_booth', 'callshop_booth_list');
@@ -57,6 +60,9 @@ if( !function_exists( 'validate_access' ) )
                                 elseif($controller=="systems"){
 					$reseller_pages = array( 'template','template_grid','get_action_buttons_tem','get_action_button','search','clearsearchfilter');
 				}
+				elseif($controller=="cdrreports"){
+					$reseller_pages = array('index','customerReport','customerReport_grid','customerReport_search','clearsearchfilter_customerReports','export_cdr_customer_xls','export_cdr_customer_pdf','resellerReport','resellerReport_grid','resellerReport_search','clearsearchfilter_resellerReports','export_cdr_reseller_xls','export_cdr_reseller_pdf');
+                                }
 				else{
 					$reseller_pages = array();
 				}
@@ -74,7 +80,7 @@ if( !function_exists( 'validate_access' ) )
 					$admin_pages = array( 'configuration', 'update_brands_select', 'configuration_search', 'clearsearchfilter_configuration', 'configuration_grid', 'purgedeactivated', 'taxes', 'taxes_search','clearsearchfilter_taxes','taxes_grid','template','template_grid','get_action_buttons_tem','get_action_button','search','clearsearchfilter');
 				}
 				elseif($controller=="callingcards"){
-					$admin_pages = array('add', 'brands', 'brands_add','brands_search', 'clearsearchfilter', 'brands_grid','cdrs','brands_cdrs_search', 'clearsearchfilter_brands_cdrs', 'brands_cdrs_grid', 'cclist', 'refill', 'remove', 'reset_card', 'update_status', 'view', 'cards_search', 'clearsearchfilter_cards', 'manage_json','add_callerid');
+					$admin_pages = array('add', 'brands', 'brands_add','brands_search', 'clearsearchfilter', 'brands_grid','cdrs','brands_cdrs_search', 'clearsearchfilter_brands_cdrs', 'brands_cdrs_grid', 'cclist', 'refill', 'remove', 'reset_card', 'update_status', 'view', 'cards_search', 'clearsearchfilter_cards', 'manage_json','add_callerid','export_cc_cdr_pdf','export_cc_cdr_xls');
 				}	
 				elseif($controller=="did"){
 					$admin_pages = array('manage', 'build_dids_reseller', 'build_dids', 'did_search', 'clearsearchfilter_did', 'manage_json', 'import');
@@ -100,6 +106,9 @@ if( !function_exists( 'validate_access' ) )
                                 elseif($controller=="opensipsconfig"){
 					$admin_pages = array('opensipdevice','opensipdevice_grid','get_action_buttons','dispatcher','dispatcher_grid','get_action_button_dispatcher');
 				}
+				elseif($controller=="cdrreports"){
+					$admin_pages = array('index','customerReport','customerReport_grid','customerReport_search','clearsearchfilter_customerReports','export_cdr_customer_xls','export_cdr_customer_pdf','resellerReport','resellerReport_grid','resellerReport_search','clearsearchfilter_resellerReports','export_cdr_reseller_xls','export_cdr_reseller_pdf','providerReport','providerReport_grid','providerReport_search','clearsearchfilter_providerReports','export_cdr_provider_xls','export_cdr_provider_pdf');
+                                }
 				else{
 					$admin_pages = array();
 				}

@@ -7,7 +7,7 @@
     <script language="javascript" type="text/javascript">
 		var base_url = '<?php echo base_url();?>';
     </script>
-	<script type="text/javascript" src="<?php echo base_url();?>js/jquery-1.7.1.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
 	<!--<script type="text/javascript" src="<?php echo base_url();?>js/jquery-1.6.2.js"></script>-->
 	<script type="text/javascript" src="<?php echo base_url();?>js/ui/ui.core.js"></script>
     <script type="text/javascript" src="<?php echo base_url();?>js/ui/ui.datepicker.js"></script>
@@ -155,7 +155,7 @@
 					<a href="<?=base_url()?>user/dashboard" class="logo" title="<?=$app_name?>" ><?=$app_name?></a>
 					<?php if($logged_in==TRUE):?>
 					<div class="welcome">
-						<span class="note" style="color: black;">Welcome, <a href="#" title="Welcome, <?=$logged_user?>"><?=$logged_user?><? //echo $this->session->userdata('logintype').$this->session->userdata('mode_cur');?></a></span>
+						<span class="note" style="color: black;">Welcome <a href="#" title="Welcome  <?=$logged_user?>"><?=ucfirst($logged_user)?><? //echo $this->session->userdata('logintype').$this->session->userdata('mode_cur');?></a></span>
 						
 						<? if ($this->session->userdata('logintype') == 4){?>
 						<? if ($this->session->userdata('mode_cur') == 'admin'){?>
@@ -214,6 +214,7 @@
                         <ul class="simple">
                             <li><a href="<?php echo base_url();?>user/accountsdetail"><img src="<?=base_url()?>menu_icons/Accounts/ListAccounts.png" border="0" width="16" height="16" />&nbsp;&nbsp;Accounts Detail</a></li>
 			    <li><a href="<?php echo base_url();?>user/user_invoice_list"><img src="<?=base_url()?>menu_icons/Accounts/InvoiceList.png" border="0" width="16" height="16" />&nbsp;&nbsp;Invoice Detail</a></li>
+			    <li><a href="<?php echo base_url();?>userReports/myReport/"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" 	height="16" />&nbsp;&nbsp;My Account CDR</a></li>                           
                         </ul>                            
                     </div>                    
                     </div>                    
@@ -226,7 +227,8 @@
                     <h3>Calling Cards</h3>
                      <ul class="simple">
                             
-                            <li><a href="<?php echo base_url();?>user/cclist"><img src="<?=base_url()?>menu_icons/Modules/CallingCards/CallingCardCDR's.png" border="0" width="16" height="16" />&nbsp;&nbsp;Callingcard CDRs</a></li> 
+                            <li><a href="<?php echo base_url();?>user/cclist"><img src="<?=base_url()?>menu_icons/Modules/CallingCards/CallingCardCDR's.png" border="0" width="16" height="16" />&nbsp;&nbsp;My Callingcard</a></li> 
+                            <li><a href="<?php echo base_url();?>userReports/myccReport"><img src="<?=base_url()?>menu_icons/CDR/cdr.png" border="0" width="16" height="16" />&nbsp;&nbsp;My Callingcard CDR</a></li> 
                            
                         </ul>                      
                     </div>            
@@ -238,7 +240,7 @@
                     <div class="dropdown_2columns">                    
                     <div class="col_1">                   
                         <ul class="simple">
-                             <li><a href="<?php echo base_url();?>user/didslist"><img src="<?=base_url()?>menu_icons/DID's/ManageDIDs.png" border="0" width="16" height="16" />&nbsp;&nbsp;Manage   DID's</a></li>
+                             <li><a href="<?php echo base_url();?>user/didslist"><img src="<?=base_url()?>menu_icons/DID's/ManageDIDs.png" border="0" width="16" height="16" />&nbsp;&nbsp;Manage DID's</a></li>
                           
                         </ul>                         
                     </div>
@@ -256,18 +258,12 @@
                     </div>
                     </li>                   
                     
+                    
+                    </li>                    
                     </ul>
 
 				</div>
-				
-				
-<!-- 				
-				<div id="search-bar">
-					<form method="post" action="http://www.google.com/">
-						<input type="text" name="q" value="live search demo" />
-					</form>
-				</div>
- -->			
+ 
 				<?php endif;?>
 			</div>
 		</div>

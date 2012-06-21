@@ -7,7 +7,10 @@
 3. Install Freeswitch : 
       
     * Install Freeswitch pre-requisite packages using YUM
-      yum install expat-devel gnutls-devel libtiff-devel libX11-devel unixODBC-devel libssl-devel python-devel zlib-devel libzrtpcpp-devel alsa-lib-devel libogg-devel libvorbis-devel perl perl-libs gdbm-devel libdb-devel uuid-devel @development-tools gdbm-devel db4-devel libjpeg libjpeg-devel libtermcap libtermcap-devel ncurses ncurses-devel
+    
+      yum clean all
+      
+      yum install autoconf automake  expat-devel gnutls-devel libtiff-devel libX11-devel unixODBC-devel python-devel zlib-devel libzrtpcpp-devel alsa-lib-devel libogg-devel libvorbis-devel perl perl-libs gdbm-devel libdb-devel uuid-devel @development-tools gdbm-devel db4-devel libjpeg libjpeg-devel libtermcap libtermcap-devel ncurses ncurses-devel ntp screen sendmail sendmail-cf gcc-c++
     
     * Download latest freeswitch version 
       cd /usr/local/src       
@@ -24,6 +27,17 @@
     
     * Install Freeswitch with sound files
 	make all install cd-sounds-install cd-moh-install
+	
+    * Create symbolic links for Freeswitch executables
+	ln -s /usr/local/freeswitch/bin/freeswitch /usr/local/bin/freeswitch
+	ln -s /usr/local/freeswitch/bin/fs_cli /usr/local/bin/fs_cli
+	
+    * Configure Freeswitch Startup Script
+	cp <ASTPP SOURCE DIR>/freeswitch/init/freeswitch.init to /etc/init.d/freeswitch
+	
+	chmod 755 /etc/init.d/freeswitch
+	chkconfig --add freeswitch
+	chkconfig --level 345 freeswitch on
          
 4. ASTPP Install :
 
@@ -32,7 +46,8 @@
 	git clone https://github.com/ASTPP/ASTPP.git
     
     2. * Install ASTPP pre-requisite packages using YUM
-	yum install autoconf automake bzip2 cpio curl curl-devel fileutils gcc-c++ gettext-devel libtool make nmap openssl openssl-devel libxml2 libxml2-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel
+	      
+	yum install bzip2 cpio curl curl-devel fileutils gettext-devel libtool make nmap openssl openssl-devel libxml2 libxml2-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel
     
     3. Goto ASTPP Folder & Run Make Command
 	1. cd ASTPP
@@ -47,8 +62,7 @@
     4. Start Services
       1. Apache (/etc/init.d/httpd start)
       2. Mysql (/etc/init.d/mysqld start)
-      3. Freeswitch (/etc/init.d/freeswitch start) 
-	    Note : If you don't have freeswitch startup script then you can copy script from freeswitch/init/freeswitch.init to /etc/init.d/freeswitch.
+      3. Freeswitch (/etc/init.d/freeswitch start) 	    
       
     5. Setup MySQL For ASTPP
 	* Set Root Password 
@@ -202,16 +216,3 @@ ASTPP Forums :
 http://astpp.org/index.php/forum/index
 
 Refer astpp.org for more information. 
-
-
-================ Fixes =======================
-##Fix 1:
-If ExtUtils/Embed.pm not found error is coming then please install 
-force install ExtUtils::Embed using cpan
-  
-##Fix 2:
-If webportal is not opening then open /etc/httpd/conf/httpd.conf
-Do below change and restart apache
-Line : 338
-- AllowOverride None
-+ AllowOverride All

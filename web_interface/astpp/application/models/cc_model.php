@@ -211,7 +211,7 @@ class Cc_model extends CI_Model
 	}
 	
 	
-	function getcdrs($start, $limit)
+	function getcdrs($start, $limit,$flag=true)
 	{
 		if($this->session->userdata('advance_search')==1){
 			
@@ -268,16 +268,16 @@ class Cc_model extends CI_Model
 			if(!empty($brands_cdrs_search['dest'])) {
 				switch($dest_operator){
 					case "1":
-					$this->db->like('clid', $brands_cdrs_search['dest']); 
+					$this->db->like('destination', $brands_cdrs_search['dest']); 
 					break;
 					case "2":
-					$this->db->not_like('clid', $brands_cdrs_search['dest']);
+					$this->db->not_like('destination', $brands_cdrs_search['dest']);
 					break;
 					case "3":
-					$this->db->where('clid', $brands_cdrs_search['dest']);
+					$this->db->where('destination', $brands_cdrs_search['dest']);
 					break;
 					case "4":
-					$this->db->where('clid <>', $brands_cdrs_search['dest']);
+					$this->db->where('destination <>', $brands_cdrs_search['dest']);
 					break;
 				}
 			}
@@ -306,7 +306,8 @@ class Cc_model extends CI_Model
 				}
 			}	
 			
-			$this->db->where('disposition', $brands_cdrs_search['disposition']);
+			if($brands_cdrs_search['disposition']!='')
+			  $this->db->where('disposition', $brands_cdrs_search['disposition']);
 			
 			$debit_operator = $brands_cdrs_search['debit_operator'];
 			if(!empty($brands_cdrs_search['debit'])) {
@@ -332,30 +333,34 @@ class Cc_model extends CI_Model
 				}
 			}	
 			
-			$credit_operator = $brands_cdrs_search['credit_operator'];
-			if(!empty($brands_cdrs_search['credit'])) {
-				switch($credit_operator){
-					case "1":
-					$this->db->where('credit ', $brands_cdrs_search['credit']);
-					break;
-					case "2":
-					$this->db->where('credit <>', $brands_cdrs_search['credit']);					
-					break;
-					case "3":
-					$this->db->where('credit > ', $brands_cdrs_search['credit']); 					
-					break;
-					case "4":
-					$this->db->where('credit < ', $brands_cdrs_search['credit']); 	
-					break;
-					case "5":
-					$this->db->where('credit >= ', $brands_cdrs_search['credit']);
-					break;
-					case "6":
-					$this->db->where('credit <= ', $brands_cdrs_search['credit']);
-					break;
-				}
-			}	
-			$this->db->where('pricelist', $brands_cdrs_search['pricelist']);
+// 			$credit_operator = $brands_cdrs_search['credit_operator'];
+// 			if(!empty($brands_cdrs_search['credit'])) {
+// 				switch($credit_operator){
+// 					case "1":
+// 					$this->db->where('credit ', $brands_cdrs_search['credit']);
+// 					break;
+// 					case "2":
+// 					$this->db->where('credit <>', $brands_cdrs_search['credit']);					
+// 					break;
+// 					case "3":
+// 					$this->db->where('credit > ', $brands_cdrs_search['credit']); 					
+// 					break;
+// 					case "4":
+// 					$this->db->where('credit < ', $brands_cdrs_search['credit']); 	
+// 					break;
+// 					case "5":
+// 					$this->db->where('credit >= ', $brands_cdrs_search['credit']);
+// 					break;
+// 					case "6":
+// 					$this->db->where('credit <= ', $brands_cdrs_search['credit']);
+// 					break;
+// 				}
+// 			}	
+			
+			if($brands_cdrs_search['pricelist']!='')
+			{
+			  $this->db->where('pricelist', $brands_cdrs_search['pricelist']);
+			}
 			
 			$pattern_operator = $brands_cdrs_search['pattern_operator'];
 			
@@ -377,9 +382,15 @@ class Cc_model extends CI_Model
 			}		
 			
 		}
-		
-		$this->db->limit($limit,$start);
-		$this->db->from('callingcardcdrs');
+		if($this->session->userdata['logintype']=='2')
+		{
+		    $this->db->where('reseller', "");
+		}else{
+		    $this->db->where('reseller', $this->session->userdata['accountinfo']['number']);
+		}
+		if($flag)
+		  $this->db->limit($limit,$start);
+		$this->db->from('callingcard_cdrs');
 		$this->db->order_by("callstart desc"); 
 		$query = $this->db->get();	
 		//echo $this->db->last_query();		
@@ -443,16 +454,16 @@ class Cc_model extends CI_Model
 			if(!empty($brands_cdrs_search['dest'])) {
 				switch($dest_operator){
 					case "1":
-					$this->db->like('clid', $brands_cdrs_search['dest']); 
+					$this->db->like('destination', $brands_cdrs_search['dest']); 
 					break;
 					case "2":
-					$this->db->not_like('clid', $brands_cdrs_search['dest']);
+					$this->db->not_like('destination', $brands_cdrs_search['dest']);
 					break;
 					case "3":
-					$this->db->where('clid', $brands_cdrs_search['dest']);
+					$this->db->where('destination', $brands_cdrs_search['dest']);
 					break;
 					case "4":
-					$this->db->where('clid <>', $brands_cdrs_search['dest']);
+					$this->db->where('destination <>', $brands_cdrs_search['dest']);
 					break;
 				}
 			}
@@ -481,7 +492,8 @@ class Cc_model extends CI_Model
 				}
 			}	
 			
-			$this->db->where('disposition', $brands_cdrs_search['disposition']);
+			if($brands_cdrs_search['disposition']!='')
+			  $this->db->where('disposition', $brands_cdrs_search['disposition']);
 			
 			$debit_operator = $brands_cdrs_search['debit_operator'];
 			if(!empty($brands_cdrs_search['debit'])) {
@@ -507,30 +519,34 @@ class Cc_model extends CI_Model
 				}
 			}	
 			
-			$credit_operator = $brands_cdrs_search['credit_operator'];
-			if(!empty($brands_cdrs_search['credit'])) {
-				switch($credit_operator){
-					case "1":
-					$this->db->where('credit ', $brands_cdrs_search['credit']);
-					break;
-					case "2":
-					$this->db->where('credit <>', $brands_cdrs_search['credit']);					
-					break;
-					case "3":
-					$this->db->where('credit > ', $brands_cdrs_search['credit']); 					
-					break;
-					case "4":
-					$this->db->where('credit < ', $brands_cdrs_search['credit']); 	
-					break;
-					case "5":
-					$this->db->where('credit >= ', $brands_cdrs_search['credit']);
-					break;
-					case "6":
-					$this->db->where('credit <= ', $brands_cdrs_search['credit']);
-					break;
-				}
-			}	
-			$this->db->where('pricelist', $brands_cdrs_search['pricelist']);
+// 			$credit_operator = $brands_cdrs_search['credit_operator'];
+// 			if(!empty($brands_cdrs_search['credit'])) {
+// 				switch($credit_operator){
+// 					case "1":
+// 					$this->db->where('credit ', $brands_cdrs_search['credit']);
+// 					break;
+// 					case "2":
+// 					$this->db->where('credit <>', $brands_cdrs_search['credit']);					
+// 					break;
+// 					case "3":
+// 					$this->db->where('credit > ', $brands_cdrs_search['credit']); 					
+// 					break;
+// 					case "4":
+// 					$this->db->where('credit < ', $brands_cdrs_search['credit']); 	
+// 					break;
+// 					case "5":
+// 					$this->db->where('credit >= ', $brands_cdrs_search['credit']);
+// 					break;
+// 					case "6":
+// 					$this->db->where('credit <= ', $brands_cdrs_search['credit']);
+// 					break;
+// 				}
+// 			}
+			
+			if($brands_cdrs_search['pricelist']!='')
+			{
+			  $this->db->where('pricelist', $brands_cdrs_search['pricelist']);
+			}
 			
 			$pattern_operator = $brands_cdrs_search['pattern_operator'];
 			
@@ -553,8 +569,13 @@ class Cc_model extends CI_Model
 					
 			
 		}
-		
-		$this->db->from('callingcardcdrs');
+		if($this->session->userdata['logintype']=='2')
+		{
+		    $this->db->where('reseller', "");
+		}else{
+		    $this->db->where('reseller', $this->session->userdata['accountinfo']['number']);
+		}
+		$this->db->from('callingcard_cdrs');
 		$cnt = $this->db->count_all_results();
 		return $cnt;
 	}
