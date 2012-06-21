@@ -2306,7 +2306,7 @@ sub post_cdr() {
 	my (
 			$astpp_db,     $config, $uniqueid, $account, $clid,
 			$dest,         $disp,       $seconds,  $cost,    $callstart,
-			$postexternal, $trunk,      $notes,$pricelist,$pattern,$calltype
+			$postexternal, $trunk,      $notes,$pricelist,$pattern,$calltype,$provider
 	   ) = @_;
 
 # The cost is passed in 100ths of a penny.
@@ -2315,11 +2315,11 @@ sub post_cdr() {
 	$uniqueid = gettext("N/A") if ( !$uniqueid );
 	$pricelist = gettext("N/A") if ( !$pricelist );
 	$pattern = gettext("N/A") if ( !$pattern );
-# 	$calltype = gettext("STANDARD") if ( !$calltype );
+	$provider = gettext("N/A") if ( !$provider );
 	$status   = 0;
 	$tmp      =
 		"INSERT INTO cdrs(uniqueid,cardnum,callerid,callednum,trunk,disposition,billseconds,"
-		. "debit,callstart,status,notes,pricelist,pattern,calltype) VALUES ("
+		. "debit,callstart,status,notes,pricelist,pattern,calltype,provider) VALUES ("
 		. $astpp_db->quote($uniqueid) . ", "
 		. $astpp_db->quote($account) . ", "
 		. $astpp_db->quote($clid) . ", "
@@ -2333,7 +2333,8 @@ sub post_cdr() {
 		. $astpp_db->quote($notes) . ","
 		. $astpp_db->quote($pricelist) . ","
 		. $astpp_db->quote($pattern) . ","
-		. $astpp_db->quote($calltype) . ")";
+		. $astpp_db->quote($calltype) . ","
+		. $astpp_db->quote($provider) . ")";
 	print STDERR "$tmp\n";
 	$astpp_db->do($tmp);
 }
@@ -4163,7 +4164,7 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 					$cost,                   $cdrinfo->{calldate},
 					"",                      $cdrinfo->{trunk},
 					$notes,$numdata->{pricelist}, $numdata->{pattern},
-					$cdrinfo->{userfield}
+					$cdrinfo->{userfield}, $cdrinfo->{provider}
 					)
 				if $config->{posttoastpp} == 1;
 			&print_csv(
@@ -4400,7 +4401,7 @@ sub vendor_process_rating_fs() {  #Rate Vendor calls.
 							$cost * -1,              $cdrinfo->{calldate},
 							"",                      $cdrinfo->{trunk},
 							$pricerecord->{comment},$pricerecord->{name},$pricerecord->{pattern},
-							$cdrinfo->{userfield}
+							$cdrinfo->{userfield}, $cdrinfo->{provider}
 							) if $config->{posttoastpp} == 1;
 					&save_cdr_vendor( $config, $cdr_db, $cdrinfo->{uniqueid}, $cost,$cdrinfo->{dst} );
 					my $tmp = "UPDATE cdrs SET cost = '" . $cost . "' WHERE uniqueid = '" .
@@ -4474,7 +4475,8 @@ sub vendor_process_rating() {  #Rate Vendor calls.
 							$cdrinfo->{disposition}, $cdrinfo->{billsec},
 							$cost * -1,              $cdrinfo->{calldate},
 							"",                      $cdrinfo->{trunk},
-							$pricerecord->{comment} . "|" . $pricerecord->{pattern}
+							$pricerecord->{comment},$pricerecord->{name},$pricerecord->{pattern},
+							$cdrinfo->{userfield}, $cdrinfo->{provider}
 							) if $config->{posttoastpp} == 1;
 					&save_cdr_vendor( $config, $cdr_db, $cdrinfo->{uniqueid}, $cost,$cdrinfo->{dst} );
 					my $tmp = "UPDATE cdrs SET cost = '" . $cost . "' WHERE uniqueid = '" .
@@ -4513,7 +4515,8 @@ sub vendor_process_rating() {  #Rate Vendor calls.
 						$cdrinfo->{disposition}, $cdrinfo->{billsec},
 						$cost * -1,              $cdrinfo->{calldate},
 						"",                      $cdrinfo->{trunk},
-						$pricerecord->{comment} . "|" . $pricerecord->{pattern}
+						$pricerecord->{comment},$pricerecord->{name},$pricerecord->{pattern},
+						$cdrinfo->{userfield}, $cdrinfo->{provider}
 						) if $config->{posttoastpp} == 1;
 				my $tmp = "UPDATE cdrs SET cost = '" . $cost . "' WHERE uniqueid = '" .
 					$cdrinfo->{uniqueid} . "' AND cost = 0 "

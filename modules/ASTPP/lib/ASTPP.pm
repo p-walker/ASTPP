@@ -374,7 +374,7 @@ sub fs_dialplan_xml_did() {
 sub fs_dialplan_xml_bridge_start() {
 	my ($self, %arg) = @_;
 	my $dialstring .= "<action application=\"set\" data=\"hangup_after_bridge=true\"/>\n";
-	$dialstring .= "<action application=\"set\" data=\"ignore_early_media=true\" />\n";
+#	$dialstring .= "<action application=\"set\" data=\"ignore_early_media=true\" />\n";
 	$dialstring .= "<action application=\"set\" data=\"continue_on_fail=true\"/>\n";
 
 	$dialstring .= "<action application=\"export\" data=\"origination_caller_id_name=".$arg{origination_caller_id_name}."\"/>\n" if($arg{origination_caller_id_name});
