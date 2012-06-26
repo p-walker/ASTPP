@@ -39,8 +39,8 @@ $("#flex1").flexigrid({
 	{display: 'Trunk', name: 'failed', width: 100, sortable: false, align: 'center'},
 // 	{display: 'Provider', name: 'failed', width: 80, sortable: false, align: 'center'},
 // 	{display: 'Pricelist', name: 'minutes', width: 70, sortable: false, align: 'center'},
-	{display: 'Pattern', name: 'xfers', width: 70, sortable: false, align: 'center'},
-        {display: 'Notes', name: 'na', width: 100, sortable: false, align: 'center'},
+	{display: 'Code', name: 'xfers', width: 70, sortable: false, align: 'center'},
+        {display: 'Destination', name: 'na', width: 100, sortable: false, align: 'center'},
 	{display: 'Call Type', name: 'na', width: 80, sortable: false, align: 'center'},
 		],
     buttons : [
@@ -244,7 +244,7 @@ function reload_button()
                      
                       <div class="float-left" style="width:30%">
 			<span>
-                       <label >Pattern:</label>
+                       <label >Code:</label>
             		   <input size="20" class="text field" name="pattern"> &nbsp;
                        <select name="pattern_operator" class="field select">
                        <option value="1">contains</option>
@@ -257,7 +257,7 @@ function reload_button()
                      
                      <div class="float-left" style="width:30%">
 			<span>
-                       <label >Notes:</label>
+                       <label >Destination:</label>
             		   <input size="20" class="text field" name="notes"> &nbsp;
                        <select name="notes_operator" class="field select">
                        <option value="1">contains</option>

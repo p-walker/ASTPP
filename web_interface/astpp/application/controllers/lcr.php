@@ -52,7 +52,7 @@ class Lcr extends CI_Controller
 	{
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Accounts | Create';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'LCR';	
+		$data['page_title'] = 'Providers';	
 		$data['cur_menu_no'] = 6;
 		
 		$this->load->view('view_lcr',$data);
@@ -63,7 +63,7 @@ class Lcr extends CI_Controller
 	{
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Accounts | Create';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'LCR - Providers';	
+		$data['page_title'] = 'Provider Details';	
 		$data['cur_menu_no'] = 6;	
 		$this->load->view('view_lcr_providers',$data);
 		
@@ -176,7 +176,7 @@ class Lcr extends CI_Controller
 	{
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Accounts | Create';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'LCR - Trunks';	
+		$data['page_title'] = 'Trunks';	
 		$data['cur_menu_no'] = 6;
 
 		if ($action === false)
@@ -406,7 +406,7 @@ class Lcr extends CI_Controller
 	{
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Accounts | Create';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'LCR - Outbound';	
+		$data['page_title'] = 'Termination Rates';	
 		$data['cur_menu_no'] = 6;
 		
 		if ($action === false)

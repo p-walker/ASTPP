@@ -138,7 +138,7 @@ function reload_button()
          <input type="hidden" name="advance_search" value="1">
          <ul style="list-style:none;">
           <fieldset >
-            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Search Routes </span></legend>
+            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Search Origination Rates</span></legend>
             <li>
             	 <div class="float-left" style="width:30%">
                  <span>
@@ -240,7 +240,7 @@ function reload_button()
         </div>
         
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
-        <div class="portlet-header ui-widget-header">Routes<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+        <div class="portlet-header ui-widget-header">Origination Rates List<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
         <div class="portlet-content">
         <form method="POST" action="del/0/" enctype="multipart/form-data" id="ListForm">        
         <table id="flex1" align="left" style="display:none;"></table>

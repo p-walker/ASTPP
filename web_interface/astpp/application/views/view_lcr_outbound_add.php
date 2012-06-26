@@ -24,13 +24,13 @@ if(isset($outbound)){
 }
 ?>
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
-        <div class="portlet-header ui-widget-header">Add New Outbound<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+        <div class="portlet-header ui-widget-header">Add New Termination Rate<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
         <div class="portlet-content">
         <form method="post" action="<?php echo base_url();?><?=isset($outbound)?"lcr/outbound/edit/":"lcr/outbound/add/"?>" enctype="multipart/form-data">
         <br /><input type="hidden" name="id" value="<?=@$outbound['id']?>" />
         <ul style="width:600px">
         <fieldset  style="width:585px;">
-            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Outbound Information</span></legend>
+            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Termination Rate Information</span></legend>
         <li>
         <label class="desc">Pattern</label>
         <input class="text field medium" type="text" name="pattern" value="<?=@$outbound['pattern']?>"  size="20" /> <b>(Example : ^44.*)</b>

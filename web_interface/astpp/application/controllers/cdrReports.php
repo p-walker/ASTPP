@@ -183,9 +183,9 @@ class CdrReports extends CI_Controller
 	    $customer_array = array();    
 	    if($this->session->userdata['logintype']==2)
 	    {
-	      $customer_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Trunk","Provider","Pricelist","Pattern","Notes","Call Type");
+	      $customer_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Trunk","Provider","Pricelist","Code","Destination","Call Type");
 	    }else{
-	      $customer_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Pricelist","Pattern","Notes","Call Type");
+	      $customer_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Pricelist","Code","Destination","Call Type");
 	    }
 	    if($query->num_rows() > 0)
 	    {				
@@ -245,10 +245,10 @@ class CdrReports extends CI_Controller
 	    if($this->session->userdata['logintype']==2)
 	    {
 		$this->fpdf->tablewidths = array(20, 20, 16, 16, 10, 18,13, 13, 16,14, 12, 10, 15, 13);
-		$customer_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Trunk","Provider","Pricelist","Pattern","Notes","Call Type");
+		$customer_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Trunk","Provider","Pricelist","Code","Destination","Call Type");
 	    }else{
 		$this->fpdf->tablewidths = array(22, 24, 20, 18, 10, 27,13, 13, 14, 13, 15, 16);
-		$customer_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Pricelist","Pattern","Notes","Call Type");
+		$customer_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Pricelist","Code","Destination","Call Type");
 	    }
 	    if($query->num_rows() > 0)
 	    {				
@@ -435,9 +435,9 @@ class CdrReports extends CI_Controller
 	    $reseller_array = array();    
 	    if($this->session->userdata['logintype']==2)
 	    {
-	      $reseller_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Trunk","Provider","Pricelist","Pattern","Notes","Call Type");
+	      $reseller_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Trunk","Provider","Pricelist","Code","Destination","Call Type");
 	    }else{
-	      $reseller_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Pricelist","Pattern","Notes","Call Type");
+	      $reseller_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Cost","Pricelist","Code","Destination","Call Type");
 	    }
 	    if($query->num_rows() > 0)
 	    {		
@@ -495,10 +495,10 @@ class CdrReports extends CI_Controller
 	    if($this->session->userdata['logintype']==2)
 	    {
 		$this->fpdf->tablewidths = array(20, 20, 16, 16, 10, 18,13, 13, 16,14, 12, 10, 15, 13);
-		$reseller_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Trunk","Provider","Pricelist","Pattern","Notes","Call Type");
+		$reseller_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Trunk","Provider","Pricelist","Code","Destination","Call Type");
 	    }else{
 		$this->fpdf->tablewidths = array(22, 24, 20, 18, 10, 27,13, 13, 14, 13, 15, 16);
-		$reseller_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Pricelist","Pattern","Notes","Call Type");
+		$reseller_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Cost","Pricelist","Code","Destination","Call Type");
 	    }
 	    if($query->num_rows() > 0)
 	    {				
@@ -661,7 +661,7 @@ class CdrReports extends CI_Controller
 	{
 	    $query = $this->cdr_model->getprovidercdrs(true,'','',false);
 	    $provider_array = array();    	    
-	    $provider_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Trunk","Pattern","Notes","Call Type");
+	    $provider_array[] = array("Date","CallerID","Called Number","Account Number","Bill Seconds","Disposition","Debit","Trunk","Code","Destination","Call Type");
 	   
 	    if($query->num_rows() > 0)
 	    {		
@@ -696,7 +696,7 @@ class CdrReports extends CI_Controller
 	    $this->fpdf->initialize('P','mm','A4');
 	    	    
 	    $this->fpdf->tablewidths = array(22, 25, 21, 18, 10, 27,16, 20, 14, 13, 17);
-	    $provider_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Trunk","Pattern","Notes","Call Type");	    
+	    $provider_array[] = array("Date","CallerID","Called Number","Account Number","BillSec","Dispo.","Debit","Trunk","Code","Destination","Call Type");	    
 	    if($query->num_rows() > 0)
 	    {				
 		

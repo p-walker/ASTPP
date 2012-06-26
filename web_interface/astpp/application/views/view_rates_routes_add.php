@@ -9,14 +9,14 @@
   });
 </script>
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
-        <div class="portlet-header ui-widget-header">Routes<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+        <div class="portlet-header ui-widget-header">Origination Rate<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
         <div class="portlet-content">
 <br />
         <form method="post" id="frm_routes" action="<?=base_url()?><?=isset($route)?"rates/routes/edit":"rates/routes/add"?>" enctype="multipart/form-data">
         <input type="hidden" name="id" value="<?=@$route['id']?>" />
         <ul style="width:600px">
         <fieldset  style="width:585px;">
-            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Routes Information</span></legend>
+            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Origination Rate Information</span></legend>
         <li>
        	<label class="desc">Pattern:</label>
         <input class="text field medium" value="<?=@$route['pattern']?>" type="text" name="pattern"  size="20" /> <b>(Example : ^44.*)</b>

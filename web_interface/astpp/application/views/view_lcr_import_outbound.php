@@ -1,5 +1,5 @@
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
-        <div class="portlet-header ui-widget-header">LCR Import Outbound Routes<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+        <div class="portlet-header ui-widget-header">LCR Import Termination Rates<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
         <div class="portlet-content">	
         <form method="post" action="<?=base_url()?>/cgi-bin/astpp-admin/astpp-wraper.cgi" target="submitter" enctype="multipart/form-data">
         <span style="font-size:12px; width:600px;">

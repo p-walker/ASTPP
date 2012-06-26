@@ -210,12 +210,12 @@ class Rates extends CI_Controller
 	{
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Accounts | Create';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'import routes';	
+		$data['page_title'] = 'Import Origination Rates';	
 		$data['cur_menu_no'] = 7;
 		
 		if($action == "done")
 		{
-			$this->session->set_userdata('astpp_notification', 'Routes Imported Successfully');	
+			$this->session->set_userdata('astpp_notification', 'Origination Rates Imported Successfully');	
 			redirect(base_url()."rates/routes");	
 		}
 		
@@ -826,9 +826,9 @@ class Rates extends CI_Controller
 	 */
 	function routes($action=false,$id=false)
 	{
-		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Rates | Routes';
+		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Rates | Origination Rates';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'Routes';	
+		$data['page_title'] = 'Origination Rates';	
 		$data['cur_menu_no'] = 7;
 		
 		if($action == false)

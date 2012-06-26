@@ -822,7 +822,7 @@ class Callingcards extends CI_Controller
 	{
 	    $query = $this->cc_model->getcdrs('','',false);
 	    $cc_array = array();    	    
-	    $cc_array[] = array("Date","CallerID","Called Number","Card Number","Bill Seconds","Disposition","Debit","Notes","Pricelist","Pattern");
+	    $cc_array[] = array("Date","CallerID","Called Number","Card Number","Bill Seconds","Disposition","Debit","Destination","Pricelist","Code");
 	   
 	    if($query->num_rows() > 0)
 	    {		
@@ -856,7 +856,7 @@ class Callingcards extends CI_Controller
 	    $this->fpdf->initialize('P','mm','A4');
 	    	    
 	    $this->fpdf->tablewidths = array(25, 25, 21, 18, 10, 30,16, 20, 14, 13);
-	    $cc_array[] = array("Date","CallerID","Called Number","Card Number","Bill Seconds","Disposition","Debit","Notes","Pricelist","Pattern");
+	    $cc_array[] = array("Date","CallerID","Called Number","Card Number","Bill Seconds","Disposition","Debit","Destination","Pricelist","Code");
 	    if($query->num_rows() > 0)
 	    {				
 		
