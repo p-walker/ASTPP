@@ -694,14 +694,13 @@
 						 <div class="dropdown_2columns">
 							
 							 <div class="col_1">            
-								<h3>Rates</h3>
+								<h3>Clients</h3>
 								<ul class="simple">
-										 <li><a href="<?php echo base_url();?>rates/pricelists/"><img src="<?=base_url()?>menu_icons/Rates/pricelist.png" border="0" width="16" height="16" />&nbsp;&nbsp;PriceLists</a></li>
-										<li><a href="<?php echo base_url();?>rates/calccharge/"><img src="<?=base_url()?>menu_icons/Rates/CalcCharge.png" border="0" width="16" height="16" />&nbsp;&nbsp;Calc Charge</a></li>
-										<li><a href="<?php echo base_url();?>rates/routes/"><img src="<?=base_url()?>menu_icons/Rates/Routes.png" border="0" width="16" height="16"  />&nbsp;&nbsp;Routes</a></li>
-									   
-										<li><a href="<?php echo base_url();?>rates/packages/"><img src="<?=base_url()?>menu_icons/Rates/packages.png" border="0" width="16" height="16" />&nbsp;&nbsp;Packages</a></li>
-										<li><a href="<?php echo base_url();?>rates/counters/"><img src="<?=base_url()?>menu_icons/Rates/Counters.png" border="0" width="16" height="16" />&nbsp;&nbsp;Counters</a></li>
+								<li><a href="<?php echo base_url();?>rates/pricelists/"><img src="<?=base_url()?>menu_icons/Rates/pricelist.png" border="0" width="16" height="16" />&nbsp;&nbsp;PriceLists</a></li>
+								<li><a href="<?php echo base_url();?>rates/routes/"><img src="<?=base_url()?>menu_icons/Rates/Routes.png" border="0" width="16" height="16"  />&nbsp;&nbsp;Origination Rates</a></li>
+								<li><a href="<?php echo base_url();?>rates/calccharge/"><img src="<?=base_url()?>menu_icons/Rates/CalcCharge.png" border="0" width="16" height="16" />&nbsp;&nbsp;Calc Charge</a></li>
+								<li><a href="<?php echo base_url();?>rates/packages/"><img src="<?=base_url()?>menu_icons/Rates/packages.png" border="0" width="16" height="16" />&nbsp;&nbsp;Packages</a></li>
+								<li><a href="<?php echo base_url();?>rates/counters/"><img src="<?=base_url()?>menu_icons/Rates/Counters.png" border="0" width="16" height="16" />&nbsp;&nbsp;Counters</a></li>
 								</ul>  
 							 </div>   
 								
@@ -874,7 +873,7 @@
                          <div class="dropdown_2columns">
                             
                              <div class="col_1">            
-                                <h3>Rates</h3>
+                                <h3>Clients</h3>
                                 <ul class="simple">
                                          <li><a href="<?php echo base_url();?>rates/pricelists/"><img src="<?=base_url()?>menu_icons/Rates/pricelist.png" border="0" width="16" height="16" />&nbsp;&nbsp;PriceLists</a></li>
                                       
@@ -986,11 +985,11 @@
                     <li><a href="#" class="drop_menu">Routing</a>
                     <div class="dropdown_2columns">
                     <div class="col_1">            
-                    <h3>Rates</h3>
+                    <h3>Clients</h3>
                     <ul class="simple">
                              <li><a href="<?php echo base_url();?>rates/pricelists/"><img src="<?=base_url()?>menu_icons/Rates/pricelist.png" border="0" width="16" height="16" />&nbsp;&nbsp;PriceLists</a></li>
                             
-                            <li><a href="<?php echo base_url();?>rates/routes/"><img src="<?=base_url()?>menu_icons/Rates/Routes.png" border="0" width="16" height="16"  />&nbsp;&nbsp;Routes</a></li>
+                            <li><a href="<?php echo base_url();?>rates/routes/"><img src="<?=base_url()?>menu_icons/Rates/Routes.png" border="0" width="16" height="16"  />&nbsp;&nbsp;Origination Rates</a></li>
                            
                             
                     </ul>  
