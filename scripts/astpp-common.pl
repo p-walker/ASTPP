@@ -4267,6 +4267,23 @@ sub processlist() {  # Deal with a list of calls which have not been rated so fa
 						"uniqueid $cdrinfo->{uniqueid}, cardno $cdrinfo->{accountcode}, phoneno $cdrinfo->{dst}\n";
 					print STDERR "disposition $cdrinfo->{disposition}\n";
 					print STDERR "----------------------\n";
+					
+					if($carddata->{maxchannels} ne '0' && $cdrinfo->{userfield} eq 'STANDARD')
+					{					
+					      &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
+					}
+					if($cdrinfo->{userfield} eq 'DID')
+					{					
+					      &update_inuse($astpp_db,$cdrinfo->{dst},'dids','-1');
+					}
+					while ( $carddata->{reseller} ne "" ) {
+					    $carddata = &get_account( $astpp_db, $carddata->{reseller} );
+					    #Calculating in use count for account 
+					    if($carddata->{maxchannels} ne '0' && $cdrinfo->{userfield} eq 'STANDARD')
+					    {
+						  &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
+					    }
+					}
 				}
 				elsif ( $cdrinfo->{accountcode} ) {
 					$status = 0;
@@ -4330,7 +4347,7 @@ sub processlist() {  # Deal with a list of calls which have not been rated so fa
 				print STDERR "disposition: $cdrinfo->{disposition}\n";
 				print STDERR "----------------------\n";
 				if(!$vars) {
-					my $tmp = "UPDATE $config->{asterisk_cdr_table} SET cost = 'error' WHERE uniqueid = " 
+					my $tmp = "UPDATE $config->{freeswitch_cdr_table} SET cost = 'error' WHERE uniqueid = " 
 						. $cdr_db->quote($uniqueid) 
 						. " AND cost = 'rating' LIMIT 1";
 					$cdr_db->do($tmp);
@@ -4348,7 +4365,7 @@ sub processlist() {  # Deal with a list of calls which have not been rated so fa
 			print STDERR "disposition: $cdrinfo->{disposition}\n";
 			print STDERR "----------------------\n";
 			if(!$vars) {
-				my $tmp = "UPDATE $config->{asterisk_cdr_table} SET cost = 'none' WHERE uniqueid = " 
+				my $tmp = "UPDATE $config->{freeswitch_cdr_table} SET cost = 'none' WHERE uniqueid = " 
 					. $cdr_db->quote($uniqueid) 
 					. " AND cost = 'rating' LIMIT 1";
 				$cdr_db->do($tmp);
