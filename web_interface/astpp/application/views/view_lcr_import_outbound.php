@@ -3,7 +3,7 @@
         <div class="portlet-content">	
         <form method="post" action="<?=base_url()?>/cgi-bin/astpp-admin/astpp-wraper.cgi" target="submitter" enctype="multipart/form-data">
         <span style="font-size:12px; width:600px;">
-        File must be in the following format:<br />LD PREPEND CODE ie. 00 or 011(We add this one),Outgoing LD PREPEND (Only used for dialing out),CountryCode,Area Code,Comment,Connect Cost,Included Seconds,Per Minute Cost,Increment,Trunk,Precedence Level
+        File must be in the following format:<br />LD PREPEND CODE ie. 00 or 011(We add this one),Outgoing LD PREPEND (Only used for dialing out),CountryCode,Area Code,Destination,Connect Cost,Included Seconds,Per Minute Cost,Increment,Trunk,Precedence Level
         <br />The file shall have the text fields escaped with quotation marks and the fields seperated by commas.<br />You do not need to have the patterns setup as regex patterns.  Your pattern will have "^" prepended and ".*" appended.<br />
         <br />
         </span>

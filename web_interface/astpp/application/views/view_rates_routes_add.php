@@ -18,7 +18,7 @@
         <fieldset  style="width:585px;">
             <legend><span style="font-size:14px; font-weight:bold; color:#000;">Origination Rate Information</span></legend>
         <li>
-       	<label class="desc">Pattern:</label>
+       	<label class="desc">Code:</label>
         <input class="text field medium" value="<?=@$route['pattern']?>" type="text" name="pattern"  size="20" /> <b>(Example : ^44.*)</b>
         </li>
         <li>
@@ -28,7 +28,7 @@
         </select>
         </li>
         <li>
-        <label class="desc">Comment:</label><input class="text field medium" type="text" value="<?=@$route['comment']?>" name="comment"  size="20" />
+        <label class="desc">Destination:</label><input class="text field medium" type="text" value="<?=@$route['comment']?>" name="comment"  size="20" />
         </li>
         <li>
         <label class="desc">Connect Charge:</label><input class="text field medium" type="text" name="connectcharge" value="<?=$this->common_model->calculate_currency(@$route['connectcost'],'','',true,false)?>"  size="8" />

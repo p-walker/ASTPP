@@ -64,6 +64,7 @@ class Did extends CI_Controller
 	 */
 	function manage($action=false,$id=false)
 	{
+		
 		$data['cur_menu_no'] = 5;
 		
 		if ($action === false)
@@ -93,7 +94,7 @@ class Did extends CI_Controller
 					$_POST['monthlycost']=$this->common_model->add_calculate_currency($_POST['monthlycost'],'','',false,false);  
 					$_POST['connectcost']=$this->common_model->add_calculate_currency($_POST['connectcost'],'','',false,false);  
 					$_POST['cost']=$this->common_model->add_calculate_currency($_POST['cost'],'','',false,false); 
-					$this->did_model->add_did($_POST);
+					$this->did_model->add_did($_REQUEST);
 					$this->session->set_userdata('astpp_notification', 'DID added successfully!');
 					redirect(base_url().'did/manage/');				
 				}
@@ -112,6 +113,7 @@ class Did extends CI_Controller
 			
 				if(!empty($_POST))
 				{
+// 				    echo "<pre>";print_r($_REQUEST);exit;
 					$errors = "";
 					if(trim($_POST['number']) == "" || !is_numeric($_POST['number']))
 					$errors .= "Number is Invalid<br />";
@@ -122,7 +124,7 @@ class Did extends CI_Controller
 					$_POST['monthlycost']=$this->common_model->add_calculate_currency($_POST['monthlycost'],'','',false,false);  
 					$_POST['connectcost']=$this->common_model->add_calculate_currency($_POST['connectcost'],'','',false,false);  
 					$_POST['cost']=$this->common_model->add_calculate_currency($_POST['cost'],'','',false,false);			
-						$this->did_model->edit_did($_POST);
+						$this->did_model->edit_did($_REQUEST);
 						$this->session->set_userdata('astpp_notification', 'DID updated successfully!');
 						redirect(base_url().'did/manage/');				
 					}

@@ -3483,7 +3483,7 @@ sub build_dids() {
         if ( !$params->{prorate} ) {
             $params->{prorate} = 0;
         }
-        
+        $params->{extension} =~ s/###/%/; 
         $tmp = "INSERT INTO dids (number,account,monthlycost,connectcost,includedseconds,cost,inc,extensions,provider,country,city,province,status,setup,prorate,disconnectionfee,limittime,maxchannels,chargeonallocation,variables,dial_as) VALUES ("
           . $astpp_db->quote( $params->{number} ) . ","
           . $astpp_db->quote( $params->{account} ) . ","
@@ -3570,6 +3570,8 @@ sub build_dids() {
         $params->{action} = gettext("Information...");
     }
     elsif ( defined($params->{action}) && $params->{action} eq gettext("Save...") ) {
+      
+	$params->{extension} =~ s/###/%/; 
         $tmp = "UPDATE dids SET". " account="
           . $astpp_db->quote( $params->{account} ) . ","
           . " monthlycost="

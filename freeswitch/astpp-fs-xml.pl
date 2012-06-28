@@ -168,9 +168,9 @@ if ( $params->{section} eq "dialplan" ) {
 	}
     }
     
-    if($astppdid eq "ASTPP-DID")
+    if($astppdid eq "ASTPP-DID" && $didinfo->{maxchannels} ne '0')
     {
-	if($didinfo->{inuse} < $didinfo->{maxchannels} || $carddata->{maxchannels} ne '0')
+	if($didinfo->{inuse} < $didinfo->{maxchannels})
 	{
 	   &update_inuse($astpp_db,$params->{'Caller-Destination-Number'},'dids','+1');
 	}else{    

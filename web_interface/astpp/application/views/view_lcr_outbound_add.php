@@ -32,7 +32,7 @@ if(isset($outbound)){
         <fieldset  style="width:585px;">
             <legend><span style="font-size:14px; font-weight:bold; color:#000;">Termination Rate Information</span></legend>
         <li>
-        <label class="desc">Pattern</label>
+        <label class="desc">Code</label>
         <input class="text field medium" type="text" name="pattern" value="<?=@$outbound['pattern']?>"  size="20" /> <b>(Example : ^44.*)</b>
         </li>
         <li>
@@ -40,7 +40,7 @@ if(isset($outbound)){
         <input class="text field medium" type="text" name="prepend" value="<?=@$outbound['prepend']?>"  size="20" />
         </li>
         <li>
-        <label class="desc">Comment</label>
+        <label class="desc">Destination</label>
         <input class="text field medium" type="text" name="comment" value="<?=@$outbound['comment']?>"  size="20" />
         </li>
         <li>

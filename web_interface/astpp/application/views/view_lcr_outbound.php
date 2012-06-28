@@ -27,9 +27,9 @@ $("#flex1").flexigrid({
 <!--        {display: '<input type="checkbox" onclick="toggleChecked(this.checked)">', name: '', width: 20, align: 'center'},\
 -->
 		{display: 'ID', name: 'Number', width: 50, sortable: false, align: 'center'},
-        {display: 'Pattern', name: 'country', width: 80, sortable: false, align: 'center'},
+        {display: 'Code', name: 'country', width: 80, sortable: false, align: 'center'},
         {display: 'Prepend', name: 'country', width: 80, sortable: false, align: 'center'},
-        {display: 'Comment', name: 'province', width: 120, sortable: false, align: 'left'},
+        {display: 'Destination', name: 'province', width: 120, sortable: false, align: 'left'},
         {display: 'Trunk', name: 'country', width: 80, sortable: false, align: 'center'},
         {display: 'Increment', name: 'country', width: 80, sortable: false, align: 'center'},
         {display: 'Connect<br/>Charge', name: 'country', width: 80, sortable: false, align: 'center'},
@@ -142,7 +142,7 @@ function reload_button()
             	<li>
                  <div class="float-left" style="width:30%">
                 <span>
-                  <label>Pattern:</label>
+                  <label>Code:</label>
                   <input size="20" class="text field" name="pattern"> &nbsp;
                   <select name="pattern_operator"  class="field select">
                   <option value="1">contains</option>
@@ -168,7 +168,7 @@ function reload_button()
                 
                 <div class="float-left" style="width:30%">
                 <span>
-                 <label>Comment:</label>
+                 <label>Destination:</label>
             	 <input size="20" class="text field" name="comment"> &nbsp;
                  <select name="comment_operator"  class="select field">
                  <option value="1">contains</option>

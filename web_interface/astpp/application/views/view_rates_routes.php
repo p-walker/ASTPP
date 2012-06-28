@@ -28,8 +28,8 @@ $("#flex1").flexigrid({
     dataType: 'json',
 	colModel : [
 		{display: 'ID', name: 'Number', width: 50, sortable: false, align: 'center'},
-        {display: 'Pattern', name: 'country', width: 100, sortable: false, align: 'center'},
-        {display: 'Comment', name: 'province', width: 120, sortable: false, align: 'left'},
+        {display: 'Code', name: 'country', width: 100, sortable: false, align: 'center'},
+        {display: 'Destination', name: 'province', width: 120, sortable: false, align: 'left'},
         {display: 'Pricelist(s)', name: 'city', width: 80, sortable: false, align: 'center'},
         {display: 'Connect Charge', name: 'province', width: 100, sortable: false, align: 'left'},
         {display: 'Included Seconds', name: 'province', width: 100, sortable: false, align: 'left'},
@@ -142,7 +142,7 @@ function reload_button()
             <li>
             	 <div class="float-left" style="width:30%">
                  <span>
-                   <label>Pattern:</label>
+                   <label>Code:</label>
                    <input size="20" class="text field" name="pattern"> &nbsp;
                    <select name="pattern_operator" class="field select ">
                    <option value="1">contains</option>
@@ -154,7 +154,7 @@ function reload_button()
                  </div>
                   <div class="float-left" style="width:30%">
                  <span>
-                   <label >Comment:</label>
+                   <label >Destination:</label>
                    <input size="20" class="text field" name="comment"> &nbsp;
                    <select name="comment_operator" class="field select">
                    <option value="1">contains</option>

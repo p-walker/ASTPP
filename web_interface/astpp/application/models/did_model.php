@@ -14,6 +14,7 @@ class Did_model extends CI_Model
 		$data['mode'] = "Manage DIDs";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
+		$data['extension'] = str_replace ("%","###",$data['extension']);
 		$this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
@@ -23,7 +24,8 @@ class Did_model extends CI_Model
 		$url = "astpp-wraper.cgi";
 		$data['mode'] = "Manage DIDs";
 		$data['logintype'] = $this->session->userdata('logintype');
-		$data['username'] = $this->session->userdata('username');		
+		$data['username'] = $this->session->userdata('username');
+		$data['extension'] = str_replace ("%","###",$data['extension']);
 		$this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
