@@ -69,7 +69,7 @@ if ( $params->{section} eq "dialplan" ) {
   
     ##IF opensips then check then get account from $params->{variable_sip_h_P-Accountcode}
 #     $params->{variable_accountcode} = $params->{'variable_sip_h_P-Accountcode'};
-    if($config['opensips']=='1' && $params->{'variable_sip_h_P-Accountcode'} ne '')
+    if($config->{opensips}=='1' && $params->{'variable_sip_h_P-Accountcode'} ne '')
     {
 	$params->{variable_accountcode} = $params->{'variable_sip_h_P-Accountcode'};
     }
@@ -105,7 +105,7 @@ if ( $params->{section} eq "dialplan" ) {
     
       ##IF opensips then check then get ip address from $params->{'variable_sip_h_X-AUTH-IP'}
       #$params->{'Hunt-Network-Addr'} = $params->{'variable_sip_h_X-AUTH-IP'};
-	if($config['opensips']=='1' && $params->{'variable_sip_h_X-AUTH-IP'} ne '')
+	if($config->{opensips}=='1' && $params->{'variable_sip_h_X-AUTH-IP'} ne '')
 	{
 	    $params->{'Hunt-Network-Addr'} = $params->{'variable_sip_h_X-AUTH-IP'};
 	}
