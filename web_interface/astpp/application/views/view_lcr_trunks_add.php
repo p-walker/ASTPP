@@ -59,7 +59,7 @@ if(isset($trunk)){
         <label class="desc">Max Channels:</label><input class="text field medium" type="text" value="<?=@$trunk['maxchannels']?>" name="maxchannels"  size="4" />
         </li>
         <li>
-        <label class="desc">Dialed Number Mods (CSV,Regex):</label><input class="text field medium" value="<?=@$trunk['dialed_modify']?>" type="text" name="dialed_modify"  size="20" />
+        <label class="desc">Dialed Number Mods (CSV,Regex):</label><input class="text field medium" value='<?=@$trunk['dialed_modify']?>' type="text" name="dialed_modify"  size="20" />
         </li>
         <li>
         <label class="desc">Precedence:</label><input class="text field medium" type="text" value="<?=@$trunk['precedence']?>" name="precedence"  size="2" />

@@ -20,20 +20,21 @@ use ASTPP ':all';
 use XML::Simple;
 use Data::Dumper;
 use URI::Escape;
-#use strict;
+use strict;
+# use warnings;
 
 use vars
   qw($void_xml $cdr_db $params $ASTPP @output $config $freeswitch_db $astpp_db $verbosity );
 use Locale::gettext_pp qw(:locale_h);
 require "/usr/local/astpp/astpp-common.pl";
 $ENV{LANGUAGE} = "en";    # de, es, br - whatever
-print STDERR "Interface language is set to: " . $ENV{LANGUAGE} . "\n";
+# print STDERR "Interface language is set to: " . $ENV{LANGUAGE} . "\n";
 bindtextdomain( "astpp", "/usr/local/share/locale" );
 textdomain("astpp");
-$verbosity = 2;
+# $verbosity = 1;
 @output    = ("STDERR");
 $ASTPP     = ASTPP->new;
-$ASTPP->set_verbosity(4);    #Tell ASTPP debugging how verbose we want to be.
+#$ASTPP->set_verbosity(1);    #Tell ASTPP debugging how verbose we want to be.
 
 $void_xml = header( -type => 'text/plain' );
 $void_xml .= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
@@ -44,14 +45,15 @@ $void_xml .= "</section>\n";
 $void_xml .= "</document>\n";
 
 sub initialize() {
-    $config = &load_config();
+    $config = &load_config();        
     $astpp_db = &connect_db( $config, @output );
     $ASTPP->set_astpp_db($astpp_db);
     $config = &load_config_db( $astpp_db, $config ) if $astpp_db;
+    $verbosity = $config->{debug};
     $freeswitch_db = &connect_freeswitch_db( $config, @output );
     $ASTPP->set_freeswitch_db($freeswitch_db);
     $cdr_db = &cdr_connect_db( $config, @output );
-    $config->{cdr_table} = $config->{freeswitch_cdr_table};
+    $config->{cdr_table} = $config->{freeswitch_cdr_table};    
 }
 
 ################# Programs start here #######################################
@@ -59,17 +61,18 @@ sub initialize() {
 my ( $ipinfo, $xml, $maxlength, $maxmins, $callstatus,$astppdid,$didinfo );
 foreach my $param ( param() ) {
     $params->{$param} = param($param);
-    $ASTPP->debug( debug => "$param $params->{$param}" );
+    $ASTPP->debug( debug => "$param $params->{$param}",
+                            verbosity => $verbosity);
 }
 $xml = header( -type => 'text/plain' );
 
-$ASTPP->debug(debug => "Destination = $params->{'Caller-Destination-Number'}" );
-
-if ( $params->{section} eq "dialplan" ) {        
+if (defined $params->{section} && $params->{section} eq "dialplan" ) {        
   
+    $ASTPP->debug(debug => "Destination = $params->{'Caller-Destination-Number'}" );
+    
     ##IF opensips then check then get account from $params->{variable_sip_h_P-Accountcode}
 #     $params->{variable_accountcode} = $params->{'variable_sip_h_P-Accountcode'};
-    if($config->{opensips}=='1' && $params->{'variable_sip_h_P-Accountcode'} ne '')
+    if($config->{opensips}=='1' && defined $params->{'variable_sip_h_P-Accountcode'} && $params->{'variable_sip_h_P-Accountcode'} ne '')
     {
 	$params->{variable_accountcode} = $params->{'variable_sip_h_P-Accountcode'};
     }
@@ -131,8 +134,7 @@ if ( $params->{section} eq "dialplan" ) {
 	context 	   => $params->{'Caller-Context'}
     );
 
-    $ASTPP->debug( debug =>"$params->{variable_accountcode}, $params->{'Caller-Destination-Number'}"
-    );
+    $ASTPP->debug( debug =>"$params->{variable_accountcode}, $params->{'Caller-Destination-Number'}");
 
     my $carddata =
       &get_account( $astpp_db, $params->{variable_accountcode} )
@@ -169,7 +171,7 @@ if ( $params->{section} eq "dialplan" ) {
 	}
     }
     
-    if($astppdid eq "ASTPP-DID" && $didinfo->{maxchannels} ne '0')
+    if(defined $astppdid && $astppdid eq "ASTPP-DID" && $didinfo->{maxchannels} ne '0')
     {
 	if($didinfo->{inuse} < $didinfo->{maxchannels})
 	{
@@ -186,7 +188,7 @@ if ( $params->{section} eq "dialplan" ) {
 	}
     }
 
-    if ( $carddata->{dialed_modify} && ($astppdid ne "ASTPP-DID")) {
+    if ( $carddata->{dialed_modify} && (defined $astppdid && $astppdid ne "ASTPP-DID")) {
         my @regexs = split( m/,/m, $carddata->{dialed_modify} );	
         foreach my $regex (@regexs) {	    
             $regex =~ s/"//g;    #Strip off quotation marks
@@ -258,7 +260,7 @@ if ( $params->{section} eq "dialplan" ) {
         $ASTPP->debug( debug => "RESELLER Call Status: $resellercallstatus" );
 	
 	#Calculating in use count for account 
-	if($carddata->{number} ne "" && $carddata->{maxchannels} ne '0' && ($astppdid ne "ASTPP-DID"))
+	if($carddata->{number} ne "" && $carddata->{maxchannels} ne '0' && (defined $astppdid && $astppdid ne "ASTPP-DID"))
 	{
 	    if($carddata->{inuse} < $carddata->{maxchannels})
 	    {
@@ -309,7 +311,7 @@ if ( $params->{section} eq "dialplan" ) {
       "L(" . sprintf( "%.0f", $maxlength * 60 * 1000 ) . ":60000:30000)";
 
     $ASTPP->debug( debug => "Looking for Route" );
-    my $routeinfo = &get_route(
+    $routeinfo = &get_route(
         $astpp_db, $config,
         $params->{'Caller-Destination-Number'},
         $carddata->{pricelist}, $carddata, $astppdid
@@ -360,14 +362,14 @@ if ( $params->{section} eq "dialplan" ) {
 			}
 			$count++;
 	    	}
-	        $xml .= $ASTPP->fs_dialplan_xml_bridge_end() if @outboundroutes;
+# 	        $xml .= $ASTPP->fs_dialplan_xml_bridge_end() if @outboundroutes;
 	}
 	$xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml);
 	$ASTPP->debug( debug => $xml );
 	print $xml;
 # 	exit;
 }
-elsif ( $params->{section} eq "directory" ) {
+elsif (defined $params->{section} && $params->{section} eq "directory" ) {
 
     #hostname darren-laptop
     #section directory
@@ -398,7 +400,8 @@ elsif ( $params->{section} eq "directory" ) {
            xml    => $xml,
            ip     => $params->{'ip'},
            user   => $params->{'user'},
-           domain => $params->{'domain'}
+           domain => $params->{'domain'},
+	   debug  => $config->{debug}
        );
        $xml = $ASTPP->fs_directory_xml_footer( xml => $xml );
     }
@@ -422,13 +425,13 @@ my $xml = new XML::Simple;
 # read XML file
 my $data = $xml->XMLin($params->{cdr});
 
-print STDERR "Call hangup and CDR Generating";
+print STDERR "Call hangup and CDR Generating" if $config->{debug} == 1;
 
 # print output
-print STDERR Dumper($data);
+print STDERR Dumper($data) if $config->{debug} == 1;
 
 my $destination_number = uri_unescape($data->{variables}->{effective_destination_number});
-if($destination_number eq "")
+if(defined $destination_number && $destination_number eq "")
 {
     $destination_number = uri_unescape($data->{callflow}->{caller_profile}->{destination_number});
 }
@@ -454,7 +457,7 @@ my $tmp = "INSERT INTO " . $config->{freeswitch_cdr_table} . "(accountcode,src,d
 	. ","
 #	. $cdr_db->quote($data->{callflow}->{caller_profile}->{originatee}->{originatee_caller_profile}->{destination_number})
 	. "'"
-	. $destination_number
+	. "$destination_number"
 	. "'"
 	. ","
 #	. $cdr_db->quote($data->{callflow}->{caller_profile}->{originatee}->{originatee_caller_profile}->{context})
@@ -532,14 +535,14 @@ my $tmp = "INSERT INTO " . $config->{freeswitch_cdr_table} . "(accountcode,src,d
 	. "'" . uri_unescape($data->{variables}->{progress_mediamsec}) . "'"
 	. ")";
 
-print STDERR "\n" . $tmp . "\n";
+print STDERR "\n" . $tmp . "\n" if $config->{debug} == 1;
 $cdr_db->do($tmp);
-print "Wrote CDR";
+print "Wrote CDR" if $config->{debug} == 1;
 my (@chargelist);
 push @chargelist, $data->{callflow}->{caller_profile}->{uuid};
 &processlist( $astpp_db, $cdr_db, $config, \@chargelist );
-print STDERR "VENDOR CHARGES: " . $config->{trackvendorcharges} . "\n";
-&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "none",  $data->{callflow}->{caller_profile}->{uuid},"" ) if $config->{trackvendorcharges} == 1;
+print STDERR "VENDOR CHARGES: " . $config->{trackvendorcharges} . "\n" if $config->{debug} == 1;
+&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "none",  $data->{callflow}->{caller_profile}->{uuid},"" ) if $config->{trackvendorcharges} == 1 && $config->{debug} == 1;
 
 &process_callingcard_cdr if $data->{variables}->{callingcard};    
 	
@@ -548,8 +551,6 @@ sub process_callingcard_cdr() {
 	
 	$destination = (uri_unescape($data->{variables}->{direction}) eq "inbound")?uri_unescape($data->{callflow}->{caller_profile}->{destination_number}):uri_unescape($data->{variables}->{callingcard_destination});
 	$destination =~ s/@.*//g;
-	
-	print STDERR "Save Calling Card Leg A CDR : " . $config-{callingcard_leg_a_cdr} . "\n";
 	
 	if(uri_unescape($data->{variables}->{direction}) eq "outbound" || $config->{callingcard_leg_a_cdr} eq '1')
 	{
@@ -571,8 +572,8 @@ sub process_callingcard_cdr() {
 	$pricelistinfo = &get_pricelist( $astpp_db, $cardinfo->{pricelist} )
 	  if $cc == 1;
 
-                    print STDERR "THIS IS A CALLINGCARD CALL! \n";
-                    print STDERR "CARD: $cardinfo->{cardnumber} \n";                    
+                    print STDERR "THIS IS A CALLINGCARD CALL! \n" if $config->{debug} == 1;
+                    print STDERR "CARD: $cardinfo->{cardnumber} \n" if $config->{debug} == 1;                    
                     $numberinfo = &get_route(
                         $astpp_db, $config,
                         $destination,
@@ -610,8 +611,8 @@ sub process_callingcard_cdr() {
                               ( ( $cardinfo->{minute_fee_pennies} * 100 ) +
                                   $charge )
                               if $cardinfo->{timeused} +
-                                   $data->{variables}->{billsec} =>
-                                  $cardinfo->{minute_fee_minutes};
+                                   ($data->{variables}->{billsec} =>
+                                  $cardinfo->{minute_fee_minutes});
                         }
                         if ( $cardinfo->{min_length_pennies} > 0
                             && ( $cardinfo->{min_length_minutes} * 60 ) >

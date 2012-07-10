@@ -147,7 +147,7 @@ class Callingcards extends CI_Controller
 				if($brand = $this->cc_model->get_brand_by_name($id))
 				{				
 					$data['brand'] = $brand;					
-					$data['pricelist'] = $this->common_model->get_price_list();				
+					$data['pricelist'] = $this->rates_model->get_price_list();				
 					$this->load->view('view_cc_brands_add',$data);
 				}
 				else

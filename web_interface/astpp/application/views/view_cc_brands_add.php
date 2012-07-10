@@ -22,11 +22,11 @@
         <fieldset  style="width:585px;">
           <legend><span style="font-size:14px; font-weight:bold; color:#000;">CC Brand Setting</span></legend>
           <li>
-            <label class="desc_ccbrand">CC Brand Name:</label>
+            <label class="desc">CC Brand Name:</label>
             <input type="text" <?php echo isset($brand)?"name='name' readonly='readonly'":"name='brandname'";?> class="text field medium"  size="20"   value="<?=@$brand['name']?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Pin Required:</label>
+            <label class="desc">Pin Required:</label>
             <select name="pin" class="select field medium" >
               <option <?php if(@$brand['pin'] == "1"){?> selected="selected"<?php }?> value="1">YES</option>
               <option <?php if(@$brand['pin'] == "0"){?> selected="selected"<?php }?> value="0">NO</option>
@@ -34,46 +34,46 @@
         >
           </li>
           <li>
-            <label class="desc_ccbrand">Pricelist:</label>
+            <label class="desc">Pricelist:</label>
             <?=form_select_default('pricelist',$pricelist,@$brand['pricelist'],array("class"=>"select field medium"))?>
           </li>
           <li>
-            <label class="desc_ccbrand">Language:</label>
+            <label class="desc">Language:</label>
             <?=form_languagelist('language',@$brand['language'],array("class"=>"select field small"))?>
           </li>
           <li>
-            <label class="desc_ccbrand">Days Valid For:</label>
+            <label class="desc">Days Valid For:</label>
             <input type="text" name="validdays" class="text field medium"  size="10"   value="<?=@$brand['validfordays']?>"/>
           </li>
         </fieldset>
         <fieldset  style="width:585px;">
           <legend><span style="font-size:14px; font-weight:bold; color:#000;">CC Brand Setting</span></legend>
           <li>
-            <label class="desc_ccbrand">Maintenance Fee:</label>
+            <label class="desc">Maintenance Fee:</label>
             <input type="text" name="maint_fee_pennies" class="text field medium"  size="5"   value="<?=$this->common_model->calculate_currency(@$brand['maint_fee_pennies'],'','',true,false)?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Days Between Maintain Fee:</label>
+            <label class="desc">Days Between Maintain Fee:</label>
             <input type="text" name="maint_fee_days" class="text field medium"  size="5"   value="<?=@$brand['maint_fee_days']?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Disconnect Fee:</label>
+            <label class="desc">Disconnect Fee:</label>
             <input type="text" name="disconnect_fee_pennies" class="text field medium"  size="5"   value="<?=$this->common_model->calculate_currency(@$brand['disconnect_fee_pennies'],'','',true,false)?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Charge after X minutes:</label>
+            <label class="desc">Charge after X minutes:</label>
             <input type="text" name="minute_fee_pennies" class="text field medium"  size="5"   value="<?=$this->common_model->calculate_currency(@$brand['minute_fee_pennies'],'','',true,false)?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Minutes used before charge:</label>
+            <label class="desc">Minutes used before charge:</label>
             <input type="text" name="minute_fee_minutes" class="text field medium"  size="5"   value="<?=@$brand['minute_fee_minutes']?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Minimum length thats not charged extra (minutes):</label>
+            <label class="desc">Minimum length thats not charged extra (minutes):</label>
             <input type="text" name="min_length_minutes" class="text field medium"  size="5"   value="<?=@$brand['min_length_minutes']?>"/>
           </li>
           <li>
-            <label class="desc_ccbrand">Extra charge for short calls:</label>
+            <label class="desc">Extra charge for short calls:</label>
             <input type="text" name="min_length_pennies" class="text field medium"  size="5"   value="<?=$this->common_model->calculate_currency(@$brand['min_length_pennies'],'','',true,false)?>"/>
           </li>
         </fieldset>

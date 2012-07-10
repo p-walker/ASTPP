@@ -203,7 +203,7 @@ fieldset {
                 </li>
                 <li>
                   <label class="desc">Dialed Number Mods:</label>
-                  <input class="text field medium" type="text" name="dialed_modify"  size="20"  value="<?=$account['dialed_modify']?>"/>
+                  <input class="text field medium" type="text" name="dialed_modify"  size="20"  value='<?=$account['dialed_modify']?>'/>
                 </li>
               </ul>
             </div>

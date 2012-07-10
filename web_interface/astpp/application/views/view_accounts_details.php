@@ -91,8 +91,8 @@ function get_alert_msg(id)
   </tr>
   <tr>
   	 <th>Company</th><td><?=$account['company_name']?></td>
-  	 <th>Address</th><td><?=$account['address_1'].'<br/>'.$account['address_2']?></td>
-  	 <th>Language</th><td><?=$account['language']?></td>
+  	 <th>Address</th><td><?=$account['address_1'].'<br/>'.$account['address_2']?></td>  	 
+  	 <th>Language</th><td><?=common_model::$global_config['language_list'][$account['language']];?></td>
      <th>City</th><td><?=$account['city']?></td>
   </tr>
   <tr>
@@ -102,23 +102,24 @@ function get_alert_msg(id)
       <th>Pricelist</th><td><?=$account['pricelist']?></td>
   </tr>
   <tr>
-      <th>Billing Schedule</th><td><?=@$sweeplist[$account['sweep']]?></td>
+      <th>Billing Schedule</th><td><?=ucfirst($sweeplist[$account['sweep']]);?></td>
       <th>Credit Limit in</th><td><?=$credit_limit;?></td>
       <th>Timezone</th><td><?=$account['tz']?></td>      
       <th>Max Channels</th><td><?=$account['maxchannels']?></td>
   </tr>
   <tr>
-      <th>Pin</th><td><?=$account['pin']?></td>
+<!--       <th>Pin</th><td><?=$account['pin']?></td> -->
+      <th>Email</th><td><?=$account['email']?></td>
       <th>Dialed Number Mods</th><td><?=$account['dialed_modify']?></td>
       <th>IP Address</th><td>dynamic</td>
       <th>Telephone</th><td><?=$account['telephone_1']?></td>
   </tr>
-  <tr>      
-      <th>Email</th><td><?=$account['email']?></td>
+  <!--<tr>      
+      <th>Email</th><td><?=$account['email']?></td>-->
 <!--       <th>Fascimile</th><td><?//=$account['fascimile']?></td> -->
+  <!--    <th>&nbsp;</th><td>&nbsp;</td>
       <th>&nbsp;</th><td>&nbsp;</td>
-      <th>&nbsp;</th><td>&nbsp;</td>
-  </tr>
+  </tr>-->
   </table>
   </div>
   </div>

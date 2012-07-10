@@ -2,7 +2,7 @@ package ASTPP;
 
 require 5.004;
 use strict;
-use warnings;
+# use warnings;
 use DBI;
 use Data::Paginate;
 use Locale::gettext_pp qw(:locale_h);
@@ -69,7 +69,7 @@ sub new
 		_verbosity_level        => $arg{verbosity_level}                || 1,
 		_asterisk_agi           => $_[3],
 		_cdr_db                 => $_[4],
-		_verbosity_item_level   => $arg{verbosity_item_level}           || 1,
+		_verbosity_item_level   => $arg{verbosity_item_level}           || 0,
 		_script                 => $arg{script}         || "astpp-admin.cgi",
 		_config                 => $_[7],
 	}, $class;
@@ -252,22 +252,25 @@ $ipdata = $ASTPP->ip_address_authenticate(
 sub ip_address_authenticate
 {
 	my ($self, %arg) = @_;
-	my ($sql,$tmp,@results);
+	my ($sql,$tmp,$record);
 	$arg{ip_address} = $arg{ip} if $arg{ip};  #Freeswitch passes the ip in a different format.
 	$tmp = "SELECT * FROM ip_map WHERE ip = " . $self->{_astpp_db}->quote($arg{ip_address})
 		. " AND prefix IN (NULL,'') OR ip = " . $self->{_astpp_db}->quote($arg{ip_address});
 	$tmp .= " AND " . $self->{_astpp_db}->quote($arg{destination}) . " RLIKE prefix" if $arg{destination};
 	$tmp .= " ORDER BY LENGTH(prefix) DESC LIMIT 1";
-	print STDERR $tmp . "\n";
+	print STDERR $tmp . "\n" if $arg{debug} == 1;
 	$sql = $self->{_astpp_db}->prepare($tmp);
 	$sql->execute;
-	while (my $record = $sql->fetchrow_hashref) {
-		print STDERR $record->{ip};
-		push @results, $record;
-	}
-	my $rows = $sql->rows;
+	$record = $sql->fetchrow_hashref;
 	$sql->finish;
-	return ($rows,@results);
+	return $record;
+# 	while (my $record = $sql->fetchrow_hashref) {
+# 		print STDERR $record->{ip};
+# 		push @results, $record;
+# 	}
+# 	my $rows = $sql->rows;
+# 	$sql->finish;
+# 	return ($rows,@results);
 }
 
 =item $ASTPP->fs_dialplan_xml_header()
@@ -440,7 +443,7 @@ sub fs_dialplan_xml_bridge() {
 	return ($dialstring);
     }
     else {
-	print STDERR "CANNOT ROUTE THIS CALL!!!!!\n";
+# 	print STDERR "CANNOT ROUTE THIS CALL!!!!!\n";
 	return "";      
     }
 }
@@ -788,11 +791,11 @@ sub fs_list_sip_usernames
 #                       } 
 		}
 	}
-	print STDERR $tmp;
+# 	print STDERR $tmp."\n";
 	$sql = $self->{_freeswitch_db}->prepare($tmp);
 	$sql->execute;
 	while (my $record = $sql->fetchrow_hashref) {
-		print STDERR $record->{username};
+# 		print STDERR $record->{username};
 		push @results, $record;
 	}
 	my $rows = $sql->rows;
@@ -844,7 +847,7 @@ sub fs_directory_xml
 	my $user_count = 0;
 	$arg{xml} .= "<domain name=\"" . $arg{domain} . "\">";
 	my ($count,@sip_users) = &fs_list_sip_usernames($self,%arg);
-	print STDERR "COUNT: $count\n";
+	print STDERR "COUNT: $count\n"  if $arg{debug} == 1;
 	if ($count > 0) {
 	foreach my $record (@sip_users) {
 		$user_count++;
@@ -868,13 +871,12 @@ sub fs_directory_xml
 	}
 	my @ip_users;
 	($count,@ip_users) = &ip_address_authenticate($self,%arg);
-	print STDERR "COUNT: $count\n";
+	print STDERR "COUNT: $count\n"  if $arg{debug} == 1;
 	if ($count > 0) {
 	foreach my $record (@ip_users) {
 # This is only temporary and should be removed
 #
-$record->{id} = 0;
-#
+		$record->{id} = 0;
 		$arg{xml} .= "<user id=\"" . $record->{account} . $record->{ip} . "\" ip=\"" . $record->{ip} . "\">\n";
 		$arg{xml} .= "<params>\n";
 		my @params = &fs_list_sip_params($self,$record->{id});
@@ -894,7 +896,7 @@ $record->{id} = 0;
 	}
 	}	
 	$arg{xml} .= "</domain>\n";
-	print STDERR "TOTAL USERS: $user_count \n";
+	print STDERR "TOTAL USERS: $user_count \n"  if $arg{debug} == 1;
 	return ($arg{xml},$user_count);
 }
 
@@ -915,11 +917,11 @@ sub debug #Prints debugging if appropriate
 {
 	my ($self, %arg) = @_;
 	$self->{_verbosity_item_level} = $arg{verbosity} if $arg{verbosity};
-	print STDERR $arg{debug} . "\n" if $arg{debug} && $self->{_verbosity_item_level} <= $self->{_verbosity_level};
-	$self->{_asterisk_agi}->verbose($arg{debug} . "\n" , $self->{_verbosity_level}) if $arg{debug} && $self->{_asterisk_agi} && $self->{_verbosity_item_level} <= $self->{_verbosity_level};
+	print STDERR $arg{debug} . "\n" if $arg{debug} && $self->{_verbosity_item_level} >= $self->{_verbosity_level};
+# 	$self->{_asterisk_agi}->verbose($arg{debug} . "\n" , $self->{_verbosity_level}) if $arg{debug} && $self->{_asterisk_agi} && $self->{_verbosity_item_level} <= $self->{_verbosity_level};
 	$self->{_astpp_db}->do("INSERT INTO activity_logs (message,user) VALUES (" 
 		. $self->{_astpp_db}->quote($arg{debug}) . "," 
-		. $self->{_astpp_db}->quote($arg{user}) . ")") if $arg{debug} && $self->{_astpp_db} && $self->{_verbosity_item_level} <= $self->{_verbosity_level};
+		. $self->{_astpp_db}->quote($arg{user}) . ")") if $arg{debug} && $self->{_astpp_db} && $self->{_verbosity_item_level} >= $self->{_verbosity_level};
 	return 0;
 }
 
