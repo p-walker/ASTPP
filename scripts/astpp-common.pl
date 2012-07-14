@@ -414,7 +414,7 @@ sub get_outbound_routes() {
 			. $astpp_db->quote($number)
 			. " RLIKE pattern AND status = 1 AND precedence <= "
 			. $astpp_db->quote($accountinfo->{routing_technique}) 
-			. "GROUP BY trunk ORDER BY cost"
+			. " ORDER BY cost,precedence"
 			# . "ORDER by LENGTH(pattern) DESC, precedence, cost"
 		);	
 		$sql->execute;
@@ -428,7 +428,7 @@ sub get_outbound_routes() {
 			. $astpp_db->quote($number)
 			. " RLIKE pattern AND status = 1 AND precedence <= " 
 			. $astpp_db->quote($routeinfo->{precedence}) 
-			. "GROUP BY trunk ORDER BY cost"
+			. " ORDER BY cost,precedence"
 			# . "ORDER by LENGTH(pattern) DESC, precedence, cost"
 		);
 		$sql->execute;
@@ -441,7 +441,7 @@ sub get_outbound_routes() {
 			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
 			. $astpp_db->quote($number)
 			. " RLIKE pattern AND status = 1 "
-			. "GROUP BY trunk ORDER BY cost"
+			. " ORDER BY cost,precedence"
 			#."ORDER by LENGTH(pattern) DESC, cost"
 		);	
 		$sql->execute;
