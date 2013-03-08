@@ -1,9 +1,5 @@
 <? extend('master.php') ?>
-
-	<? startblock('extra_head') ?>
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>    
+<? startblock('extra_head') ?>  
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -25,12 +21,14 @@ $("#flex1").flexigrid({
     dataType: 'json',
 	colModel : [
 		{display: 'Directory ID', name: 'DirectoryID', width: 80, sortable: false, align: 'center'},
-		{display: 'User Name', name: 'Number', width: 80, sortable: false, align: 'center'},
-        {display: 'Password', name: 'country', width: 100, sortable: false, align: 'center'},
-        {display: 'VM Password', name: 'province', width: 100, sortable: false, align: 'center'},
-	{display: 'Account Code', name: 'code', width: 100, sortable: false, align: 'center'},
-        {display: 'Context', name: 'city', width: 100, sortable: false, align: 'center'},
-        {display: 'Action', name: '', width : 50, align: 'center', formatter:'showlink', formatoptions:{baseLinkUrl:'', }, },
+		{display: 'User Name', name: 'Number', width: 150, sortable: false, align: 'left'},
+        {display: 'Password', name: 'country', width: 150, sortable: false, align: 'left'},
+        {display: 'VM Password', name: 'province', width: 100, sortable: false, align: 'left'},
+	{display: 'Account Code', name: 'code', width: 150, sortable: false, align: 'left'},
+	{display: 'Caller Name', name: 'Callername', width: 150, sortable: false, align: 'left'},
+	{display: 'Caller Number', name: 'Callernumber', width: 150, sortable: false, align: 'left'},
+        {display: 'Context', name: 'city', width: 100, sortable: false, align: 'left'},
+        {display: 'Action', name: '', width : 100, align: 'center', formatter:'left', formatoptions:{baseLinkUrl:'', }, },
 
 		],
     buttons : [
@@ -46,12 +44,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 20,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 300,
+	height: "auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',

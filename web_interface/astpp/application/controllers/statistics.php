@@ -168,9 +168,9 @@ class Statistics extends CI_Controller
 	
 	function get_action_buttons($id)
 	{		
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+    	
 		$ret_url = '';		
-		$ret_url .= '<a href="/statistics/listerrors/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url .= '<a href="/statistics/listerrors/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -279,16 +279,7 @@ class Statistics extends CI_Controller
 			$start = ($page_no-1) * $perpage;
 			if($start < 0 )
 			$start = 0;
-			
-			/*$sd =  $start_date;		   
-		   	$ed =  $end_date;*/  	
-			
-			//$this->fscdr_db = Common_model::$global_config['fscdr_db'];
-			
-			//$this->fscdr_db->where('cost','error'); //@build_list_errors
-			//$query = $this->fscdr_db->get('trunks');
-			//$query = $this->db->get('trunks');
-			
+						
 			$trunkstats = $this->statistics_model->getTrunkStatsList($start, $perpage, $sd, $ed);
 			
 			if(count($trunkstats) > 0)
@@ -406,35 +397,12 @@ class Statistics extends CI_Controller
 			{
 				foreach ($query->result_array() as $row)
 				{
-					
-// 					$dcontext   = substr( $row['dcontext'], 0, 4 ) . "..";
-// 					$channel    = substr( $row['channel'],  0, 9 ) . "..";
-// 					$dstchannel = substr( $row['channel'],  0, 9 ) . "..";
-// 					$lastdata   = substr( $row['lastdata'], 0, 4 ) . "..";
+
 					if ($this->session->userdata('logintype') != 2 ) {
 						$row['accountcode'] = "";
 						$row['cost']        = "";
 					}
 					
-// 					$json_data['rows'][] = array('cell'=>array(
-// 						$row['calldate'],
-// 						$row['clid'],//calldate
-// 						$row['src'],
-// 						$row['dst'],
-// 						"<acronym title='".$row['dcontext']."'>".$dcontext."</acronym>",
-// 						"<acronym title='".$row['channel'].">".$channel."</acronym>",
-// 						"<acronym title='".$row['dstchannel'].">".$dstchannel."</acronym>",
-// 						$row['lastapp'],
-// 						"<acronym title='".$row['lastdata'].">".$lastdata."</acronym>",
-// 						$row['duration'],
-// 						$row['billsec'],
-// 						$row['disposition'],
-// 						$row['amaflags'],
-// 						$row['accountcode'],
-// 						"<acronym title='".$row['uniqueid']."'>...</acronym>",
-// 						$row['userfield'],
-// 						$this->common_model->calculate_currency($row['cost'])
-// 					));
 					$json_data['rows'][] = array('cell'=>array(
 						$row['calldate'],
 						$row['clid'],//calldate

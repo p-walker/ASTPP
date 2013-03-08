@@ -1,9 +1,6 @@
 <? extend('master.php') ?>
 
 	<? startblock('extra_head') ?>
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="/css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="/js/flexigrid.js"></script>    
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -50,12 +47,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 20,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 300,
+	height: "auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',

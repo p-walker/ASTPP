@@ -1,10 +1,6 @@
 <? extend('master.php') ?>
 
 	<? startblock('extra_head') ?>
-		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
 
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
@@ -28,8 +24,8 @@ $("#flex1").flexigrid({
 	colModel : [
 		{display: 'Package Name', name: 'Number', width: 80, sortable: false, align: 'center'},
         {display: 'Pricelist', name: 'country', width: 100, sortable: false, align: 'center'},
-        {display: 'Pattern', name: 'province', width: 100, sortable: false, align: 'center'},
-        {display: 'Included Seconds', name: 'city', width: 100, sortable: false, align: 'center'},
+	{display: 'Included Seconds', name: 'city', width: 100, sortable: false, align: 'center'},        
+	{display: 'Pattern Count', name: 'province', width: 100, sortable: false, align: 'center'},
         {display: 'Action', name: '', width : 50, align: 'center', formatter:'showlink', formatoptions:{baseLinkUrl:'', }, },
 
 		],
@@ -46,12 +42,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 20,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 300,
+	height: "auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',

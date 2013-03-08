@@ -29,7 +29,15 @@
             <li>
             <label class="desc">Account Code:</label>
             <input class="text field medium" type="text" name="accountcode" value="<?php echo @$switch['accountcode'];?>"  size="8" />
-            </li>            
+            </li>
+            <li>
+            <label class="desc">Caller Name:</label>
+            <input class="text field medium" type="text" name="effective_caller_id_name" value="<?php echo @$switch['effective_caller_id_name'];?>"  size="8" />
+            </li>
+            <li>
+            <label class="desc">Caller Number:</label>
+            <input class="text field medium" type="text" name="effective_caller_id_number" value="<?php echo @$switch['effective_caller_id_number'];?>"  size="8" />
+            </li>
             <li>
             <label class="desc">VM Password:</label>
             <input class="text field medium" type="text" name="vm_password"  value="<?php echo @$switch['vm_password'];?>" size="8" />

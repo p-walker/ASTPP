@@ -26,9 +26,9 @@
             <?=$pricelists?>
             </select>
             </li>
-            <li>
-            <label class="desc">Pattern:</label><input class="text field medium" type="text" value="<?php echo @$package['pattern'];?>" name="pattern"  size="20" />
-            </li>
+<!--            <li>
+            <label class="desc">Pattern:</label><input class="text field medium" type="text" value="<?php //echo @$package['pattern'];?>" name="pattern"  size="20" />
+            </li>-->
             <li>
             <label class="desc">Included in Seconds:</label>
             <input class="text field medium" type="text" name="includedseconds" value="<?php echo @$package['includedseconds'];?>"  size="8" />

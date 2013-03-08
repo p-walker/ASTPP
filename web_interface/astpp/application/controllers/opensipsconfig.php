@@ -34,8 +34,8 @@ class Opensipsconfig extends CI_Controller {
     }
     
     /*
-    * CI has a built in method named _remap which allows
-    * you to overwrite the behavior of calling your controller methods over URI
+      * CI has a built in method named _remap which allows
+      * you to overwrite the behavior of calling your controller methods over URI
     */
     public function _remap($method, $params = array())
     {
@@ -58,11 +58,11 @@ class Opensipsconfig extends CI_Controller {
     }
 
     /**
-     * -------Here we write code for controller opensipsconfig functions opensipsdevices------
+     * -------Here we write code for controller opensipsconfig functions opensipdevices------
      * @action: Add, Edit, Delete opensips devices
      */
     function opensipdevice($action=false, $id=false) {
-        $data['app_name'] = 'ASTPP - Open Source Billing Solution | Opensips  Config | Opensips Devices';
+        $data['app_name'] = 'ASTPP - Open Source Billing Solution | Opensip  Config | Open Sip Devices';
         $data['username'] = $this->session->userdata('user_name');
         $data['page_title'] = 'OPENSIPS DEVICES';
         $data['cur_menu_no'] = 9;
@@ -101,6 +101,7 @@ class Opensipsconfig extends CI_Controller {
                     $errors .= "Password is required<br />";
 
                 if ($errors == "") {
+//                    echo "bhaviok";
                     $this->opensips_model->update_opensip($id, $_POST, $id);
                     $this->session->set_userdata('astpp_notification', 'Opensips updated successfully!');
                     redirect(base_url() . 'opensipsconfig/opensipdevice');
@@ -129,8 +130,8 @@ class Opensipsconfig extends CI_Controller {
     }
 
     /**
-     * -------Here we write code for controller switchconfig functions opensipsdevice_grid------
-     * Listing of opensips devices data through php function json_encode
+     * -------Here we write code for controller switchconfig functions fssipdevices_grid------
+     * Listing of fssip devices data through php function json_encode
      */
     function opensipdevice_grid() {
         $json_data = array();
@@ -180,11 +181,11 @@ class Opensipsconfig extends CI_Controller {
     }
 
     function get_action_buttons($id) {
-        $update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-        $delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+        
+        
         $ret_url = '';
-        $ret_url = '<a href="/opensipsconfig/opensipdevice/edit/' . $id . '/" class="icon" rel="facebox" ' . $update_style . ' title="Update">&nbsp;</a>';
-        $ret_url .= '<a href="/opensipsconfig/opensipdevice/delete/' . $id . '/" class="icon" ' . $delete_style . ' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+        $ret_url = '<a href="/opensipsconfig/opensipdevice/edit/' . $id . '/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+        $ret_url .= '<a href="/opensipsconfig/opensipdevice/delete/' . $id . '/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
         return $ret_url;
     }
 
@@ -192,7 +193,7 @@ class Opensipsconfig extends CI_Controller {
 
         $data['app_name'] = 'ASTPP - Open Source Billing Solution | Opensip  Config | Dispatcher';
         $data['username'] = $this->session->userdata('user_name');
-        $data['page_title'] = 'Dispatcher List';
+        $data['page_title'] = 'Dispatcher';
         $data['cur_menu_no'] = 9;
         if ($action === false)
             $action = "list";
@@ -221,6 +222,7 @@ class Opensipsconfig extends CI_Controller {
             $this->load->view('view_opensips_dispatcher_add', $data);
         }
         elseif ($action == 'edit') {
+//            exit; 
             if (!empty($_POST)) {
                 $errors = "";
              if (trim($_POST['destination']) == "")
@@ -301,11 +303,11 @@ class Opensipsconfig extends CI_Controller {
         }
     }
     function get_action_button_dispatcher($id) {
-        $update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-        $delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+        
+        
         $ret_url = '';
-        $ret_url = '<a href="/opensipsconfig/dispatcher/edit/' . $id . '/" class="icon" rel="facebox" ' . $update_style . ' title="Update">&nbsp;</a>';
-        $ret_url .= '<a href="/opensipsconfig/dispatcher/delete/' . $id . '/" class="icon" ' . $delete_style . ' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+        $ret_url = '<a href="/opensipsconfig/dispatcher/edit/' . $id . '/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+        $ret_url .= '<a href="/opensipsconfig/dispatcher/delete/' . $id . '/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
         return $ret_url;
     }
 

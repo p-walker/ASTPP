@@ -213,7 +213,7 @@ sub addaccount() {
     $accountinfo->{company}        = "" if ( !$accountinfo->{company} );
     $accountinfo->{address1}       = "" if ( !$accountinfo->{address1} );
     $accountinfo->{address2}       = "" if ( !$accountinfo->{address2} );
-    $accountinfo->{postal_code}    = "" if ( !$accountinfo->{postal_code} );
+    $accountinfo->{postal_code}    = "" if ( !$accountinfo->{postal_code} );    
     $accountinfo->{province}       = "" if ( !$accountinfo->{province} );
     $accountinfo->{city}           = "" if ( !$accountinfo->{city} );
     $accountinfo->{country}        = "" if ( !$accountinfo->{country} );
@@ -407,49 +407,57 @@ sub get_dial_string() {
 # Return the list of outbound routes you should use based either on cost or precedence.
 sub get_outbound_routes() {
 	my ( $astpp_db, $number, $accountinfo,$routeinfo, @reseller_list ) = @_;
-	my ( @routelist, @outbound_route_list, $record, $sql );
-	if ($accountinfo->{routing_technique} && $accountinfo->{routing_technique} != 0) {
+	my ( @routelist, @outbound_route_list, $record, $sql,$maxlen_pattern,@outbound_routes_list );
+# 	if ($accountinfo->{routing_technique} && $accountinfo->{routing_technique} != 0) {
+# 		$sql =
+# 			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
+# 			. $astpp_db->quote($number)
+# 			. " RLIKE pattern AND status = 1 AND precedence <= "
+# 			. $astpp_db->quote($accountinfo->{routing_technique}) 
+# 			. "GROUP BY trunk ORDER BY cost"
+# 			# . "ORDER by LENGTH(pattern) DESC, precedence, cost"
+# 		);	
+# 		$sql->execute;
+# 		while ( $record = $sql->fetchrow_hashref ) {
+# 			push @routelist, $record;
+# 		}
+# 		$sql->finish;
+# 	} elsif ($routeinfo->{precedence} && $routeinfo->{precedence} != 0 ){
+# 		$sql =
+# 			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
+# 			. $astpp_db->quote($number)
+# 			. " RLIKE pattern AND status = 1 AND precedence <= " 
+# 			. $astpp_db->quote($routeinfo->{precedence}) 
+# 			. "GROUP BY trunk ORDER BY cost"
+# 			# . "ORDER by LENGTH(pattern) DESC, precedence, cost"
+# 		);
+# 		$sql->execute;
+# 		while ( $record = $sql->fetchrow_hashref ) {
+# 			push @routelist, $record;
+# 		}
+# 		$sql->finish;
+# 	} else {
 		$sql =
-			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
-			. $astpp_db->quote($number)
-			. " RLIKE pattern AND status = 1 AND precedence <= "
-			. $astpp_db->quote($accountinfo->{routing_technique}) 
-			. " ORDER BY cost,precedence"
-			# . "ORDER by LENGTH(pattern) DESC, precedence, cost"
-		);	
-		$sql->execute;
-		while ( $record = $sql->fetchrow_hashref ) {
-			push @routelist, $record;
-		}
-		$sql->finish;
-	} elsif ($routeinfo->{precedence} && $routeinfo->{precedence} != 0 ){
-		$sql =
-			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
-			. $astpp_db->quote($number)
-			. " RLIKE pattern AND status = 1 AND precedence <= " 
-			. $astpp_db->quote($routeinfo->{precedence}) 
-			. " ORDER BY cost,precedence"
-			# . "ORDER by LENGTH(pattern) DESC, precedence, cost"
-		);
-		$sql->execute;
-		while ( $record = $sql->fetchrow_hashref ) {
-			push @routelist, $record;
-		}
-		$sql->finish;
-	} else {
-		$sql =
+# 			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
+# 			. $astpp_db->quote($number)
+# 			. " RLIKE pattern AND status = 1 "
+# 			. "GROUP BY trunk ORDER BY cost"
 			$astpp_db->prepare( "SELECT * FROM outbound_routes WHERE "
 			. $astpp_db->quote($number)
 			. " RLIKE pattern AND status = 1 "
-			. " ORDER BY cost,precedence"
-			#."ORDER by LENGTH(pattern) DESC, cost"
-		);	
+			. "ORDER BY precedence DESC, cost,precedence");
+			
+# 			print STDERR "SELECT * FROM outbound_routes WHERE "
+# 			. $astpp_db->quote($number)
+# 			. " RLIKE pattern AND status = 1 AND resellers="
+# 			. $astpp_db->quote($accountinfo->{number})
+# 			. " ORDER BY cost,precedence";
 		$sql->execute;
 		while ( $record = $sql->fetchrow_hashref ) {
 			push @routelist, $record;
 		}
 		$sql->finish;
-	}
+# 	}
 	if (@reseller_list) {
 		print STDERR "CHECKING LIST OF RESELLERS AGAINST TRUNKS\n"  if $config->{debug} == 1;
 		foreach my $route (@routelist) {
@@ -472,6 +480,20 @@ sub get_outbound_routes() {
 		print STDERR "WE DID NOT RECEIVE A LIST OF RESELLERS TO CHECK AGAINST.\n"   if $config->{debug} == 1;
 		@outbound_route_list = @routelist;
 	}
+	
+	#Remove small lenght prefixes from list
+# 	if(scalar(@outbound_route_list)>0)
+# 	{
+# 	  $maxlen_pattern = length($outbound_route_list[0]->{pattern});
+# 	  foreach my $outbound_route (@outbound_route_list) {
+# 	      if (length($outbound_route->{pattern}) < $maxlen_pattern)
+# 	      {
+# 		  
+# 	      }else{
+# 		  push @outbound_routes_list, $outbound_route;
+# 	      }
+# 	  }
+# 	}
 	return @outbound_route_list;
 }
 
@@ -1104,20 +1126,29 @@ sub calc_call_cost() {
     if (!$increment || $increment == 0) {
 	$increment = 1;
     }
-    if ($answeredtime > 0) {
-    my ($total_seconds);
-    $total_seconds = ( $answeredtime - $inc_seconds ) / $increment if $inc_seconds;
-    $total_seconds = ( $answeredtime ) / $increment if !$inc_seconds;
-    if ( $total_seconds < 0 ) {
-        $total_seconds = 0;
+    if (!$inc_seconds) {
+	$inc_seconds = 0;
     }
-    my $bill_increments = ceil($total_seconds);
-    my $billseconds     = $bill_increments * $increment;
-    $cost = ( $billseconds / 60 ) * $cost + $connect;
-    print STDERR "AnsweredTime: $answeredtime Included Sec: $inc_seconds\n" if $config->{debug} == 1;
-    print STDERR "Increment: $increment Total Increments: $total_seconds\n" if $config->{debug} == 1;
-    print STDERR "Bill Seconds: $billseconds  Total cost is $cost\n" if $config->{debug} == 1;
-    return $cost;
+    print STDERR "ANSWERED TIME : ". $answeredtime."\n";        
+    if ($answeredtime > 0) {
+	my ($total_seconds);
+	$total_seconds = ( $answeredtime - $inc_seconds ) / $increment;
+	#$total_seconds = ( $answeredtime ) / $increment if !$inc_seconds;
+	print STDERR "TOTAL SECONDS : ". $total_seconds."\n";
+	if ( $total_seconds < 0 ) {
+	    $total_seconds = 0;
+	}
+	my $bill_increments = ceil($total_seconds);
+	my $billseconds = $bill_increments * $increment;
+	print STDERR "BILL SECONDS : ". $billseconds."\n";
+	print STDERR "Code Cost : ".$cost."\n";
+	print STDERR "Code Connect Cost : ".$connect."\n";
+	$cost = ( $billseconds / 60 ) * $cost + $connect;
+	print STDERR "COST : ".$cost."\n";
+	print STDERR "AnsweredTime: $answeredtime Included Sec: $inc_seconds\n" if $config->{debug} == 1;
+	print STDERR "Increment: $increment Total Increments: $total_seconds\n" if $config->{debug} == 1;
+	print STDERR "Bill Seconds: $billseconds  Total cost is $cost\n" if $config->{debug} == 1;
+	return $cost;
     } else {
 	print STDERR "NO CHARGE - ANSWEREDTIME = 0\n" if $config->{debug} == 1;
 	return 0;
@@ -2065,31 +2096,40 @@ sub finduniquecallingcard() {
 
 # Refill and ASTPP account.
 sub refill_account() {
-    my ( $astpp_db, $account, $amount ) =
-      @_;    # The amount shall be passed in 100ths of a penny.
-    my ( $sql, $status );
+#     my ( $astpp_db, $account, $amount,$status_string ) =@_;    # The amount shall be passed in 100ths of a penny.
+    my ( $astpp_db, $account,$payment_info ) =@_;    # The amount shall be passed in 100ths of a penny.
+    my ( $sql, $status,$status_string );
     my $description = gettext("Refill Account");
     my $uniqueid    = gettext("N/A");
     my $timestamp   = &prettytimestamp;
     my $tmp         =
-"INSERT INTO cdrs (uniqueid, cardnum, callednum, credit, callstart) VALUES ("
+       "INSERT INTO cdrs (uniqueid, cardnum, callednum, credit, callstart) VALUES ("
       . $astpp_db->quote($uniqueid) . ", "
       . $astpp_db->quote($account) . ","
       . $astpp_db->quote($description) . ", "
-      . $astpp_db->quote($amount) . ", NOW())";
+      . $astpp_db->quote($payment_info->{refilldollars}) . ", NOW())";
     print STDERR "$tmp\n" if $config->{debug} == 1;
     if ( $astpp_db->do($tmp) ) {
-        $status =
-            gettext("Refilled account:")
-          . " $account "
-          . gettext("in the amount of:")
-          . $amount / 1 . "\n" if $config->{debug} == 1;
-        return $status;
+	  my $tmp = "INSERT INTO payments (accountid,credit,type,payment_by,reference,notes) VALUES ("
+		    . $astpp_db->quote($payment_info->{payment_for}) . ", "
+		    . $astpp_db->quote($payment_info->{refilldollars}) . ","
+		    . $astpp_db->quote($payment_info->{payment_type}) . ","
+		    . $astpp_db->quote($payment_info->{payment_by}) . ","
+		    . $astpp_db->quote($payment_info->{reference}) . ", "
+		    . $astpp_db->quote($payment_info->{notes}). ")";
+#  print STDERR "$tmp\n";
+	   # print STDERR "$tmp\n" if $config->{debug} == 1;
+	  $astpp_db->do($tmp);
+
+#         $status = gettext("Refilled account:") . " $account " . gettext("in the amount of:"). $amount / 1 . "\n" if $config->{debug} == 1;
+	my $status_string = { status => "0", message => $account." account refilled successfully!" } ;        
     }
     else {
-        $status = "$tmp " . gettext("FAILED!");
-        return $status;
+        #$status = "$tmp " . gettext("FAILED!");
+	my $status_string = { status => "1", message => "Sorry, we are unable to refill ".  $account ." account!" } ;
+        #return $status;
     }
+    return to_json($status_string);
 }
 
 sub write_callingcard_cdr() { # Write the callingcardcdr record if this is a calling card.
@@ -3535,11 +3575,11 @@ sub get_package() {
     my ( $astpp_db, $carddata, $number ) = @_;
     my ( $sql, $record );
     $sql =
-      $astpp_db->prepare( "SELECT * FROM packages WHERE "
+      $astpp_db->prepare( "SELECT * FROM packages inner join package_patterns on packages.id = package_patterns.package_id WHERE "
           . $astpp_db->quote($number)
-          . " RLIKE pattern AND pricelist = "
+          . " RLIKE package_patterns.patterns AND pricelist = "
           . $astpp_db->quote( $carddata->{pricelist} )
-          . " ORDER BY LENGTH(pattern) DESC LIMIT 1" );
+          . " ORDER BY LENGTH(package_patterns.patterns) DESC LIMIT 1" );
     $sql->execute;
     $record = $sql->fetchrow_hashref;
     $sql->finish;
@@ -3721,6 +3761,22 @@ sub get_callingcard() {
     $sql->execute;
     $carddata = $sql->fetchrow_hashref;
     $sql->finish;
+    return $carddata;
+}
+
+# Return data on a specific calling card.
+sub get_callingcard_by_pin() {
+    my ( $astpp_db, $pin, $config ) = @_;
+    my ( $sql,$tmp,$carddata );
+    $tmp =
+       "SELECT * FROM callingcards WHERE pin = "
+          . $astpp_db->quote($pin);
+    print STDERR "$tmp\n" if $config->{debug} == 1;
+    $sql = $astpp_db->prepare($tmp);
+    $sql->execute;
+    $carddata = $sql->fetchrow_hashref;
+    $sql->finish;
+    print STDERR $carddata->{cardnumber};
     return $carddata;
 }
 
@@ -4071,7 +4127,7 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 		"uniqueid: $cdrinfo->{uniqueid}, cardno: $carddata->{number}, phoneno: $cdrinfo->{dst}, Userfield: $cdrinfo->{userfield}\n" if $config->{debug} == 1;
 	print STDERR
 		"disposition: $cdrinfo->{disposition} Pricelist: $carddata->{pricelist} reseller: $carddata->{reseller}\n" if $config->{debug} == 1;
-	if ( $cdrinfo->{disposition} =~ /^ANSWERED$/ || $cdrinfo->{disposition} eq "NORMAL_CLEARING") {
+# 	if ( $cdrinfo->{disposition} =~ /^ANSWERED$/ || $cdrinfo->{disposition} eq "NORMAL_CLEARING" || $cdrinfo->{disposition} eq "SUCCESS") {
 #    		if ($config->{thirdlane_mods} == 1 && $cdrinfo->{userfield} =~ m/.\d\d\d-IN/) {
 #    			print STDERR "Call belongs to a Thirdlane(tm) DID.\n" if $config->{debug} == 1;
 #			$cdrinfo->{dst} =~ s/-IN//g;
@@ -4123,8 +4179,10 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 			}
 
 			if ( $branddata->{markup} ne "" && $branddata->{markup} != 0 ) {
-				$numdata->{connectcost} = $numdata->{connectcost} * ( ( $branddata->{markup} / 1 ) + 1 );
-				$numdata->{cost} = $numdata->{cost} * ( ( $branddata->{markup} / 1 ) + 1 );
+# 				$numdata->{connectcost} = $numdata->{connectcost} * ( ( $branddata->{markup} / 1 ) + 1 );
+# 				$numdata->{cost} = $numdata->{cost} * ( ( $branddata->{markup} / 1 ) + 1 );
+				$numdata->{connectcost} = ($numdata->{connectcost} * $branddata->{markup}) / 100;
+				$numdata->{cost} = ($numdata->{cost} *  $branddata->{markup}) / 100;
 			}
 			if ( $numdata->{inc} > 0 ) {
 				$increment = $numdata->{inc};
@@ -4138,7 +4196,7 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 					$numdata->{connectcost}, $numdata->{cost},
 					$cdrinfo->{billsec},     $increment,
 					$numdata->{includedseconds}
-					);
+				    );
 
 			$cost = sprintf( "%." . $config->{decimalpoints} . "f", $cost );
 			print STDERR "Matching pattern is $numdata->{pattern}\n" if $config->{debug} == 1;
@@ -4176,15 +4234,15 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 				or die "Could not restore INT,QUIT,CHLD signals: $!\n" if $config->{debug} == 1;    #
 				$status = 1;
 		}
-	}
-	else {
-		&save_cdr( $config, $cdr_db,$cdrinfo->{uniqueid}, "error",$cdrinfo->{dst} ) if !$vars && $config->{astcdr} == 1;
-		print STDERR "ERROR - ERROR - ERROR - ERROR - ERROR \n" if $config->{debug} == 1;
-		print STDERR "DISPOSITION: $cdrinfo->{disposition} \n" if $config->{debug} == 1;
-		print STDERR "UNIQUEID: $cdrinfo->{uniqueid} \n" if $config->{debug} == 1;
-		print STDERR "----------------------\n\n" if $config->{debug} == 1;
-		$status = 0;
-	}
+# 	}
+# 	else {
+# 		&save_cdr( $config, $cdr_db,$cdrinfo->{uniqueid}, "error",$cdrinfo->{dst} ) if !$vars && $config->{astcdr} == 1;
+# 		print STDERR "ERROR - ERROR - ERROR - ERROR - ERROR \n" if $config->{debug} == 1;
+# 		print STDERR "DISPOSITION: $cdrinfo->{disposition} \n" if $config->{debug} == 1;
+# 		print STDERR "UNIQUEID: $cdrinfo->{uniqueid} \n" if $config->{debug} == 1;
+# 		print STDERR "----------------------\n\n" if $config->{debug} == 1;
+# 		$status = 0;
+# 	}
 	return $status;
 }
 
@@ -4256,35 +4314,37 @@ sub processlist() {  # Deal with a list of calls which have not been rated so fa
 				if ( $cdrinfo->{lastapp} eq "MeetMe" ) {    # There is an issue with calls that come out of meetmee
 					$cdrinfo->{billsec} = $cdrinfo->{duration};
 				}
-				if ( $cdrinfo->{billsec} <= 0 ) {			# not having the right billable seconds.
-					&save_cdr( $config, $cdr_db, $uniqueid, 0,$cdrinfo->{dst} ) if !$vars && $config->{astcdr} == 1;
-					&save_cdr_vendor( $config, $cdr_db, $uniqueid, 0,$cdrinfo->{dst} )
-						if $config->{astcdr} == 1;
-					print STDERR "\n----------------------\n" if $config->{debug} == 1;
-					print STDERR "CDR Written - No Billable Seconds\n" if $config->{debug} == 1;
-					print STDERR
-						"uniqueid $cdrinfo->{uniqueid}, cardno $cdrinfo->{accountcode}, phoneno $cdrinfo->{dst}\n" if $config->{debug} == 1;
-					print STDERR "disposition $cdrinfo->{disposition}\n" if $config->{debug} == 1;
-					print STDERR "----------------------\n" if $config->{debug} == 1;
-					
-					if($carddata->{maxchannels} ne '0' && $cdrinfo->{userfield} eq 'STANDARD')
-					{					
-					      &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
-					}
-					if($cdrinfo->{userfield} eq 'DID')
-					{					
-					      &update_inuse($astpp_db,$cdrinfo->{dst},'dids','-1');
-					}
-					while ( $carddata->{reseller} ne "" ) {
-					    $carddata = &get_account( $astpp_db, $carddata->{reseller} );
-					    #Calculating in use count for account 
-					    if($carddata->{maxchannels} ne '0' && $cdrinfo->{userfield} eq 'STANDARD')
-					    {
-						  &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
-					    }
-					}
-				}
-				elsif ( $cdrinfo->{accountcode} ) {
+# 				if ( $cdrinfo->{billsec} <= 0 ) {# not having the right billable seconds.
+# 					&save_cdr( $config, $cdr_db, $uniqueid, 0,$cdrinfo->{dst} ) if !$vars && $config->{astcdr} == 1;
+# 					&save_cdr_vendor( $config, $cdr_db, $uniqueid, 0,$cdrinfo->{dst} )
+# 						if $config->{astcdr} == 1;
+# 					print STDERR "\n----------------------\n" if $config->{debug} == 1;
+# 					print STDERR "CDR Written - No Billable Seconds\n" if $config->{debug} == 1;
+# 					print STDERR
+# 						"uniqueid $cdrinfo->{uniqueid}, cardno $cdrinfo->{accountcode}, phoneno $cdrinfo->{dst}\n" if $config->{debug} == 1;
+# 					print STDERR "disposition $cdrinfo->{disposition}\n" if $config->{debug} == 1;
+# 					print STDERR "----------------------\n" if $config->{debug} == 1;
+# 					
+# 					if($carddata->{maxchannels} ne '0' && $cdrinfo->{userfield} eq 'STANDARD')
+# 					{					
+# 					      &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
+# 					}
+# 					if($cdrinfo->{userfield} eq 'DID')
+# 					{					
+# 					      &update_inuse($astpp_db,$cdrinfo->{dst},'dids','-1');
+# 					}
+# 					while ( $carddata->{reseller} ne "" ) {
+# 					    $carddata = &get_account( $astpp_db, $carddata->{reseller} );
+# 					    #Calculating in use count for account 
+# 					    if($carddata->{maxchannels} ne '0' && $cdrinfo->{userfield} eq 'STANDARD')
+# 					    {
+# 						  &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
+# 					    }
+# 					}
+# 				}
+# 				els
+				if ( $cdrinfo->{accountcode} ) 
+				{
 					$status = 0;
 					$status = &rating( $astpp_db, $cdr_db,$config, $cdrinfo, $carddata, $vars);
 					#Calculating in use count for account 
@@ -4331,7 +4391,6 @@ sub processlist() {  # Deal with a list of calls which have not been rated so fa
 							{
 							      &update_inuse($astpp_db,$carddata->{number},'accounts','-1');
 							}
-							
 							$previous_account = $carddata->{number};
 						}
 					}
@@ -5230,7 +5289,6 @@ sub edit_callerid() {
 	    . " callerid_number =" . $astpp_db->quote( $params->{callerid_number} ) . ", "
 	    . " status = " .$callstatus." WHERE accountid ="
 	    . $astpp_db->quote( $params->{accountid} );
-
     if ( $astpp_db->do($tmp) ) {
 	$status = gettext("Account CallerID Updated Successfully!");
     }
@@ -5333,4 +5391,32 @@ sub addinvoiceconf()
     $astpp_db->do(
 	"INSERT INTO invoice_conf (accountid, company_name, address, city, province, country, zipcode, telephone, fax, emailaddress, website) VALUES ("
 	.$astpp_db->quote( $accrecord->{accountid}).", 'Company name', 'Address', 'City', 'Province', 'Country', 'Zipcode', 'Telephone', 'Fax', 'Email Address', 'Website')" );
+}
+
+sub search_for_block_prefixes() {
+  my ( $astpp_db,$params,$accnumber) = @_;
+  my($temp,$sql,$accrecord);
+  $temp = "SELECT * from block_patterns WHERE ".$astpp_db->quote($params)." RLIKE blocked_patterns AND accountid = (select accountid from accounts where number = ".$astpp_db->quote($accnumber).")";
+#   print STDERR $temp;
+  $sql = $astpp_db->prepare($temp);
+  $sql->execute;
+  $accrecord = $sql->fetchrow_hashref();
+  return $accrecord;
+}
+
+#Use full when calling cad ani method is enabled. 
+#This function will return calling card information from customer account number
+sub get_callingcard_from_account()
+{
+    my ( $astpp_db, $cardno, $config ) = @_;
+    my ( $sql,$tmp,$carddata );
+    $tmp =
+       "SELECT * FROM callingcards WHERE account = "
+          . $astpp_db->quote($cardno);
+    print STDERR "$tmp\n" if $config->{debug} == 1;
+    $sql = $astpp_db->prepare($tmp);
+    $sql->execute;
+    $carddata = $sql->fetchrow_hashref;
+    $sql->finish;
+    return $carddata;
 }

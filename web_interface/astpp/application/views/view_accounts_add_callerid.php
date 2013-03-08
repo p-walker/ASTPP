@@ -18,7 +18,7 @@
       </li>
       <li>
           <label class="desc">Status:</label>
-          <input type="checkbox" name="status" <?if(isset($status)){ echo "checked";}?>/>
+          <input type="checkbox" name="status" <?if(isset($status) && $status=='1'){ echo "checked";}?>/>
       </li>
       <li>
           <label class="desc">Caller Id Name:</label>

@@ -2,37 +2,35 @@
 <?php error_reporting(E_ERROR);?>
 <? startblock('extra_head') ?>
 <script type="text/javascript">
-		$().ready(function() {
-		
-		// validate signup form on keyup and submit
-		$("#createAccount").validate({
-			rules: {
-				customnum: {
-					required: true,
-					minlength: 5
-				},
-				credit_limit: "required",
-				context: "required",
-				accountpassword: {
-					required: true,
-					minlength: 6
-				},
-				email: {
-					required: true,
-					email: true
-				},
-				firstname: {
-					required: true
-				}
+	$().ready(function() {
+	
+	// validate signup form on keyup and submit
+	$("#createAccount").validate({
+		rules: {
+			customnum: {
+				required: true,
+				minlength: 5
+			},
+			credit_limit: "required",
+			context: "required",
+			accountpassword: {
+				required: true,
+				minlength: 6
+			},
+			email: {
+				required: true,
+				email: true
+			},
+			firstname: {
+				required: true
+			},
+			pricelists: {
+			    required: true
 			}
-		});
-		});
-	</script>
-<style>
-fieldset {
-	width: 609px;
-}
-</style>
+		}
+	    });
+	});
+</script>
 <?php endblock() ?>
 <?php startblock('page-title') ?>
 <?=$page_title?>
@@ -55,7 +53,7 @@ fieldset {
               <ul>
                 <li>
                   <label class="desc">Account Number:</label>
-                  <input name="<?php echo ($flag=='create')?"customnum":"item";?>" type="text" class="text field medium" id="customnum" <?=($flag =="create")?"":"readonly='readonly'"?>  value="<?=@$account['number']?>"  size="20"/>
+                  <input name="<?php echo ($flag=='create')?"customnum":"item";?>" type="text" class="text field medium" id="customnum" readonly='readonly' <?=($flag =="create")?"":"readonly='readonly'"?>  value="<?if(isset($number) && $number!= ""){ echo $number;} else{ echo @$account['number']; }?>"  size="20"/>
                 </li>
                 <li>
                   <label class="desc">Password:</label>
@@ -65,7 +63,7 @@ fieldset {
             </div>
           </fieldset>
         </div>
-        `
+        
         <div style="width:500px; margin-bottom:10px;">
           <fieldset  style="width:500px;">
             <legend><span style="font-size:14px; font-weight:bold; color:#000; padding:5px;"> Customer Profile</span></legend>
@@ -107,14 +105,14 @@ fieldset {
                 <li>
                   <label class="desc">Email:</label>
                   <input class="text field medium" type="text" name="email"  size="50"  value="<?=$account['email']?>"/>
-                </li>
-                <li>
+                </li>                
                 <li>
                   <label class="desc">Address 1:</label>
                   <input name="address1" type="text" class="text field medium" id="address1"  value="<?=@$account['address_1']?>"  size="50"/>
                 </li>
-                <label class="desc">Address 2:</label>
-                <input name="address2" type="text" class="text field medium" id="address2"  value="<?=@$account['address_2']?>"  size="50"/>
+                <li>
+		    <label class="desc">Address 2:</label>
+		    <input name="address2" type="text" class="text field medium" id="address2"  value="<?=@$account['address_2']?>"  size="50"/>
                 </li>
                 <li>
                   <label class="desc">City:</label>
@@ -127,7 +125,7 @@ fieldset {
                 <li>
                   <label class="desc">Zip/Postal Code:</label>
                   <input type="text" name="postal_code" class="text field medium"  size="20"  value="<?=@$account['postal_code']?>"/>
-                </li>
+                </li>                
                 <li>
                   <label class="desc">Country:</label>
                   <?=form_countries('country',@$account['country'],array("class"=>"select field small"))?>
@@ -141,6 +139,7 @@ fieldset {
           </fieldset>
         </div>
       </div>
+      
       <div style="float:left; width:500px; margin-left:30px;">
         <div style="width:500px; margin-bottom:10px;">
           <fieldset  style="width:500px;">
@@ -168,7 +167,11 @@ fieldset {
                     <option value="2" <?php if(@$account['status'] == 2){ echo "selected='selected'";}?>>Inactive</option>
                   </select>
 		</li>
-                <?php if(!isset($account)){?>
+		
+                <?php 
+                if(Common_model::$global_config['system_config']['softswitch']=='0')
+		{
+                if(!isset($account)){?>
                 <li>
                   <label class="desc">Add VOIP Friend:</label>
                   <span>
@@ -197,7 +200,21 @@ fieldset {
                   <label class="desc">IP Address:</label>
                   <input type="text" class="field text medium" name="ipaddr" value="dynamic" size="20" />
                 </li>
-                <li>
+                <?}else{
+		  if(!isset($account)){?>
+		  <li>
+                  <label class="desc">Add VOIP Friend:</label>
+                  <span>                  
+                    &nbsp;<input type="checkbox" name="SIP" value="on" />                    
+                  </span></li>                  
+                <?
+		  }
+		  ?>
+		  <input class="field text medium" type="hidden" name="context" size="20"  value="<?=$config['default_context']?>"/>
+		  <?
+		  }?>
+		  
+                <li>                
                   <label class="desc">Max Channels:</label>
                   <input type="text" class="text field medium" name="maxchannels"  size="4"  value="<?=$account['maxchannels']?>"/>
                 </li>

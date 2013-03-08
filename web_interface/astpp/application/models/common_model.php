@@ -276,9 +276,9 @@ class Common_model extends CI_Model
 	{
 		$ret_html = '';
 		$trunks = $this->list_trunks();
+		$ret_html .= "<option value=''>--Select Trunk--</option>";
 		foreach ($trunks as $elem)
 		{
-			$ret_html .= "<option value=''>--Select Trunk--</option>";
 			$ret_html .= '<option value="'.$elem.'"';
 			if($elem == $default)
 				$ret_html .= 'selected="selected"';
@@ -826,4 +826,15 @@ class Common_model extends CI_Model
                     return $query->result();
 		}
 	}	  
+	
+	function status_message($response_tmp)
+	{
+	    $response = json_decode($response_tmp);
+	    if($response->status==0)
+	    {
+		$this->session->set_userdata('astpp_notification', $response->message);
+	    }else{
+		$this->session->set_userdata('astpp_errormsg', $response->message );
+	    }
+	}
 }

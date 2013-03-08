@@ -13,7 +13,7 @@ class Lcr_model extends CI_Model
 		$data['mode'] = "Trunks";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_trunk($data)
@@ -23,7 +23,7 @@ class Lcr_model extends CI_Model
 		$data['mode'] = "Trunks";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function get_trunk_by_name($name)
@@ -46,7 +46,7 @@ class Lcr_model extends CI_Model
 		$data['action'] = "Deactivate...";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function getTrunkCount()
@@ -146,7 +146,7 @@ class Lcr_model extends CI_Model
 		$data['mode'] = "Outbound Routes";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_outbound($data)
@@ -156,7 +156,7 @@ class Lcr_model extends CI_Model
 		$data['mode'] = "Outbound Routes";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function get_outbound_by_id($id)
@@ -179,7 +179,7 @@ class Lcr_model extends CI_Model
 		$data['action'] = "Deactivate...";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}	
 	
 	
@@ -546,7 +546,8 @@ class Lcr_model extends CI_Model
 		}
 		
 		$this->db->where('status','1');
-		$this->db->limit($limit,$start);	
+		$this->db->limit($limit,$start);
+		$this->db->order_by('pattern ASC,comment ASC');
 	  	$this->db->from('outbound_routes');	
 		$query = $this->db->get();	
 		//echo $this->db->last_query();		
@@ -829,5 +830,12 @@ class Lcr_model extends CI_Model
 		//echo $this->db->last_query();		
 		return $query;
 	}		
+      function delete_selected_routes($routes_ID){
+	  $where =  "id IN ($routes_ID)";
+	  $this->db->where($where);
+	  $this->db->delete("outbound_routes");
+	  return true;
+      }		
+
 }
 ?>

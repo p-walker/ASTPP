@@ -1,11 +1,5 @@
 <? extend('master.php') ?>
-
-	<? startblock('extra_head') ?>
-		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
-
+<? startblock('extra_head') ?>
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -50,17 +44,17 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 20,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 300,
+	height: "auto",
     pagetext: 'Page',
     outof: 'of',
-    nomsg: 'No items',
+    nomsg: 'No Periodic Charges Found',
     procmsg: 'Processing, please wait ...',
-    pagestat: 'Displaying {from} to {to} of {total} items',
+    pagestat: 'Displaying {from} to {to} of {total} periodic charges',
     //preProcess: formatContactResults,
     onSuccess: function(data){
        $('a[rel*=facebox]').facebox({
@@ -170,10 +164,6 @@ function reload_button()
                      </select>
                     </span>
                  </div>
-                 
-                 
-               
-                    
             </li>
             
             <li> 
@@ -204,7 +194,7 @@ function reload_button()
          </form>             
           </div>
         </div>
-<div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
+	    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
             <div class="portlet-header ui-widget-header">Periodic Charges<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
             <div class="portlet-content">
             <form method="POST" action="del/0/" enctype="multipart/form-data" id="ListForm">
@@ -218,10 +208,5 @@ function reload_button()
 <?php 
 	//echo $form;
 ?>
-    <? endblock() ?>
-	
-    <? startblock('sidebar') ?>
-    Filter by
-    <? endblock() ?>
-    
+<? endblock() ?>	      
 <? end_extend() ?>  

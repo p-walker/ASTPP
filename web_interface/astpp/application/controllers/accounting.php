@@ -12,12 +12,6 @@ class Accounting extends CI_Controller {
         $this->load->library('session');
         $this->load->library('form_builder');
 
-//		$this->load->model('Pricelists_model');
-//		$this->load->model('accounts_model');
-//		
-//		$this->load->model('Astpp_common');	
-//		$this->load->model('rates_model');	
-//		$this->load->model('switch_config_model');
         $this->load->model('accounting_model');
         $this->load->model('common_model');
 
@@ -49,9 +43,9 @@ class Accounting extends CI_Controller {
     }
 
     function get_action_buttons_taxes($tax_id) {
-        $delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+        
         $ret_url = '';
-        $ret_url .= '<a href="' . base_url() . 'accounting/account_taxes/delete/' . $tax_id . '/" class="icon" ' . $delete_style . ' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+        $ret_url .= '<a href="' . base_url() . 'accounting/account_taxes/delete/' . $tax_id . '/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
         return $ret_url;
     }
 
@@ -184,11 +178,11 @@ class Accounting extends CI_Controller {
      * @$_POST['username']: Account Number
      */
     function valid_account_tax() {
-        $tax_id = '';
+        $tax_id = '';                
         if (!empty($_POST['username'])) {
 
-            $account_num = mysql_real_escape_string($_POST['username']);
-            $row = $this->accounting_model->check_account_num($account_num);
+            $account_num = mysql_real_escape_string($_POST['username']);            
+            $row = $this->accounting_model->check_account_num($account_num);            
             if (isset($row['accountid']) && $row['accountid'] != '') {
                 $taxes_id = $this->accounting_model->get_accounttax_by_id($row['accountid']);
                 if ($taxes_id) {
@@ -198,10 +192,10 @@ class Accounting extends CI_Controller {
 
                     $tax_id = rtrim($tax_id, ",");
                     echo $row['accountid'] . ',' . $tax_id;
-                }
-            } else {
-                echo $row['accountid'];
-            }
+                }else {
+		    echo $row['accountid'];
+		}
+	    }	 
         }
     }
 
@@ -230,12 +224,12 @@ class Accounting extends CI_Controller {
      */
     function account_invoice_grid() {
         $json_data = array();
-        $count_all = $this->accounting_model->getAccount_taxes_count();
+        $count_all = $this->accounting_model->getAccount_invoiceList(false);        
 
         $config['total_rows'] = $count_all;
-        $config['per_page'] = $_GET['rp'] = 1;
+        $config['per_page'] = $_GET['rp'];
 
-        $page_no = $_GET['page'] = 10;
+        $page_no = $_GET['page'];
 
         $json_data['page'] = $page_no;
         $json_data['total'] = ($config['total_rows'] > 0) ? $config['total_rows'] : 0;
@@ -246,7 +240,7 @@ class Accounting extends CI_Controller {
             $start = 0;
 
         $json_data['rows'] = array();
-        $query = $this->accounting_model->getAccount_invoiceList($start, $perpage);
+        $query = $this->accounting_model->getAccount_invoiceList(true,$start, $perpage);
         if ($query->num_rows() > 0) {
             foreach ($query->result_array() as $row) {
                 $json_data['rows'][] = array('cell' => array(
@@ -263,13 +257,17 @@ class Accounting extends CI_Controller {
         echo json_encode($json_data);
     }
 
-    function get_action_buttons_invoice($invoiceid) {
-        $details_style = 'style="text-decoration:none;background-image:url(/images/details.png);"';
-        $pdf_style = 'style="text-decoration:none;background-image:url(/images/pdf.png);"';
+    function get_action_buttons_invoice($invoiceid) {        
         $ret_url = '';
-        $ret_url .= '<a href="' . base_url() . 'accounts/view_invoice/' . $invoiceid . '/" class="icon" ' . $details_style . ' title="Details">&nbsp;</a>';
-        $ret_url .= '<a href="' . base_url() . 'accounts/download_invoice/' . $invoiceid . '/" class="icon" ' . $pdf_style . ' title="Details">&nbsp;</a>';
+        $ret_url .= '<a href="' . base_url() . 'accounts/view_invoice/' . $invoiceid . '/" class="icon details_image" title="View Invoice">&nbsp;</a>';
+        $ret_url .= '<a href="' . base_url() . 'accounts/download_invoice/' . $invoiceid . '/" class="icon pdf_image" title="Download Invoice">&nbsp;</a>';
+	$ret_url .= '<a href="' . base_url() . 'accounting/delete_invoice/'.$invoiceid.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+
         return $ret_url;
+    }
+    function delete_invoice($invoiceid){
+      $result = $this->accounting_model->delete_invoice_by_id($invoiceid);
+      redirect(base_url().'accounting/invoice_list');
     }
 
     function get_account_details($number) {

@@ -1,11 +1,6 @@
 <? extend('master.php') ?>
 
 	<? startblock('extra_head') ?>
-		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
-
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -26,51 +21,45 @@ $("#flex1").flexigrid({
     method: 'GET',
     dataType: 'json',
 	colModel : [
-		{display: 'Provider', name: 'Number', width:100,  sortable: false, align: 'center'},
-		{display: 'Destination', name: 'country',width:100, sortable: false, align: 'center'},
-	//         {display: 'IDD Code', name: 'province',width:120, sortable: false, align: 'center'},
-		{display: '<acronym title="International Direct Dialling Code">IDD Code</acronym>', name: 'province',width:100, sortable: false, align: 'center'},
+		{display: 'Provider', name: 'Number', width:120,  sortable: false, align: 'center'},
+		{display: 'Code', name: 'code',width:100, sortable: false, align: 'center'},	
+		{display: '<acronym title="International Direct Dialling Code">IDD Code</acronym>', name: 'province',width:150, sortable: false, align: 'center'},
 		{display: 'Attempted Calls', name: 'province',width:120, sortable: false, align: 'center'},
-		{display: 'Completed Calls', name: 'CompletedCalls',width:100, sortable: false, align: 'center'},	
-		// 		{display: 'ASR', name: 'province',width:50, sortable: false, align: 'center'},
-		{display: '<acronym title="Answer Seizure Rate.">ASR</acronym>', name: 'province',width:80, sortable: false, align: 'center'},
-		// 		{display: 'ACD', name: 'province',width:50, sortable: false, align: 'center'},
-		{display: '<acronym title="Average Call Duration">ACD</acronym>',width:80, name: 'city',  sortable: false, align: 'center'},     
-		//         {display: 'MCD', name: 'city', width:50, sortable: false, align: 'center'},
-		  {display: '<acronym title="Maximum Call Duration">MCD</acronym>',width:80, name: 'city',  sortable: false, align: 'center'},
+		{display: 'Completed Calls', name: 'CompletedCalls',width:100, sortable: false, align: 'center'},			
+		{display: '<acronym title="Answer Seizure Rate.">ASR</acronym>', name: 'province',width:80, sortable: false, align: 'center'},		
+		{display: '<acronym title="Average Call Duration">ACD</acronym>',width:80, name: 'city',  sortable: false, align: 'center'},     		
+		{display: '<acronym title="Maximum Call Duration">MCD</acronym>',width:80, name: 'city',  sortable: false, align: 'center'},
 		{display: 'Actual',width:80, name: 'provider',  sortable: false, align: 'center'},
 		{display: 'Billable', width:100,name: 'status',  sortable: false, align: 'center'},
-		{display: 'Price',width:80, name: 'calls',  sortable: false, align: 'center'},
 		{display: 'Cost', width:80,name: 'province',  sortable: false, align: 'center'},
-
-		],
-		 buttons : [
+	],
+	buttons : [
 		{name: 'Remove Search Filter', bclass: 'reload', onpress : clear_filter},
-		],
+	],
 	nowrap: false,
 	showToggleBtn: false,
-    sortname: "id",
+	sortname: "Provider",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	title: '',
 	useRp: true,
 	rp: 20,
-	showTableToggleBtn: true,
-	height: 300,
+	showTableToggleBtn: false,
+	height: "auto",	
 	width: "auto",	
-    pagetext: 'Page',
-    outof: 'of',
-    nomsg: 'No items',
-    procmsg: 'Processing, please wait ...',
-    pagestat: 'Displaying {from} to {to} of {total} items',
-    onSuccess: function(data){
+	pagetext: 'Page',
+	outof: 'of',
+	nomsg: 'No items',
+	procmsg: 'Processing, please wait ...',
+	pagestat: 'Displaying {from} to {to} of {total} items',
+	onSuccess: function(data){
         //alert(data);
         //format();
-    },
-    onError: function(){
-        alert("Request failed");
-    }
+	},
+	onError: function(){
+	  alert("Request failed");
+      }
 });
         
 function format() {
@@ -211,10 +200,10 @@ function reload_button()
                          
                           <div class="float-left" style="width:30%">
                 			<span>
-                            <label>Destination:</label>
+                            <label>Code:</label>
                             <select class="select field" name="Destination" id="Destination"  style="width:307px;">
                             <option value="ALL">ALL</option>
-                            <?php foreach($destination as $key => $value)
+                            <?php foreach($pattern as $key => $value)
                                 {
                                     if($value!="")
                                     {
@@ -228,7 +217,7 @@ function reload_button()
                             </span>
                          </div> 
                          
-                          <div class="float-left" style="width:30%">
+                          <!--<div class="float-left" style="width:30%">
                 			<span>
                               <label>IDD Code:</label>
                               <select class="select field" name="Pattern" value="IDD Code" id="Pattern"  style="width:307px;">
@@ -245,7 +234,7 @@ function reload_button()
                              ?>
                               </select>
                             </span>
-                         </div>   
+                         </div>   -->
                   </li>
 					 <li>
                      	<div class="float-left" style="width:30%">

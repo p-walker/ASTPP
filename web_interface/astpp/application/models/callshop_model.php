@@ -159,7 +159,7 @@ class Callshop_model extends CI_Model
 		$admin_reseller_report = array();
 		$q = "SELECT DISTINCT cardnum AS '".$name."' FROM $table";		
 		$query = $this->db->query($q);					
-    	if($query->num_rows() > 0)
+		if($query->num_rows() > 0)
 		{
 			
 			foreach ($query->result_array() as $row)
@@ -168,7 +168,7 @@ class Callshop_model extends CI_Model
 				 $bth = @$row[''.$name.''];
 				 //$bth = $this->session->userdata('username');
 				 
-				 $sql1 = "SELECT notes, COUNT(*) AS attempts, AVG(billseconds) AS acd,"
+				 $sql1 = "SELECT notes,pattern, COUNT(*) AS attempts, AVG(billseconds) AS acd,"
 				  				. " MAX(billseconds) AS mcd, SUM(billseconds) AS billable, " 
 				  				. " SUM(debit) AS cost, SUM(cost) AS price FROM "
 								. $table . " WHERE (notes IS NOT NULL AND notes != '') AND cardnum = '". $bth . "' GROUP BY notes";
@@ -179,32 +179,15 @@ class Callshop_model extends CI_Model
 				 if($query1->num_rows() > 0)
 					{
 						foreach ($query1->result_array() as $row1)
-						{
-							//echo $row1['notes'];
-							//echo "<br>";
-							//	^800801802$
-							 //333333|USA|1<br>777777|USA|1<br>888888|USA|1<br>|Calling Card DID|800801802<br>|Calling Card DID|^800801802$<br>|USA|1<br>666666|USA|1<br>
-							// $note1 = explode( '/(\^|DID)/', $row1['notes'], 2 );
-							// my @note1 = explode( m/(\^|DID:)/, $row1->{notes}, 2 );
-							 // $note1 = explode( 'DID|^', $row1['notes'], 2);
+						{												 
 							 $note1 = preg_split('/(\^|DID:)/', $row1['notes'], 2);
-							 
-							 /*
-							Array(	[0] => 333333|USA|1	)
-							Array(	[0] => 777777|USA|1)
-							Array(	[0] => 888888|USA|1 )
-							Array( [0] => |Calling Card DID|800801802 )
-							Array( [0] => |Calling Card DID|^800801802$)
-							Array(	[0] => |USA|1)
-							Array(	[0] => 666666|USA|1)
-							 */
 							 $caret_sign="";
 							 if(isset($note1[1])) {
 								 $caret_sign = "^";
 							 }
 							 $pos = strpos($row1['notes'], "DID:");
 							 if($pos){
-								 $caret_sign = 'DID:';
+							    $caret_sign = 'DID:';
 							 }
 							 
 							 $idd   = $caret_sign.@$note1[1] . @$note1[2];
@@ -212,8 +195,7 @@ class Callshop_model extends CI_Model
 							$note1 = preg_split( '/\|/', @$note1[0]);
 							 $dst   = ( @$note1[0] == 1 ) ? @$note1[0] : @$note1[1];
 							 if($dst == "")
-							 	$dst   = 'N/A';
-								
+							 	$dst   = $row1['pattern'];
 							$atmpt = $row1['attempts'];
 							$acd   = $row1['acd'];
 							$mcd   = $row1['mcd'];
@@ -260,7 +242,7 @@ class Callshop_model extends CI_Model
 							$cost  = $cost / 1;			
 							
 						
-							$admin_reseller_report[] = array('bth' => $bth, 'dst' => $dst, 'idd' => $idd, 'atmpt' => $atmpt, 'cmplt' => $cmplt, 'asr' => $asr, 'acd' => $acd, 'mcd'=> $mcd, 'act' => $act, 'bill' => $bill,'price' => $price, 'cost' => $cost);	
+							$admin_reseller_report[] = array('bth' => $bth, 'dst' => $dst, 'idd' => $idd, 'atmpt' => $atmpt, 'cmplt' => $cmplt, 'asr' => round($asr,2), 'acd' => $acd, 'mcd'=> $mcd, 'act' => $act, 'bill' => $bill,'price' => $price, 'cost' => $cost);	
 							
 						}
 					}
@@ -281,7 +263,7 @@ class Callshop_model extends CI_Model
 		if($username!=""){
 			$notes = "WHERE notes LIKE '".$username." %'";
 		}
-		$q = "SELECT DISTINCT notes FROM cdrs ".$notes." "; 
+		$q = "SELECT DISTINCT notes,pattern FROM cdrs ".$notes." "; 
 		
 		$query = $this->db->query($q);	
 		
@@ -289,19 +271,14 @@ class Callshop_model extends CI_Model
 		$dst = array();
 		$ptn = array();
 	
-        if($query->num_rows() > 0)
+		if($query->num_rows() > 0)
 		{
 			$i=0;
 			foreach ($query->result_array() as $row)
 			{
 				
-				$notes = $row['notes'];
-			 	//$note = split( 'm/(\^|DID:)/', $notes);	
-				$note = preg_split('/(\^|DID:)/', $notes, 2);
-				//$note = explode( "m/(\^|DID:)/", $notes, 2 );											
-				//$note = explode( "DID|^", $notes);	
-				//echo "<pre>";
-				//print_r($note);
+				$notes = $row['notes'];			 	
+				$note = preg_split('/(\^|DID:)/', $notes, 2);				
 				$caret_sign="";
 				if(isset($note[1])) {
 					 $caret_sign = "^";
@@ -311,14 +288,11 @@ class Callshop_model extends CI_Model
 					 $caret_sign = 'DID:';
 				 }
 				 
-				$ptn[$i] =  @$caret_sign.@$note[1] . @$note[2];
-				//$note = explode( "[|.-]", @$note[0] );
-				$note = preg_split( '/\|/', $note[0] );
-				//$dst[$i] = ( $note == 1 ) ? $note[0] : (if($note[0] != "") $note[1]);
+				//$ptn[$i] =  @$caret_sign.@$note[1] . @$note[2];				
+				$ptn[$i] = $row['pattern'];
+				$note = preg_split( '/\|/', $note[0] );				
 				$dst[$i] = (@$note ==1) ? @$note[0] : ( (@$note[0]!="") ? @$note[1]: "");
 				$i++;
-					
-				//$options[] = $row['number'];
 			}
 			
 		}

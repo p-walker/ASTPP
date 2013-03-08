@@ -181,12 +181,10 @@ class Accounts_model extends CI_Model
 				
 			}
 		}
-		
-		//$this->db->where('status < ', '2');
-		//$this->db->where('status', '1');
+
+		$this->db->where('deleted', '0');
 		$this->db->from('accounts');		
-		$count_all =  $this->db->count_all_results();
-		//echo $this->db->last_query();
+		$count_all =  $this->db->count_all_results();		
 		return $count_all;
 	}
 	
@@ -390,7 +388,7 @@ class Accounts_model extends CI_Model
 		
 	
 	 //$this->db->where('status < ', '2');
-	 //$this->db->where('status', '1');
+	  $this->db->where('deleted', '0');
 	  $this->db->order_by("number", "desc"); 
 	  $this->db->limit($limit,$start);
 	  $this->db->from('accounts');	
@@ -401,6 +399,14 @@ class Accounts_model extends CI_Model
   
 	function add_account($data)
 	{
+		$pay_type = "";
+		$payment_type = $data["payment_type"];
+		foreach($payment_type as $type_value){
+		  $pay_type.=$type_value.",";
+		}
+		$pay_type = rtrim($pay_type,",");
+		$data["payment_type"] = $pay_type;
+ 
 		$this->load->library("curl");
 		$url = "astpp-wraper.cgi";
 		
@@ -427,22 +433,42 @@ class Accounts_model extends CI_Model
 	
 	function account_process_payment($data)
 	{
+		$data["payment_type"] = $data["payment_type"][0];
+		if ( $this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5 ) {
+			$accountinfo = $this->session->userdata['accountinfo'];
+			$reseller = $accountinfo["accountid"];
+		}
+		else {
+			$reseller = "-1";
+		}
+ 		$data["payment_by"] = $reseller;
+		
+//  echo "<pre>"; print_r($data); exit;
 		$this->load->library("curl");	
 		$url = "astpp-wraper.cgi";
 		$data['mode'] = "Process Payment";		
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_account($data)
 	{
+		$pay_type = "";
+		$payment_type = $data["payment_type"];
+		foreach($payment_type as $type_value){
+		  $pay_type.=$type_value.",";
+		}
+		$pay_type = rtrim($pay_type,",");
+		$data["payment_type"] = $pay_type;
+
 		$this->load->library("curl");
 		$url = "astpp-wraper.cgi";
 		$data['mode'] = "Edit Account";
 		$data['logintype'] = $this->session->userdata('logintype');
-		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		$data['username'] = $this->session->userdata('username');
+		$response = $this->curl->sendRequestToPerlScript($url,$data);
+		return $response;
 	}
 	
 	function remove_account($data)
@@ -919,7 +945,186 @@ class Accounts_model extends CI_Model
             return $query;
             
         }
+	function insert_block($data,$accid){
+	  $data = explode(",",$data);
+	  $tmp =array();
+	  foreach($data as $key => $data_value){
+	      $tmp[$key]["accountid"] = $accid;
+	      $tmp[$key]["blocked_patterns"] = $this->get_pattern_by_id($data_value);
+	  }
+	  $this->db->insert_batch("block_patterns",$tmp);		
+	}
+	function get_pattern_by_id($pattern){
+	  $this->db->select("pattern");
+	  $this->db->where("id",$pattern);
+	  $query = $this->db->get("routes");
+	  $query = $query->result();
+	  return $query[0]->pattern;
+	}
+	function build_block_prefix_search(){
+	      if($this->session->userdata('advance_search')==1){
+	      
+	      $routes_search =  $this->session->userdata('routes_search');
+	      $pattern_operator = $routes_search['pattern_operator'];
+	      if(!empty($routes_search['pattern'])) {
+		      switch($pattern_operator){
+			      case "1":
+			      $this->db->like('pattern', $routes_search['pattern']); 
+			      break;
+			      case "2":
+			      $this->db->not_like('pattern', $routes_search['pattern']);
+			      break;
+			      case "3":
+			      $this->db->where('pattern', $routes_search['pattern']);
+			      break;
+			      case "4":
+			      $this->db->where('pattern <>', $routes_search['pattern']);
+			      break;
+		      }
+	      }
+	      
+	      $comment_operator = $routes_search['comment_operator'];
+	      
+	      if(!empty($routes_search['comment'])) {
+		      switch($comment_operator){
+			      case "1":
+			      $this->db->like('comment', $routes_search['comment']); 
+			      break;
+			      case "2":
+			      $this->db->not_like('comment', $routes_search['comment']);
+			      break;
+			      case "3":
+			      $this->db->where('comment', $routes_search['comment']);
+			      break;
+			      case "4":
+			      $this->db->where('comment <>', $routes_search['comment']);
+			      break;
+		      }
+	      }
 
-
+	}
+      }
+	function getRoutesList($flag,$account_num,$start,$perpage){
+	  $this->build_block_prefix_search();
+	    $where = '(pattern NOT IN (select blocked_patterns from block_patterns where accountid = "'.$account_num.'"))';
+	    $this->db->where($where);
+	    $this->db->group_by('pattern'); 
+	    $this->db->order_by('comment','asc'); 
+	    if($flag == true){
+	      $this->db->limit($perpage,$start);
+	      $query = $this->db->get('routes');
+	      return $query;
+	    }else{
+		$query = $this->db->get('routes');
+		return $query->num_rows();
+	    }
+	}
+	function list_block_prefix_count($accountid,$pattern=""){
+	  if ($accountid) {
+	  $this->db->where('accountid', $accountid);	
+	  }
+	  if($pattern != ""){
+	    $this->db->where('blocked_patterns',$pattern);	
+	  }
+	  $this->db->from('block_patterns');	
+	  $didscnt = $this->db->count_all_results();
+	  return $didscnt;
+	}
+	function list_blocked_prefixes($accountid, $start, $limit){
+	    if ($accountid) {
+	    $this->db->where('accountid', $accountid);	
+	    }
+    
+	    $this->db->limit($limit,$start);
+	    $this->db->from('block_patterns');
+	    $query = $this->db->get();
+	    return $query;
+	}
+	function insert_block_patern($data){
+	    $this->db->insert("block_patterns",$data);		
+	    return true;
+	}
+	function build_payment_search(){
+	  if($this->session->userdata('advance_search')==1){
+	      $payment_search =  $this->session->userdata('payment_search');
+	      
+	      if(isset($payment_search['account']) && !empty($payment_search['account'])) {
+		$account_operator = $payment_search['account_operator'];
+		$accountinfo = $this->accounts_model->get_account_by_number($payment_search['account']);
+		$number = $accountinfo["accountid"];
+		switch($account_operator){
+		    case "1":
+		    $this->db->like('accountid', $number); 
+		    break;
+		    case "2":
+		    $this->db->not_like('accountid',$number);
+		    break;
+		    case "3":
+		    $this->db->where('accountid', $number);
+		    break;
+		    case "4":
+		    $this->db->where('accountid <>', $number);
+		    break;
+		}
+	      }
+	      $creditlimit_operator = $payment_search['amount_operator'];
+	      if(!empty($payment_search['amount'])) 
+	      {
+		switch($creditlimit_operator){
+		    case "1":
+		    $this->db->where('credit', $payment_search['amount']);
+		    break;
+		    case "2":
+		    $this->db->where('credit <>', $payment_search['amount']);					
+		    break;
+		    case "3":
+		    $this->db->where('credit > ', $payment_search['amount']); 					
+		    break;
+		    case "4":
+		    $this->db->where('credit < ', $payment_search['amount']); 	
+		    break;
+		    case "5":
+		    $this->db->where('credit >= ', $payment_search['amount']);
+		    break;
+		    case "6":
+		    $this->db->where('credit <= ', $payment_search['amount']);
+		    break;
+		}
+	      }
+	    if($payment_search['payment_type'] != "") {
+		    $this->db->where('type',$payment_search['payment_type']);
+	    }
+	  }
+        }
+	function list_payment_report($flag,$accountid=NULL,$start,$limit){
+	    $this->build_payment_search();
+	    if ($accountid) {
+	      $this->db->where('accountid', $accountid);	
+	    }else{
+		if ( $this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5 ) {
+			$accountinfo = $this->session->userdata['accountinfo'];
+			$reseller = $accountinfo["accountid"];
+		}
+		else {
+			$reseller = "-1";
+		}
+		$this->db->where('payment_by',$reseller);	
+	    }
+	    if($flag == true){
+	      $this->db->limit($limit,$start);
+	      $this->db->from('payments');
+	      $query = $this->db->get();
+	      return $query;
+	    }else{
+		$query = $this->db->get('payments');
+		return $query->num_rows();
+	    }
+	}
+      function selected_prefixes_delete($prefixes){
+	  $where =  "id IN ($prefixes)";
+	  $this->db->where($where);
+	  $this->db->delete("block_patterns");
+	  return true;
+      }		      
 
 }

@@ -87,6 +87,7 @@ input.small, select.small{
 
 input.medium, select.medium{
 	width:50%;
+	margin-left:10px;
 }
 
 input.large, select.large, textarea.textarea {
@@ -140,7 +141,7 @@ form li div span label{
 	padding-bottom:12px;
 }
 label.desc{
-	font-size:95%;
+	font-size:75%;
 	font-weight:bold;
 	color:#222;
 	line-height:150%;
@@ -148,6 +149,41 @@ label.desc{
 	padding:0 0 3px 0;
 	border:none;
 	display:block;
+	float:left;
+	padding-right:5px;
+	padding-top:5px;
+	text-align: right;
+    width: 100px;
+}
+.desc_ccbrand{
+	font-size:75%;
+	font-weight:bold;
+	color:#222;
+	line-height:150%;
+	margin:0;
+	padding:0 0 3px 0;
+	border:none;
+	display:block;
+	float:left;
+	padding-right:5px;
+	padding-top:5px;
+	text-align: right;
+    width: 250px;
+}
+.Searchdesc{
+	font-size:75%;
+	font-weight:bold;
+	color:#222;
+	line-height:150%;
+	margin:0;
+	padding:0 0 3px 0;
+	border:none;
+	display:block;
+	float:left;
+	padding-right:5px;
+	padding-top:5px;
+	text-align: left;
+    width: 100px;
 }
 label.choice{
 	display:block;

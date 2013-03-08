@@ -1,40 +1,11 @@
-<? extend('master.php') ?>
-
-	<? startblock('extra_head') ?>
-		<script type="text/javascript" src="/js/ui/ui.tabs.js"></script>
-		<script type="text/javascript">
-		$(document).ready(function() {
-			// Tabs
-			$('#tabs, #tabs2, #tabs5').tabs();
-		});
-		</script>
-	<? endblock() ?>
-
-
-
-    <? startblock('page-title') ?>
-       
-    <? endblock() ?>
-    
-	<? startblock('content') ?>
-  <style>
-  .summary_title
-  {
-	  color: #FFFFFF;
-   /* float: left;*/
-    font-size: 14px;
-    font-weight: bold;
-	text-align:left;
-	margin-left:28px;
-	margin-top: -23px;
-  }
-  
-  </style>  
-				<div class="inner-page-title">			
-          			<h2>Dashboard</h2>
-				</div>
+<? extend('master.php') ?>	
+    <? startblock('page-title') ?>       
+    <? endblock() ?>    
+	<? startblock('content') ?>  
+	    <div class="inner-page-title">			
+	    <h2>Dashboard</h2>
+	    </div>
                 <div class="clear"></div>
-                
 <?
 if($this->session->userdata['logintype']=='1' || $this->session->userdata['logintype']=='2'){?>                
                 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">
@@ -42,13 +13,12 @@ if($this->session->userdata['logintype']=='1' || $this->session->userdata['login
                   <div class="portlet-content">
                   <div class="hastabledasb">
                   <table class="default" width='60%'>
-<!--<tr class="header"><td colspan=5>Account Counts</td></tr>-->
 <tr class="rowone"  style="background:#4476AF;" >
-	<td><img src="<?=base_url()?>images/dashboardicons/admins-icon.png" width="24" height="24" /><div class="summary_title">Admins</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/resellers-icon.png" width="24" height="24" /><div class="summary_title">Resellers</div></td>
-	<td ><img src="<?=base_url()?>images/dashboardicons/customers-icon.png" width="24" height="24" /><div class="summary_title">Customers</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/call shops-icon.png" width="24" height="24" /><div class="summary_title">Call Shops</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/providers-icon.png" width="24" height="24" /><div class="summary_title">Providers</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/admins-icon.png" width="24" height="24" /><div class="summary_title">Admins</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/resellers-icon.png" width="24" height="24" /><div class="summary_title">Resellers</div></td>
+	<td ><img src="<?=base_url()?>assets/images/dashboardicons/customers-icon.png" width="24" height="24" /><div class="summary_title">Customers</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/call shops-icon.png" width="24" height="24" /><div class="summary_title">Call Shops</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/providers-icon.png" width="24" height="24" /><div class="summary_title">Providers</div></td>
 </tr>
 <tr class="rowone">
 	<td><?=@$admin_count?></td>
@@ -58,24 +28,30 @@ if($this->session->userdata['logintype']=='1' || $this->session->userdata['login
 	<td><?=@$vendor_count?></td>
 </tr>
 <tr class="rowone" style="background:#4476AF;">
-	<td><img src="<?=base_url()?>images/dashboardicons/funds receivable-icon.png" width="24" height="24" /><div class="summary_title">Funds Receivable</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/funds payable-icon.png" width="24" height="24" /><div class="summary_title">Funds Payable</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/Phone-icon.png" width="24" height="24" /><div class="summary_title">DID Numbers</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/unbilled cdrs-icon.png" width="24" height="24" /><div class="summary_title">Unbilled CDRs</div></td>
-    <td>&nbsp;</td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/funds receivable-icon.png" width="24" height="24" /><div class="summary_title">Funds Receivable</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/funds payable-icon.png" width="24" height="24" /><div class="summary_title">Funds Payable</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/Phone-icon.png" width="24" height="24" /><div class="summary_title">DID Numbers</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/unbilled cdrs-icon.png" width="24" height="24" /><div class="summary_title">Unbilled CDRs</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/uptime.png" width="24" height="24" /><div class="summary_title">system Uptime</div></td>
+<!--     <td>&nbsp;</td> -->
 </tr>
 <tr class="rowone">
 	<td><?=@$total_owing?></td>
 	<td><?=@$total_due?></td>
 	<td align=center><a href="#mode=Manage%20DIDs"><?=@$dids?></a></td>
 	<td align=center><a href="#mode=List%20Errors"><?=@$unbilled_cdrs?></a></td>
-    <td>&nbsp;</td>
+	<td align=center><a href="#mode=List%20Errors"><?system("uptime | \
+sed s/^.*up// | \
+awk -F, '{ if ( $3 ~ /user/ ) { print $1 $2 } else { print $1 }}' | \
+sed -e 's/:/\ hours\ /' -e 's/ min//' -e 's/$/\ minutes/' | \
+sed 's/^ *//'");?></a></td>
+<!--     <td>&nbsp;</td> -->
 </tr>
 <tr class="rowone" style="background:#4476AF;">
-	<td><img src="<?=base_url()?>images/dashboardicons/calling cards in use-icon.png" width="24" height="24" /><div class="summary_title">Calling Cards in use</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/calling cards in use-icon.png" width="24" height="24" /><div class="summary_title">Total Active Cards</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/unused card balance-icon.png" width="24" height="24" /><div class="summary_title">Unused Card Balance</div></td>
-	<td><img src="<?=base_url()?>images/dashboardicons/used card balance-icon.png" width="24" height="24" /><div class="summary_title">Used Card Balance</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/calling cards in use-icon.png" width="24" height="24" /><div class="summary_title">Calling Cards in use</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/calling cards in use-icon.png" width="24" height="24" /><div class="summary_title">Total Active Cards</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/unused card balance-icon.png" width="24" height="24" /><div class="summary_title">Unused Card Balance</div></td>
+	<td><img src="<?=base_url()?>assets/images/dashboardicons/used card balance-icon.png" width="24" height="24" /><div class="summary_title">Used Card Balance</div></td>
     <td>&nbsp;</td>
 </tr>
 <tr class="rowone">

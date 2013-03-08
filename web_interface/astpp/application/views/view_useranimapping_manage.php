@@ -1,12 +1,5 @@
 <? extend('user_master.php') ?>
-
-	<? startblock('extra_head') ?>
-		
-
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="/css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="/js/flexigrid.js"></script>
-
+<? startblock('extra_head') ?>
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -15,13 +8,6 @@ function get_alert_msg(id)
     return answer // answer is a boolean
 }
 </script>
-
-<style>
-    fieldset{
-        width: 609px;
-    }
-    
-</style>		
 
 <script type="text/javascript">
 $(document).ready(function() {

@@ -71,11 +71,11 @@ class Lcr extends CI_Controller
 	
 	function get_action_buttons_providers($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
+    	
 		$ret_url = '';
-		$ret_url = '<a href="/accounts/edit/'.$id.'/" class="icon" '.$update_style.' title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/accounts/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/accounts/edit/'.$id.'/" class="icon edit_image" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/accounts/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}	
 	
@@ -199,11 +199,13 @@ class Lcr extends CI_Controller
 				$errors .= "Trunk Name is required<br />";
 				if(trim($_POST['path']) == "")
 				$errors .= "Peer name is required<br />";
-				
+// 				$_POST = $this->input->post(null,true);
+// 				echo "<pre>";print_r($_POST);exit;
 				if ($errors == "")
 				{				
-					$this->lcr_model->add_trunk($_POST);
-					$this->session->set_userdata('astpp_notification', 'Trunk added successfully!');
+					$response = $this->lcr_model->add_trunk($_POST);
+					//$this->session->set_userdata('astpp_notification', 'Trunk added successfully!');
+					$this->common_model->status_message($response);
 					redirect(base_url().'lcr/trunks/');				
 				}
 				else 
@@ -229,8 +231,9 @@ class Lcr extends CI_Controller
 				
 				if ($errors == "")
 				{				
-					$this->lcr_model->edit_trunk($_POST);
-					$this->session->set_userdata('astpp_notification', 'Trunk updated successfully!');
+					$response = $this->lcr_model->edit_trunk($_POST);
+					$this->common_model->status_message($response);
+					//$this->session->set_userdata('astpp_notification', 'Trunk updated successfully!');
 					redirect(base_url().'lcr/trunks/');				
 				}
 				else 
@@ -263,8 +266,9 @@ class Lcr extends CI_Controller
 				redirect(base_url().'lcr/trunks/');
 			}
 			
-			$this->lcr_model->remove_trunk($trunk);		
-			$this->session->set_userdata('astpp_notification', 'Trunk removed successfully!');
+			$response = $this->lcr_model->remove_trunk($trunk);		
+			//$this->session->set_userdata('astpp_notification', 'Trunk removed successfully!');
+			$this->common_model->status_message($response);
 			redirect(base_url().'lcr/trunks/');
 		}
 		
@@ -272,11 +276,11 @@ class Lcr extends CI_Controller
 	
 	function get_action_buttons_trunks($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
+    	
 		$ret_url = '';
-		$ret_url = '<a href="/lcr/trunks/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/lcr/trunks/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/lcr/trunks/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/lcr/trunks/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}	
 	
@@ -416,6 +420,7 @@ class Lcr extends CI_Controller
 
 		if($action == 'list')
 		{
+			$data['trunks'] = $this->common_model->list_trunks_select('');
 			$this->load->view('view_lcr_outbound',$data);
 		}
 		elseif($action == 'add')
@@ -501,11 +506,11 @@ class Lcr extends CI_Controller
 	
 	function get_action_buttons_outbound($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
+    	
 		$ret_url = '';
-		$ret_url = '<a href="/lcr/outbound/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/lcr/outbound/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/lcr/outbound/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/lcr/outbound/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -541,7 +546,8 @@ class Lcr extends CI_Controller
 			foreach ($query->result_array() as $row)
 			{
 				$json_data['rows'][] = array('cell'=>array(
-					$row['id'],
+					'<input type="checkbox" name="chkAll" id='.$row['id'].' class="chkRefNos" onclick="cickchkbox('.$row['id'].')" value='.$row['id'].'>',
+// 					$row['id'],
 					$row['pattern'],
 					$row['prepend'],
 					$row['comment'],
@@ -573,6 +579,14 @@ class Lcr extends CI_Controller
 		$this->load->view('view_lcr_import_outbound',$data);
 		
 	}
+	function delete_selected_outbound_rates(){
+  	  $delete_result = $this->lcr_model->delete_selected_routes($_POST['deletable_id']);
+	  if($delete_result){
+	    echo "1";
+	  }else{
+	    echo "0";
+	  }
+	}	
 	
 }
 

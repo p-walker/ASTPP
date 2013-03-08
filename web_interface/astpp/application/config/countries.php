@@ -285,8 +285,8 @@ $config['timezone_list'] =  array(
 
 
 $config['timezone1_list'] =  array(
-
-'Africa/Abidjan' => 'Africa/Abidjan',
+'America/Panama' => 'America/Panama',
+/*'Africa/Abidjan' => 'Africa/Abidjan',
 'Africa/Accra' => 'Africa/Accra',
 'Africa/Addis_Ababa' => 'Africa/Addis_Ababa',
 'Africa/Algiers' => 'Africa/Algiers',
@@ -737,7 +737,7 @@ $config['timezone1_list'] =  array(
 
 'Pacific/Wallis' => 'Pacific/Wallis',
 'UTC' => 'UTC',
-'WET' => 'WET'
+'WET' => 'WET'*/
 );
 
 $config['language_list'] = array(
@@ -950,6 +950,6 @@ $config['language_list'] = array(
 
 $config['device_types'] = array("friend"=>"friend","user"=>"user","peer"=>"peer");
 
-$config['disposition'] = array("NORMAL_CLEARING" => "NORMAL_CLEARING","INVALID_GATEWAY" => "INVALID_GATEWAY", "NO_ROUTE_DESTINATION" => "NO_ROUTE_DESTINATION", "CALL_REJECTED" => "CALL_REJECTED", "DESTINATION_OUT_OF_ORDER" => "DESTINATION_OUT_OF_ORDER", "NORMAL_TEMPORARY_FAILURE" => "NORMAL_TEMPORARY_FAILURE", "ORIGINATOR_CANCEL" => "ORIGINATOR_CANCEL" );
+$config['disposition'] = array("" => "--Select Disposition--","NORMAL_CLEARING" => "NORMAL_CLEARING","INVALID_GATEWAY" => "INVALID_GATEWAY", "NO_ROUTE_DESTINATION" => "NO_ROUTE_DESTINATION", "CALL_REJECTED" => "CALL_REJECTED", "DESTINATION_OUT_OF_ORDER" => "DESTINATION_OUT_OF_ORDER", "NORMAL_TEMPORARY_FAILURE" => "NORMAL_TEMPORARY_FAILURE", "ORIGINATOR_CANCEL" => "ORIGINATOR_CANCEL","SYSTEM_SHUTDOWN" => "SYSTEM_SHUTDOWN" );
 
 ?>

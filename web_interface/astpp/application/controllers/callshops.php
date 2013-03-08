@@ -186,9 +186,9 @@ class Callshops extends CI_Controller
 	
 	function get_action_buttons($id)
 	{
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+    	
 		$ret_url = '';
-		$ret_url .= '<a href="/callshops/remove/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url .= '<a href="/callshops/remove/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}	
 	
@@ -407,26 +407,19 @@ class Callshops extends CI_Controller
 				{
 					
 					$json_data['rows'][] = array('cell'=>array($value['bth'],
-															   $value['dst'],
-															   $value['idd'],
-															   $value['atmpt'],
-															   $value['cmplt'],
-															   $value['asr'],
-															   $value['mcd'],
-															   $value['act'],
-															   $value['bill'],
-															   $value['price'],
-															   $value['cost']));
+								      $value['dst'],
+								      $value['idd'],
+								      $value['atmpt'],
+								      $value['cmplt'],
+								      $value['asr'],
+								      $value['mcd'],
+								      $value['act'],
+								      $value['bill'],
+								      $value['price'],
+								      $value['cost']));
 															   
 				}
-			}
-			
-			
-		
-		
-			//grid json data	
-			//$json_data = array();$json_data['page'] = 0;$json_data['total'] = 0;
-			//$json_data['rows'][] = array('cell'=>array("asdfa","sdfasf","sdfasf","adfsds","fsdf","gfhf","hgfhf","fghf","gfhgf","fghgf","ghjf"));
+			}			
 			echo json_encode($json_data);					
 		}
 		
@@ -702,19 +695,13 @@ class Callshops extends CI_Controller
 	}
 	
 	function get_action_buttons_booths($id)
-	{
-		//$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-		$viewdetails_style = 'style="text-decoration:none;background-image:url(/images/details.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
-		//$import_style = 'style="text-decoration:none;background-image:url(/images/import.png);"';
-		$url = '';
+	{		
 		$ret_url = '';
-
 		$ret_url = '<a href="/callshops/booths_list/HangupCall/'.$id.'/" class="icon"  title="Update">Hangup Call</a>';
 		$ret_url .= '<a href="/callshops/booths_list/DeactivateBooth/'.$id.'/" class="icon"   title="Update">Deactivate Booth</a>';
 		$ret_url .= '<a href="/callshops/booths_list/RestoreBooth/'.$id.'/" class="icon"  title="Update">Restore Booth</a>';	
-		$ret_url .= '<a href="'.base_url().'callshops/booth_detail/'.$id.'/" class="icon" '.$viewdetails_style.' title="View Details">&nbsp;</a>';	
-		$ret_url .= '<a href="/callshops/remove_callshop_booth/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url .= '<a href="'.base_url().'callshops/booth_detail/'.$id.'/" class="icon details_image" title="View Details">&nbsp;</a>';	
+		$ret_url .= '<a href="/callshops/remove_callshop_booth/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 
 		return $ret_url;
 	}
@@ -857,11 +844,6 @@ class Callshops extends CI_Controller
 			echo json_encode($json_data);		
 			
 		}
-		
-	
 	}
-
 }
-
-
 ?>

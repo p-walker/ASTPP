@@ -1,7 +1,4 @@
 <?php include('header_advance_search.php');?>
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -27,12 +24,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	title: '',
 	useRp: true,
 	rp: 10,
 	showTableToggleBtn: true,
-	height: 300,
+	height: "auto",	
 	width: "auto",	
     pagetext: 'Page',
     outof: 'of',
@@ -112,9 +109,9 @@ function reload_button()
 <SCRIPT LANGUAGE="javascript">
 <!-- Begin
 function sendValue(selvalue, othervalue){
-	window.opener.document.form7.account_number.value = selvalue;
-	if(othervalue && window.opener.document.form7.accountcode){
-			window.opener.document.form7.accountcode.value = othervalue;
+	window.opener.document.form9.account_number.value = selvalue;
+	if(othervalue && window.opener.document.form9.accountcode){
+			window.opener.document.form9.accountcode.value = othervalue;
 	}
 	window.close();
 }
@@ -126,7 +123,6 @@ function sendValue(selvalue, othervalue){
 <style>
     fieldset{
         text-align: center;
-        
     }
 </style>	
 	      

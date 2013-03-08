@@ -29,7 +29,22 @@
           <label class="desc">Payment in <?=$account['currency']?>:</label>
           <input class="text field medium" type="text" name="refilldollars"  size="8" />
           <input type="hidden" name="account_currency" value="<?=$account['currency'];?>" />
-      </li>		
+      </li>
+      <li>
+	<label class="desc">Payment Type:</label>
+	  <?php foreach($payment_type as $payment_key =>$payment_value){ ?>
+	      <input type="radio" name="payment_type[]" value=<?=$payment_key?>><?=$payment_value?>
+	  <?}?>
+      </li>
+      <li>
+	<label class="desc">Reference:</label>
+	<input type="text" name="reference" class="text field medium"  size="20"  value="<?=@$account['reference']?>"/>
+      </li>
+      <li>
+	<label class="desc">Note:</label>
+	<textarea name="notes" ></textarea>
+      </li>
+		
   </ul>
   <div style="width:100%; float:left; height:50px; margin-top:20px;">
       <input class="ui-state-default float-right ui-corner-all ui-button" type="submit" name="action" value="Refill..." />

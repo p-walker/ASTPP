@@ -324,7 +324,7 @@ $xml .= $ASTPP->fs_dialplan_xml_timelimit(
 
 sub fs_dialplan_xml_timelimit() {
 	my ($self, %arg) = @_;
-	$arg{xml} .= "<action application=\"sched_hangup\" data=\"+" . $arg{max_length} * 60 . "\"/>\n";
+	$arg{xml} .= "<action application=\"sched_hangup\" data=\"+" . $arg{max_length} * 60 . " allotted_timeout\"/>\n";
 	$arg{xml} .= "<action application=\"set\" data=\"accountcode=" . $arg{accountcode} . "\"/>\n";
 	return $arg{xml};
 }
@@ -358,6 +358,7 @@ sub fs_dialplan_xml_did() {
 		$xml .= "<action application=\"set\" data=\"" . $variable . "\"/>\n";
 	}
 	$xml .= "<action application=\"set\" data=\"calltype=DID\"/>\n";
+	
 	if ($diddata->{extensions} =~ m/^("|)(L|l)ocal.*/m) {
 		my ($junk,$ext,$context) = split /,(?!(?:[^",]|[^"],[^"])+")/, $diddata->{extensions};
 		#jump to local dialplan
@@ -377,7 +378,7 @@ sub fs_dialplan_xml_did() {
 
 sub fs_dialplan_xml_bridge_start() {
 	my ($self, %arg) = @_;
-	my $dialstring .= "<action application=\"set\" data=\"hangup_after_bridge=true\"/>\n";
+	my $dialstring .= "<action application=\"set\" data=\"hangup_after_bridge=false\"/>\n";
 #	$dialstring .= "<action application=\"set\" data=\"ignore_early_media=true\" />\n";
 	$dialstring .= "<action application=\"set\" data=\"continue_on_fail=true\"/>\n";
 
@@ -389,6 +390,15 @@ sub fs_dialplan_xml_bridge_start() {
 sub fs_dialplan_xml_bridge_end() {
 # 	my $dialstring = "\"/>\n";
 	return my $dialstring;
+}
+
+
+sub trim($)
+{
+        my $string = shift;
+        $string =~ s/^\s+//;
+        $string =~ s/\s+$//;
+        return $string;
 }
 
 =item $ASTPP->fs_dialplan_xml_bridge()
@@ -409,7 +419,7 @@ $xml .= $ASTPP->fs_dialplan_xml_bridge(
 
 sub fs_dialplan_xml_bridge() {
 	my ($self, %arg) = @_;
-	my ( $sql, $trunkdata, $dialstring,$data );
+	my ( $sql, $trunkdata, $dialstring,$data,$callcount );
 	$sql = $self->{_astpp_db}->prepare( "SELECT * FROM trunks WHERE name = ". $self->{_astpp_db}->quote( $arg{trunk_name} ) );
 	$sql->execute;
 	$trunkdata = $sql->fetchrow_hashref;
@@ -428,18 +438,29 @@ sub fs_dialplan_xml_bridge() {
 		}
 	}
 	
+	$callcount = `/usr/local/bin/fs_cli -x 'limit_usage db $trunkdata->{path} gw_$trunkdata->{path}'`;      
+	$callcount = &trim($callcount);
+	if($callcount >= $trunkdata->{maxchannels})
+	{	  
+	    return "";
+	}
+		
 	$dialstring .= "<action application=\"set\" data=\"calltype=STANDARD\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"outbound_route=" . $arg{route_id} . "\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"trunk=" . $trunkdata->{name} . "\"/>\n";
-	$dialstring .= "<action application=\"set\" data=\"provider=" . $trunkdata->{provider} . "\"/>\n";	
+	$dialstring .= "<action application=\"set\" data=\"provider=" . $trunkdata->{provider} . "\"/>\n";
+	$dialstring .= "<action application=\"limit\" data=\"db ".$trunkdata->{path}." gw_".$trunkdata->{path}." ".$trunkdata->{maxchannels}."\"/>\n";
 	$dialstring .= "<action application=\"bridge\" data=\"";
 	if ( $trunkdata->{tech} eq "Zap" ) {
 		$dialstring .= "openzap/" . $trunkdata->{path} . "/1/" . $arg{route_prepend} . $arg{destination_number}; 
 		return ($dialstring);
 	}
 	elsif ( $trunkdata->{tech} eq "SIP" ) {
-	  $dialstring .= "sofia/gateway/" . $trunkdata->{path} . "/" . $arg{route_prepend} . $arg{destination_number};
-	$dialstring .= "\"/>\n";  
+	  
+	$dialstring .= "sofia/gateway/" . $trunkdata->{path} . "/" . $arg{route_prepend} . $arg{destination_number};
+	$dialstring .= "\"/>\n";
+	$dialstring .= "<action application=\"set\" data=\"b_hangup_cause=\${last_bridge_hangup_cause}\"/>\n";
+#         $dialstring .= "<action application=\"execute_extension\" data=\"hangup_reason-\${last_bridge_hangup_cause} XML features\"/>\n";
 	return ($dialstring);
     }
     else {
@@ -601,6 +622,14 @@ sub fs_add_sip_user() {
 		. $self->{_freeswitch_db}->quote($arg{accountcode})
 		. "),("
 		. $self->{_freeswitch_db}->quote($directory_id) . ","
+		. "'effective_caller_id_name',"
+		. $self->{_freeswitch_db}->quote($arg{effective_caller_id_name})
+		. "),("
+		. $self->{_freeswitch_db}->quote($directory_id) . ","
+		. "'effective_caller_id_number',"
+		. $self->{_freeswitch_db}->quote($arg{effective_caller_id_number})
+		. "),("
+		. $self->{_freeswitch_db}->quote($directory_id) . ","
 		. "'user_context',"
 		. $self->{_freeswitch_db}->quote($arg{freeswitch_context}) . ")";
 	print STDERR $tmp . "\n";
@@ -609,7 +638,7 @@ sub fs_add_sip_user() {
 	$tmp = "INSERT INTO directory_params (directory_id,param_name,param_value) VALUES ("
 		. $self->{_freeswitch_db}->quote($directory_id) . ","
 		. "'vm-password',"
-		. $self->{_freeswitch_db}->quote($arg{vm_password})
+		. $self->{_freeswitch_db}->quote($arg{vm_password})		
 		. "),("
 		. $self->{_freeswitch_db}->quote($directory_id) . ","
 		. "'password',"
@@ -623,6 +652,7 @@ sub fs_add_sip_user() {
 
 sub fs_save_sip_user() {
     my ($self, %arg) = @_;
+    my ($sql);
 	my $tmp = "UPDATE directory SET username = "
 		. $self->{_freeswitch_db}->quote($arg{username})
 		. " WHERE id = "
@@ -659,6 +689,62 @@ sub fs_save_sip_user() {
 		. " WHERE param_name = 'password'"
 		. " AND directory_id = "
 		. $self->{_freeswitch_db}->quote($arg{directory_id});
+	print STDERR $tmp . "\n";
+	$self->{_freeswitch_db}->do($tmp);
+	
+	
+	########## For Effective Caller ID Name #################
+	
+	$tmp = "SELECT var_value FROM directory_vars WHERE directory_id = "
+		. $self->{_freeswitch_db}->quote($arg{directory_id})
+		. " AND var_name = 'effective_caller_id_name' LIMIT 1";
+	print STDERR $tmp . "\n";
+	$sql = $self->{_freeswitch_db}->prepare($tmp);
+	$sql->execute;
+	my $effective_caller_id_name = $sql->fetchrow_hashref;
+	$sql->finish;
+	
+	if($effective_caller_id_name!='')
+	{
+	    $tmp = "UPDATE directory_vars SET var_value = "
+		. $self->{_freeswitch_db}->quote($arg{effective_caller_id_name})
+		. " WHERE var_name = 'effective_caller_id_name'"
+		. " AND directory_id = "
+		. $self->{_freeswitch_db}->quote($arg{directory_id});
+	}else{
+	    $tmp = "INSERT INTO directory_vars (directory_id,var_name,var_value) VALUES ("				
+		. $self->{_freeswitch_db}->quote($arg{directory_id}) . ","
+		. "'effective_caller_id_name',"
+		. $self->{_freeswitch_db}->quote($arg{effective_caller_id_name})
+		. ")";
+	}
+	print STDERR $tmp . "\n";
+	$self->{_freeswitch_db}->do($tmp);
+	
+	
+	#### For Effect Caller Id Number #######
+	$tmp = "SELECT var_value FROM directory_vars WHERE directory_id = "
+		. $self->{_freeswitch_db}->quote($arg{directory_id})
+		. " AND var_name = 'effective_caller_id_number' LIMIT 1";
+	print STDERR $tmp . "\n";
+	$sql = $self->{_freeswitch_db}->prepare($tmp);
+	$sql->execute;
+	my $effective_caller_id_number = $sql->fetchrow_hashref;
+	$sql->finish;
+	if($effective_caller_id_number!='')
+	{
+	      $tmp = "UPDATE directory_vars SET var_value = "
+		. $self->{_freeswitch_db}->quote($arg{effective_caller_id_number})
+		. " WHERE var_name = 'effective_caller_id_number'"
+		. " AND directory_id = "
+		. $self->{_freeswitch_db}->quote($arg{directory_id});
+	}else{
+	      $tmp = "INSERT INTO directory_vars (directory_id,var_name,var_value) VALUES ("				
+		. $self->{_freeswitch_db}->quote($arg{directory_id}) . ","
+		. "'effective_caller_id_number',"
+		. $self->{_freeswitch_db}->quote($arg{effective_caller_id_number})
+		. ")";
+	}
 	print STDERR $tmp . "\n";
 	$self->{_freeswitch_db}->do($tmp);
 
@@ -728,6 +814,27 @@ sub fs_retrieve_sip_user() {
 	$record = $sql->fetchrow_hashref;
 	$sql->finish;
 	$deviceinfo->{accountcode} = $record->{var_value};
+	
+	$tmp = "SELECT var_value FROM directory_vars WHERE directory_id = "
+		. $self->{_freeswitch_db}->quote($arg{directory_id})
+		. " AND var_name = 'effective_caller_id_name' LIMIT 1";
+	print STDERR $tmp . "\n";
+	$sql = $self->{_freeswitch_db}->prepare($tmp);
+	$sql->execute;
+	$record = $sql->fetchrow_hashref;
+	$sql->finish;
+	$deviceinfo->{effective_caller_id_name} = $record->{var_value};
+	
+	$tmp = "SELECT var_value FROM directory_vars WHERE directory_id = "
+		. $self->{_freeswitch_db}->quote($arg{directory_id})
+		. " AND var_name = 'effective_caller_id_number' LIMIT 1";
+	print STDERR $tmp . "\n";
+	$sql = $self->{_freeswitch_db}->prepare($tmp);
+	$sql->execute;
+	$record = $sql->fetchrow_hashref;
+	$sql->finish;
+	$deviceinfo->{effective_caller_id_number} = $record->{var_value};
+	
 	return $deviceinfo;
 }
 

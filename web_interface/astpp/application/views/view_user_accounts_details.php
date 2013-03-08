@@ -1,16 +1,6 @@
 <? extend('user_master.php') ?>
 <?php error_reporting(E_ERROR);?>
-	<? startblock('extra_head') ?>
-	<link rel="stylesheet" href="/css/flexigrid.css" type="text/css" />
-	<script type="text/javascript" src="/js/flexigrid.js"></script>	
-    
-	<script type="text/javascript" src="/js/validate.js"></script>
-	
-<style>
-    fieldset{
-        width: 609px;
-    }
-</style>			
+	<? startblock('extra_head') ?>			
 	<? endblock() ?>
 
     <? startblock('page-title') ?>

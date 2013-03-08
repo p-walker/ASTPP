@@ -106,7 +106,7 @@ class Rates extends CI_Controller
 		}
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | Rates | Counters';
 		$data['username'] = $this->session->userdata('user_name');	
-		$data['page_title'] = 'Counters';	
+		$data['page_title'] = 'Package usage';	
 		$data['cur_menu_no'] = 7;
 		
 		$this->load->model('rates_model');
@@ -260,13 +260,14 @@ class Rates extends CI_Controller
 				$errors = "";
 				if(trim($_POST['name']) == "")
 				$errors .= "Name is required<br />";
-				if(trim($_POST['pattern']) == "")
-				$errors .= "Pattern is required<br />";
+/*				if(trim($_POST['pattern']) == "")
+				$errors .= "Pattern is required<br />";*/
 								
 				if ($errors == "")
 				{				
-					$this->rates_model->add_package($_POST);
-					$this->session->set_userdata('astpp_notification', 'Packages added successfully!');
+					$response = $this->rates_model->add_package($_POST);
+					$this->common_model->status_message($response);
+					//$this->session->set_userdata('astpp_notification', 'Packages added successfully!');
 					redirect(base_url().'rates/packages/');				
 				}
 				else 
@@ -285,13 +286,14 @@ class Rates extends CI_Controller
 				$errors = "";
 				if(trim($_POST['name']) == "")
 				$errors .= "Name is required<br />";
-				if(trim($_POST['pattern']) == "")
-				$errors .= "Pattern is required<br />";
+/*				if(trim($_POST['pattern']) == "")
+				$errors .= "Pattern is required<br />";*/
 							
 				if ($errors == "")
 				{				
-					$this->rates_model->edit_package($_POST);
-					$this->session->set_userdata('astpp_notification', 'Packages updated successfully!');
+					$response = $this->rates_model->edit_package($_POST);
+					$this->common_model->status_message($response);
+					//$this->session->set_userdata('astpp_notification', 'Packages updated successfully!');
 					redirect(base_url().'rates/packages/');				
 				}
 				else 
@@ -312,7 +314,7 @@ class Rates extends CI_Controller
 				  return;
 			  }	
 			  $data['pricelists'] = $this->rates_model->list_pricelists_select($package['pricelist']);
-			  $this->load->view('view_rates_packages_add',$data);	
+			   $this->load->view('view_rates_packages_edit',$data);		
 			}
 		}
 		elseif($action == 'delete')
@@ -323,8 +325,9 @@ class Rates extends CI_Controller
 				redirect(base_url().'rates/packages/');
 			}
 			
-			$this->rates_model->remove_package($package);		
-			$this->session->set_userdata('astpp_notification', 'Packages removed successfully!');
+			$response = $this->rates_model->remove_package($package);		
+			$this->common_model->status_message($response);
+			//$this->session->set_userdata('astpp_notification', 'Packages removed successfully!');
 			redirect(base_url().'rates/packages/');
 		}		
 		
@@ -397,8 +400,8 @@ class Rates extends CI_Controller
 				$json_data['rows'][] = array('cell'=>array(
 							$row['name'],
 							$row['pricelist'],
-							$row['pattern'],
 							$row['includedseconds'],
+ 							$pattern = $this->rates_model->list_packages_patterns(false,$row["id"],"",""),
 							$this->get_action_buttons_packages($row['id'])
 						));
 			}
@@ -407,23 +410,21 @@ class Rates extends CI_Controller
 	}
 	
 	function get_action_buttons_packages($id)
-	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+	{		
 		$ret_url = '';
-		$ret_url = '<a href="/rates/packages/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/rates/packages/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/rates/packages/edit/'.$id.'/" class="icon edit_image" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/rates/packages/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}		
 	
 	
 	function get_action_buttons_periodiccharges($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
+    	
 		$ret_url = '';
-		$ret_url = '<a href="/rates/periodiccharges/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/rates/periodiccharges/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/rates/periodiccharges/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/rates/periodiccharges/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -665,8 +666,9 @@ class Rates extends CI_Controller
 				
 				if ($errors == "")
 				{				
-					$this->rates_model->add_pricelist($_POST);
-					$this->session->set_userdata('astpp_notification', 'Pricelist added successfully!');
+					$response = $this->rates_model->add_pricelist($_POST);
+					//$this->session->set_userdata('astpp_notification', 'Pricelist added successfully!');
+					$this->common_model->status_message($response);
 					redirect(base_url().'rates/pricelists/');				
 				}
 				else 
@@ -691,14 +693,15 @@ class Rates extends CI_Controller
 				
 				if ($errors == "")
 				{				
-					$this->rates_model->edit_pricelist($_POST);
-					$this->session->set_userdata('astpp_notification', 'Pricelist updated successfully!');
+					$response = $this->rates_model->edit_pricelist($_POST);
+					//$this->session->set_userdata('astpp_notification', 'Pricelist updated successfully!');
+					$this->common_model->status_message($response);
 					redirect(base_url().'rates/pricelists/');				
 				}
 				else 
 				{
 					$this->session->set_userdata('astpp_errormsg', $errors);
-					redirect(base_url().'rates/pricelists/');				
+					redirect(base_url().'rates/pricelists/');
 				}
 			}	
 			else
@@ -724,8 +727,9 @@ class Rates extends CI_Controller
 				redirect(base_url().'rates/pricelists/');
 			}
 			
-			$this->rates_model->remove_pricelist($pricelist);		
-			$this->session->set_userdata('astpp_notification', 'Pricelist removed successfully!');
+			$response = $this->rates_model->remove_pricelist($pricelist);		
+			$this->common_model->status_message($response);
+			//$this->session->set_userdata('astpp_notification', 'Pricelist removed successfully!');
 			redirect(base_url().'rates/pricelists/');
 		}
 			
@@ -734,11 +738,9 @@ class Rates extends CI_Controller
 	
 	function get_action_buttons_routes($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
 		$ret_url = '';
-		$ret_url = '<a href="/rates/routes/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/rates/routes/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/rates/routes/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/rates/routes/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}	
 	
@@ -804,7 +806,8 @@ class Rates extends CI_Controller
 			foreach ($query->result_array() as $row)
 			{
 				$json_data['rows'][] = array('cell'=>array(
-					$row['id'],
+					'<input type="checkbox" name="chkAll" id='.$row['id'].' class="chkRefNos" onclick="cickchkbox('.$row['id'].')" value='.$row['id'].'>',
+// 					$row['id'],
 					$row['pattern'],
 					$row['comment'],
 					$row['pricelist'],
@@ -919,11 +922,9 @@ class Rates extends CI_Controller
 	
 	function get_action_buttons_pricelists($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
 		$ret_url = '';
-		$ret_url = '<a href="/rates/pricelists/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/rates/pricelists/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/rates/pricelists/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/rates/pricelists/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}	
 	
@@ -1003,7 +1004,167 @@ class Rates extends CI_Controller
 		}
 		echo json_encode($json_data);		
 	}
+	/**
+	* -------Here we write code for controller accounts functions packages_pattern_json------
+	* Listing of Blocked prefixes detail through account no
+	* @account_number: Account Number
+	*/
+	function packages_pattern_json($package_id=NULL) {
+	    $json_data = array();
+	    $count_all = $this->rates_model->list_packages_patterns(false,$package_id,"","");
+	    $config['total_rows'] = $count_all;
+
+	    $config['per_page'] = $_GET['rp'];
+
+	    $page_no = $_GET['page'];
+
+	    $json_data = array();
+	    $json_data['page'] = $page_no;
+
+	    $json_data['total'] = $config['total_rows'];
+
+
+	    $perpage = $config['per_page'];
+	    $start = ($page_no - 1) * $perpage;
+	    if ($start < 0)
+		$start = 0;
+
+	    $query = $this->rates_model->list_packages_patterns(true,$package_id, $start, $perpage);
+
+	    if ($query->num_rows() > 0) {
+		foreach ($query->result_array() as $row) {
+		    $json_data['rows'][] = array('cell' => array(
+						  '<input type="checkbox" name="chkAll" id='.$row['id'].' class="chkRefNos" onclick="cickchkbox('.$row['id'].')" value='.$row['id'].'>',
+						  $row['patterns'],
+						  $this->get_action_buttons_patternlist($row['id'],$package_id)));
+		}
+	    }
+	    echo json_encode($json_data);
+	}
+	function get_action_buttons_patternlist($id,$package_id) {
+	    $delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+	    $ret_url = '';
+	    $ret_url .= '<a href="/rates/remove_package_details/'.$id.'/'.$package_id.'" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+
+	    return $ret_url;
+	}
+
+	function remove_package_details($patern_id,$packageid){
+	    $this->db->where("id",$patern_id);
+	    $this->db->delete("package_patterns");
+	    redirect(base_url().'rates/packages/edit/'.$packageid);
+	}
+	function add_package_patterns($Package_ID){
+	    $data['app_name'] = 'ASTPP - Open Source Billing Solution | Accounts | Package Pattern List';
+	    $data['username'] = $this->session->userdata('user_name');
+	    $data['page_title'] = 'Package Pattern';
+	    $data['cur_menu_no'] = 5;
+
+	    $data['package_id'] = $Package_ID;
+
+	    $this->session->set_userdata("selected_prefixes","");
+	    $this->load->view('view_pattern_for_packagelist', $data);
+	}
+	function Package_routes_grid($Packag_ID)
+	{
+	    $json_data = array();
+	    $count_all = $this->rates_model->Package_getRoutesList(false,$Packag_ID,"","");
+	    
+	    $config['total_rows'] = $count_all;			
+	    $config['per_page'] = $_GET['rp'];
+
+	    $page_no = $_GET['page']; 
+	    
+	    $json_data['page'] = $page_no;			
+	    $json_data['total'] = ($config['total_rows']>0) ? $config['total_rows'] : 0;					
+	      
+	      $perpage = $config['per_page'];
+	      $start = ($page_no-1) * $perpage;
+	      if($start < 0 )
+	      $start = 0;
+	      $selected_arr = array();
+	    $query = $this->rates_model->Package_getRoutesList(true,$Packag_ID,$start, $perpage);
+	    if($query->num_rows() > 0)
+	    {
+		if(isset($this->session->userdata["selected_prefixes"]) && !empty($this->session->userdata["selected_prefixes"])){
+		  $selected_arr = explode(",",$this->session->userdata("selected_prefixes"));
+		} 
+		foreach ($query->result_array() as $row)
+		{
+		    $var = "";
+		    $var .=  "<input type='checkbox' name='".$row['id']."' id='chk".$row['id']."' class='chkbx'";
+		    if(in_array($row['id'],$selected_arr)){ $var .= "checked = 'true'";}
+		    $var .= "onClick='return selected_routes(".$row['id'].");'>";
+
+		    $json_data['rows'][] = array('cell'=>array(
+			    $var,
+			    $row['pattern'],
+			    $row['comment'],
+		    ));
+		}
+	    }
+	    echo json_encode($json_data);		
+	}
+	function Package_routes_search()
+	{	
+		$ajax_search = $this->input->post('ajax_search',0);	
+		if($this->input->post('advance_search', TRUE)==1) {		
+			$this->session->set_userdata('advance_search',$this->input->post('advance_search'));
+			unset($_POST['action']);
+			unset($_POST['advance_search']);
+			$this->session->set_userdata('routes_search', $_POST);		
+		}
+		if(@$ajax_search!=1) {		
+		redirect(base_url().'accounts/add_block_prefixes/');
+		}
+	}
 	
-	
+	/**
+	  * -------Here we write code for controller rates functions clearsearchfilter_routes------
+	  * Empty CI database session variable routes_search for normal listing
+	  */
+	function Package_clearsearchfilter_routes()
+	{
+		$this->session->set_userdata('advance_search',0);
+		$this->session->set_userdata('routes_search', "");
+		redirect(base_url().'accounts/add_block_prefixes/');		
+	}
+
+	function add_pckg_pattern($Package_ID){
+	  $result = $this->rates_model->insert_block(rtrim($_POST["add_patterns"],","),$Package_ID);
+	  $this->session->set_userdata("selected_prefixes","");
+	}
+	function insert_package_pattern($Package_ID){
+	  $count_all = $this->rates_model->list_package_pattern_count($Package_ID,$_POST['add_to_list']);
+	  if($count_all > 0){
+	    echo 0;
+	  }else{
+	    $tmp = array("package_id" =>$Package_ID,
+			"patterns" =>$_POST['add_to_list']);
+	    $result = $this->rates_model->insert_package_patern($tmp);
+	    echo 1;
+	  }
+	}
+
+	function set_selected_prefixes(){
+	    $this->session->set_userdata("selected_prefixes",$_POST["prefixes"]);
+	}
+	function remove_selected_package_details(){
+  	  $delete_result = $this->rates_model->delete_selected_package($_POST['deletable_id']);
+	  if($delete_result){
+	    echo "1";
+	  }else{
+	    echo "0";
+	  }
+	}
+
+	function delete_selected_rates(){
+  	  $delete_result = $this->rates_model->delete_selected_routes($_POST['deletable_id']);
+	  if($delete_result){
+	    echo "1";
+	  }else{
+	    echo "0";
+	  }
+	}
 }
 ?>

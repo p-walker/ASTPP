@@ -15,7 +15,7 @@ class Did_model extends CI_Model
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
 		$data['extension'] = str_replace ("%","###",$data['extension']);
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_did($data)
@@ -26,7 +26,7 @@ class Did_model extends CI_Model
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');
 		$data['extension'] = str_replace ("%","###",$data['extension']);
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function remove_did($data)
@@ -37,7 +37,7 @@ class Did_model extends CI_Model
 		$data['action'] = "Deactivate...";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);	
+		return $this->curl->sendRequestToPerlScript($url,$data);	
 	}
 	
 	function purchase_did($data)

@@ -1,9 +1,7 @@
 <? extend('master.php') ?>
 
 	<? startblock('extra_head') ?>
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>    
+
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -46,12 +44,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 20,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 300,
+	height: "auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',
@@ -156,7 +154,7 @@ function reload_button()
           </div>
         </div>-->
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all">                        
-            <div class="portlet-header ui-widget-header">Dispatcher List<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
+            <div class="portlet-header ui-widget-header">Opensips Devices<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
             <div class="portlet-content">
             <form method="POST" action="del/0/" enctype="multipart/form-data" id="ListForm">
             <table id="flex1" align="left" style="display:none;"></table>

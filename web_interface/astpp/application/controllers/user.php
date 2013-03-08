@@ -23,7 +23,7 @@ class User extends CI_Controller
 		$this->load->model('cc_model');
 		$this->load->model('Astpp_common');
 		$this->load->model('userdid_model');
-$this->load->model('usermodel');
+		$this->load->model('usermodel');
 		
 		if($this->session->userdata('user_login')== FALSE)
 			redirect(base_url().'astpp/login');
@@ -392,14 +392,10 @@ $this->load->model('usermodel');
 	
 		
 	function get_action_buttons($id)
-	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+	{	
 		$ret_url = '';
-		
-		$ret_url = '<a href="#" onclick="edit_did_confirm(\''.$id.'\')" class="icon" '.$update_style.' title="Update">&nbsp;</a>';
-		//$ret_url = '<a href="/user/edit_did/'.$id.'/"  class="icon" '.$update_style.' title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/user/remove_dids/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="#" onclick="edit_did_confirm(\''.$id.'\')" class="icon edit_image" title="Update">&nbsp;</a>';		
+// 		$ret_url .= '<a href="/user/remove_dids/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -670,9 +666,8 @@ $this->load->model('usermodel');
 	
 	function get_dids_action_buttons($id)
 	{
-		$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
 		$ret_url = '';
-		$ret_url .= '<a href="/user/dids/remove/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url .= '<a href="/user/dids/remove/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 			
@@ -691,8 +686,6 @@ $this->load->model('usermodel');
               {
                     $this->load->view('view_user_invoice_list',$data);
               }
-            
-            
         }
 
         
@@ -739,14 +732,12 @@ $this->load->model('usermodel');
         
         function get_action_buttons_invoice($invoiceid)
 	{
-        	$details_style = 'style="text-decoration:none;background-image:url(/images/details.png);"';
-                $pdf_style = 'style="text-decoration:none;background-image:url(/images/pdf.png);"';
 		$ret_url = '';
-		$ret_url .= '<a href="'.base_url().'accounts/view_invoice/'.$invoiceid.'/" class="icon" '.$details_style.' title="Details">&nbsp;</a>';
-                $ret_url .= '<a href="'.base_url().'accounts/download_invoice/'.$invoiceid.'/" class="icon" '.$pdf_style.' title="Details">&nbsp;</a>';
+		$ret_url .= '<a href="'.base_url().'accounts/view_invoice/'.$invoiceid.'/" class="icon details_image" title="Details">&nbsp;</a>';
+                $ret_url .= '<a href="'.base_url().'accounts/download_invoice/'.$invoiceid.'/" class="icon pdf_image" title="Details">&nbsp;</a>';
 		return $ret_url;
 	}
-                        
+                
     	function add_callerid($card_number="")
         {
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | CallingCards | Add CC Caller ID';
@@ -805,7 +796,7 @@ $this->load->model('usermodel');
 		redirect(base_url().'user/user_invoice_list');		
 	}
 	
- function edit_account($name)
+	function edit_account($name)
         {
             
             $data['name']="Edit User Account";
@@ -817,16 +808,154 @@ $this->load->model('usermodel');
         {
            $this->usermodel->edit_account($_POST);
            redirect("user/accountsdetail");
-        }
-        /*===================================================================================================*/
-
+        }  
         
-/*=====================================================================================================================================================*/
+        function rates()
+        {
+// 	    echo "<pre>";print_r($this->session);echo "</pre>";
+	    $data['app_name'] = 'ASTPP - Open Source Billing Solution | Rates';
+	    $data['username'] = $this->session->userdata('user_name');	
+	    $data['page_title'] = 'Rates';
+	    $this->load->view('view_user_rates',$data);	    
+	}	
 	
+	function rates_grid()
+	{
+		$json_data = array();
+		$count_all = $this->usermodel->getRatesList(false);
+		
+		$config['total_rows'] = $count_all;
+		$config['per_page'] = $_GET['rp'];
 
+		$page_no = $_GET['page']; 
+		
 	
+		$json_data['page'] = $page_no;			
+		$json_data['total'] = ($config['total_rows']>0) ? $config['total_rows'] : 0;
+		 
+		 $perpage = $config['per_page'];
+		 $start = ($page_no-1) * $perpage;
+		 if($start < 0 )
+		 $start = 0;
+		 
+		$query = $this->usermodel->getRatesList(true,$start, $perpage);
+         		
+		if($query->num_rows() > 0)
+		{
+			foreach ($query->result_array() as $row)
+			{
+				$json_data['rows'][] = array('cell'=>array(
+					$row['pattern'],
+					$row['comment'],
+					$row['includedseconds'],
+					$row['inc'],
+					$this->common_model->calculate_currency($row['connectcost']),
+					$this->common_model->calculate_currency($row['cost'])
+					
+				));
+	 		}
+		}
+		echo json_encode($json_data);		
+	}
+		
+	function rates_search()
+	{	
+		$ajax_search = $this->input->post('ajax_search',0);	
+		if($this->input->post('advance_search', TRUE)==1) {		
+			$this->session->set_userdata('advance_search',$this->input->post('advance_search'));
+			unset($_POST['action']);
+			unset($_POST['advance_search']);
+			$this->session->set_userdata('rates_search', $_POST);		
+		}
+		if(@$ajax_search!=1) {		
+		redirect(base_url().'user/rates/');
+		}
+	}
+	
+	function clearsearchfilter_rates()
+	{
+		$this->session->set_userdata('advance_search',0);
+		$this->session->set_userdata('rates_search', "");
+		redirect(base_url().'user/rates/');		
+	}
+	function user_payment_list(){
+	    $data['app_name'] = 'ASTPP - Open Source Billing Solution | Payment Details';
+	    $data['username'] = $this->session->userdata('user_name');	
+	    $data['page_title'] = 'Payment Details';
+	    $data['payment_type']= $this->config->item("payment_type");
+	    $this->load->view('view_user_payment_report',$data);	    
+	}
+	function pyament_report_list()
+	{
+	    $accountinfo = $this->session->userdata['accountinfo'];
+	    $payment_type = $this->config->item("payment_type");
+	    $this->load->model('accounts_model');
+
+	    $count_all = $this->accounts_model->list_payment_report(false,$accountinfo['accountid'],"","");	
+	    
+	    $config['total_rows'] = $count_all;			
+	    $config['per_page'] = $_GET['rp'];
+
+	    $page_no = $_GET['page']; 
+
+	    $json_data = array();
+	    $json_data['page'] = $page_no;
+	    
+	    $json_data['total'] = $config['total_rows'];	
+	    
+	      
+	    $perpage = $config['per_page'];
+	    $start = ($page_no-1) * $perpage;
+	    if($start < 0 )
+	    $start = 0;
+	      
+	    $query = $this->accounts_model->list_payment_report(true,$accountinfo['accountid'],$start,$perpage);
+	    if($query->num_rows() > 0)
+	    {
+		$json_data['page'] = $page_no;
+		$json_data['total'] = $config['total_rows'];
+		foreach ($query->result_array() as $row)
+		{
+		    $json_data['rows'][] = array('cell'=>array(
+			    $this->common_model->calculate_currency($row['credit']),
+			    $payment_type[$row['type']],
+			    $row['notes'],
+			    $row['reference']
+		    ));
+		}
+	    }		
+	    echo json_encode($json_data);		
+	}
+	/**
+	 * -------Here we write code for controller user functions payment_search------
+	 * We post array of provider field to CI database session variable payment_search
+	 */
+	function payment_search()
+	{	
+	    $ajax_search = $this->input->post('ajax_search',0);
+	    if($this->input->post('advance_search', TRUE)==1) {		
+		    $this->session->set_userdata('advance_search',$this->input->post('advance_search'));
+		    unset($_POST['action']);
+		    unset($_POST['advance_search']);
+		    $this->session->set_userdata('payment_search', $_POST);		
+	    }
+	    if(@$ajax_search!=1) {		
+		    redirect(base_url().'user/user_payment_list');
+	    }
+	}
+	
+	
+	/**
+	 * -------Here we write code for controller user functions clearsearchfilter_provider------
+	 * Empty CI database session variable payment_search for normal listing
+	 */
+	function clearsearchfilter_payment()
+	{
+		$this->session->set_userdata('advance_search',0);
+		$this->session->set_userdata('payment_search', "");
+		redirect(base_url().'user/user_payment_list');
+		
+	}
+
 }
-
-
-
 ?>

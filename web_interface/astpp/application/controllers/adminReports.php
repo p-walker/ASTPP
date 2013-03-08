@@ -187,7 +187,7 @@ class AdminReports extends CI_Controller
 			
 			
 			if(!empty($user_search['Pattern'])) {
-				$pattern  = $reseller_search['Pattern'];
+				$pattern  = $user_search['Pattern'];
 			}
 			
 			if(!empty($user_search['start_date'])) {
@@ -253,6 +253,7 @@ class AdminReports extends CI_Controller
 		
 		$destination_list = $sth_destination[1];
 		$pattern_list = $sth_destination[2];
+		
 		
 		$data['Destination'] = $destination;
 		$data['destination'] = $destination_list;
@@ -969,10 +970,9 @@ class AdminReports extends CI_Controller
 		
 		$data['cur_menu_no'] = 2;
 		
-			
+
 		//For Reseller		
 		//$Reseller_post = $this->input->post('Reseller',0);
-		
 		if($this->session->userdata('advance_search')==1){
 			
 			$provider_search =  $this->session->userdata('provider_search');
@@ -1016,12 +1016,10 @@ class AdminReports extends CI_Controller
 			
 		}
 		
-		 
 		if($reseller == NULL)
 		{
 			 $reseller = "ALL";
 		}
-		
 		
 		if ( $this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5 ) {
 			 $sth_reseller = $this->accounts_model->getReseller("".$this->session->userdata('username')."", $type);
@@ -1043,7 +1041,6 @@ class AdminReports extends CI_Controller
 		{
 			 $pattern = "ALL";
 		}
-				
 		
 		if ( $this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5 ) {
 			$sth_destination = $this->callshop_model->getDestination("".$this->session->userdata('username')."");
@@ -1052,9 +1049,9 @@ class AdminReports extends CI_Controller
 			$sth_destination = $this->callshop_model->getDestination();
 		}
 		
-		
 		$destination_list = $sth_destination[1];
 		$pattern_list = $sth_destination[2];
+				
 		
 		$data['Destination'] = $destination;
 		$data['destination'] = $destination_list;
@@ -1116,19 +1113,8 @@ class AdminReports extends CI_Controller
 			$this->load->view('view_adminReports_providerReport',$data);
 		}
 		else 
-		{
-						
-		//Filter		 
-		  /* $sd =  $start_date;		   
-		   $ed =  $end_date;
-		   
-		   if($sd==NULL || $ed==NULL || $sd=='NULL' || $ed=='NULL'){
-				$sd = date("Y-m-d", strtotime(date('m').'/01/'.date('Y').' 00:00:00'));
-				$ed = date('Y-m-d 23:59:59');
-			}*/
-		   
-		   $where = ""; 
-		   
+		{  
+			$where = ""; 
 			if($sd!='NULL' && $ed!='NULL' && $sd!="" && $ed!="") {	
 				$where = " AND callstart BETWEEN '". $sd . "' AND '". $ed . "' ";
 			}
@@ -1138,16 +1124,9 @@ class AdminReports extends CI_Controller
 			   if ( $this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5 ) {
 					$where .="AND cardnum IN (SELECT `number` FROM accounts WHERE reseller = '". $reseller. "' AND type IN (".$type.")) ";
 				}
-				else {
-			//            if ( strpos( $this->session->userdata('logintype'), "1" ) != -1 ) {
-						$where .="AND cardnum IN (SELECT `number` FROM accounts WHERE type IN (".$type.")) ";
-			//           }
-			//            elsif ( strpos( $this->session->userdata('logintype'), "3" ) != -1 ) {
-			//				if ($Reseller_post != 'ALL') {
-			//	                $where .= "AND cardnum = " . $Reseller_post . " ";
-			//		}
-			//           }
-				}
+				else {			
+				    $where .="AND cardnum IN (SELECT `number` FROM accounts WHERE type IN (".$type.")) ";			
+				  }
 			}
 			else {
 			if ( $this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5 ) {
@@ -1165,26 +1144,30 @@ class AdminReports extends CI_Controller
 			}
 		}
 		
-		if ( $destination == 'ALL' ) {
-			if ( urldecode($pattern) == 'ALL' || urldecode($pattern) == "") {
-				$where .= "";
-			}
-			else {
-				$where .= "AND notes LIKE '" . "%|" . urldecode($pattern)  . "' ";
-			}
+		if($destination != 'ALL')
+		{
+		      $where .= "AND pattern = '".urldecode($destination)."'";
 		}
-		else {
-			if ( urldecode($pattern) == 'ALL' || urldecode($pattern) == "") {
-				$where .= ""; 
-			}
-			else {
-				$where .= "AND (notes LIKE '". "%|" . $destination . "|%" . "' "
-				  . "OR notes LIKE '" .  "%|" . urldecode($pattern) . "'  ) ";
-			}
-		}
-		
+// 		if ( $destination == 'ALL' ) {
+// 			if ( urldecode($pattern) == 'ALL' || urldecode($pattern) == "") {
+// 				$where .= "";
+// 			}
+// 			else {
+// 				$where .= "AND notes LIKE '" . "%|" . urldecode($pattern)  . "' ";
+// 			}
+// 		}
+// 		else {
+// 			if ( urldecode($pattern) == 'ALL' || urldecode($pattern) == "") {
+// 				$where .= ""; 
+// 			}
+// 			else {
+// 				$where .= "AND (notes LIKE '". "%|" . $destination . "|%" . "' "
+// 				  . "OR notes LIKE '" .  "%|" . urldecode($pattern) . "'  ) ";
+// 			}
+// 		}
+// 		echo $where;
 		$table = "tmp_" . time();
-		
+// 		echo $where;
 		//$drop_view = @mysql_query("DROP TEMPORARY TABLE $table");
 		
 		//$query ="CREATE TEMPORARY TABLE $table SELECT * FROM cdrs WHERE uniqueid != '' " . $where;
@@ -1193,11 +1176,7 @@ class AdminReports extends CI_Controller
 		
 		$rs_create = $this->db->query($query);
 		
-		 
-		 
-		if($rs_create) {			
-		
-			
+		if($rs_create) {				
 			$sql =$this->db->query("SELECT DISTINCT cardnum AS '".$name."' FROM $table");
 			$count_all =  $sql->num_rows();
 			
@@ -1219,7 +1198,7 @@ class AdminReports extends CI_Controller
 			//$sql =mysql_query("SELECT DISTINCT cardnum AS ".$reseller." FROM $table"); 
 			
 			$admin_reseller_report =  $this->callshop_model->getCardNum($reseller, $table, $start,$perpage, $name);
-			
+// 			echo "<pre>";print_r($admin_reseller_report);
 			if(count($admin_reseller_report) > 0)
 			{
 				$json_data['page'] = $page_no;				
@@ -1229,27 +1208,20 @@ class AdminReports extends CI_Controller
 				{
 					
 					$json_data['rows'][] = array('cell'=>array($value['bth'],
-															   $value['dst'],
-															   $value['idd'],
-															   $value['atmpt'],
-															   $value['cmplt'],
-															   $value['asr'],
-															   $value['acd'],
-															   $value['mcd'],
-															   $value['act'],
-															   $value['bill'],
-															   $this->common_model->calculate_currency($value['price']),
-															   $this->common_model->calculate_currency($value['cost'])));
+							  $value['dst'],
+							  $value['idd'],
+							  $value['atmpt'],
+							  $value['cmplt'],
+							  $value['asr'],
+							  $value['acd'],
+							  $value['mcd'],
+							  $value['act'],
+							  $value['bill'],
+// 							  $this->common_model->calculate_currency($value['price']),
+							  $this->common_model->calculate_currency($value['cost'])));
 															   
 				}
-			}
-			
-			
-		
-		
-			//grid json data	
-			//$json_data = array();$json_data['page'] = 0;$json_data['total'] = 0;
-			//$json_data['rows'][] = array('cell'=>array("asdfa","sdfasf","sdfasf","adfsds","fsdf","gfhf","hgfhf","fghf","gfhgf","fghgf","ghjf"));
+			}			
 			echo json_encode($json_data);					
 		}
 		
@@ -1258,6 +1230,92 @@ class AdminReports extends CI_Controller
 		
 		
 	}	
+	/**
+	 * -------Here we write code for controller adminReports functions paymentReport------
+	 */
+	function paymentReport(){
+	    $data['app_name'] = 'ASTPP - Open Source Billing Solution';
+	    $data['username'] = $this->session->userdata('user_name');	
+	    $data['page_title'] = 'Payment Report';
+	    $data['payment_type']= $this->config->item("payment_type");
+	    $this->load->view('view_payment_report',$data);
+	}
+	/**
+	 * -------Here we write code for controller adminReports functions pyament_report_list------
+	 */
+	function pyament_report_list()
+	{
+	    $payment_type = $this->config->item("payment_type");
+	    $this->load->model('accounts_model');
+// 	    $this->load->model('common_model');
+
+	    $count_all = $this->accounts_model->list_payment_report(false,"","","");	
+	    
+	    $config['total_rows'] = $count_all;			
+	    $config['per_page'] = $_GET['rp'];
+
+	    $page_no = $_GET['page']; 
+
+	    $json_data = array();
+	    $json_data['page'] = $page_no;
+	    
+	    $json_data['total'] = $config['total_rows'];	
+	    
+	      
+	    $perpage = $config['per_page'];
+	    $start = ($page_no-1) * $perpage;
+	    if($start < 0 )
+	    $start = 0;
+	      
+	    $query = $this->accounts_model->list_payment_report(true,"",$start,$perpage);
+	    if($query->num_rows() > 0)
+	    {
+		    $json_data['page'] = $page_no;
+		    $json_data['total'] = $config['total_rows'];
+		    foreach ($query->result_array() as $row)
+		    {
+			$accountinfo = $this->accounts_model->get_account_number($row['accountid']);
+			$json_data['rows'][] = array('cell'=>array(
+				$accountinfo["number"],
+				$this->common_model->calculate_currency($row['credit']),
+				$payment_type[$row['type']],
+				$row['reference'],
+				$row['notes']
+			));
+		    }
+	    }		
+	    echo json_encode($json_data);		
+	}
+	/**
+	 * -------Here we write code for controller adminReports functions payment_search------
+	 * We post array of provider field to CI database session variable payment_search
+	 */
+	function payment_search()
+	{	
+	    $ajax_search = $this->input->post('ajax_search',0);
+	    if($this->input->post('advance_search', TRUE)==1) {		
+		    $this->session->set_userdata('advance_search',$this->input->post('advance_search'));
+		    unset($_POST['action']);
+		    unset($_POST['advance_search']);
+		    $this->session->set_userdata('payment_search', $_POST);		
+	    }
+	    if(@$ajax_search!=1) {		
+		    redirect(base_url().'adminReports/paymentReport/');
+	    }
+	}
+	
+	
+	/**
+	 * -------Here we write code for controller adminReports functions clearsearchfilter_provider------
+	 * Empty CI database session variable payment_search for normal listing
+	 */
+	function clearsearchfilter_payment()
+	{
+		$this->session->set_userdata('advance_search',0);
+		$this->session->set_userdata('payment_search', "");
+		redirect(base_url().'adminReports/paymentReport/');
+		
+	}
 	
 }
 

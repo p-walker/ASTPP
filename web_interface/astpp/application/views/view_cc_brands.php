@@ -1,11 +1,9 @@
 <? extend('master.php') ?>
-
+<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
+<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
 	<? startblock('extra_head') ?>
 
 <?php if($page_type == 'list'){?>		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
 
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
@@ -27,8 +25,6 @@ $("#flex1").flexigrid({
     method: 'GET',
     dataType: 'json',
 	colModel : [
-<!--        {display: '<input type="checkbox" onclick="toggleChecked(this.checked)">', name: '', width: 20, align: 'center'},\
--->
 		{display: 'CC Brand<br/> Name', name: 'Number', width: 80, sortable: false, align: 'center'},
         {display: 'Pin Required', name: 'country', width: 70, sortable: false, align: 'center'},
         {display: 'Pricelist', name: 'province', width: 80, sortable: false, align: 'center'},
@@ -57,19 +53,19 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 10,
 	showTableToggleBtn: false,
-	width: 1261,
-	height: 250,
+	width: "auto",	
+	height: "auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',
     procmsg: 'Processing, please wait ...',
     pagestat: 'Displaying {from} to {to} of {total} items',
     //preProcess: formatContactResults,
-    onSuccess: function(data){
+    onSuccess: function(data){      
         $('a[rel*=facebox]').facebox({
         		loadingImage : '<?php echo base_url();?>/images/loading.gif',
         		closeImage   : '<?php echo base_url();?>/images/closelabel.png'

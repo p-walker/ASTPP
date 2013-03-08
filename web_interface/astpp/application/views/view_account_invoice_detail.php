@@ -1,10 +1,6 @@
 <?php extend('master.php') ?>
 
 <?php startblock('extra_head') ?>
-		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="/css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="/js/flexigrid.js"></script>
 
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
@@ -22,7 +18,6 @@ function get_alert_msg(id)
         text-align: center;
         
     }
-	
 	.invoice_heading{
 		font-weight:bold;
 		font-family: Arial,Helvetica,sans-serif;

@@ -1,10 +1,5 @@
 <?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-
-/*$admin_pages = array('account_list', 'create','payment_process','edit','account_detail_add','remove_account_details','account_detail','accountDetailsPopup','view_invoice','remove','search','clearsearchfilter', 'search_callingcard_account_list', 'search_did_account_list', 'search_did_provider_list', 'search_trunks_provider_list', 'search_trunks_reseller_list', 'search_outbound_reseller_list', 'search_counters_account_list','search_configuration_reseller_list','search_fssipdevices_account_list','search_fscdrs_account_list', 'invoice_json', 'ip_json', 'ani_json', 'dids_json', 'chargelist_json', 'account_detail_json', 'iax_sip_json', 'periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'pricelists_grid', 'configuration', 'update_brands_select', 'configuration_search', 'clearsearchfilter_configuration', 'configuration_grid', 'purgedeactivated', 'taxes', 'taxes_search','clearsearchfilter_taxes','taxes_grid', 'add', 'brands', 'brands_add','brands_search','brands_grid','cdrs','brands_cdrs_search', 'clearsearchfilter_brands_cdrs', 'brands_cdrs_grid', 'cclist', 'refill', 'remove', 'reset_card', 'update_status', 'view', 'cards_search', 'clearsearchfilter_cards', 'manage_json');
-*/
-			
-			
 if( !function_exists( 'validate_access' ) )
 {
 	function validate_access($user_type,$method, $controller)
@@ -12,7 +7,7 @@ if( !function_exists( 'validate_access' ) )
 		switch($user_type){
 			case 0:
 				if($controller=="user"){
-					$user_pages = array('dashboard','logout', 'cclist', 'viewcard_json', 'manage_json', 'didslist', 'dids_json', 'remove_dids', 'edit_did', 'editdid', 'accountsdetail', 'account_detail_json', 'chargelist_json', 'userdids_json','user_invoice_list','userinvoice_json','get_action_buttons_invoice','add_callerid','redirect_notification', 'search','clearsearchfilter','edit_account','update');
+					$user_pages = array('dashboard','logout', 'cclist', 'viewcard_json', 'manage_json', 'didslist', 'dids_json', 'remove_dids', 'edit_did', 'editdid', 'accountsdetail', 'account_detail_json', 'chargelist_json', 'userdids_json','user_invoice_list','userinvoice_json','get_action_buttons_invoice','add_callerid','redirect_notification', 'search','clearsearchfilter','edit_account','update','rates','rates_grid','rates_search','clearsearchfilter_rates','user_payment_list','pyament_report_list','payment_search','clearsearchfilter_payment');
 				}
 				elseif($controller=="useranimapping"){
 					$user_pages = array('index', 'animappinglists', 'manage_json', 'import');
@@ -33,10 +28,10 @@ if( !function_exists( 'validate_access' ) )
 			break;
 			case 1:
 				if($controller=="accounts"){
-					$reseller_pages = array('account_list', 'create','payment_process','edit','account_detail_add','remove_account_details','account_detail','accountDetailsPopup','view_invoice','remove','search','clearsearchfilter', 'search_callingcard_account_list', 'search_did_account_list', 'search_did_provider_list', 'search_trunks_provider_list', 'search_trunks_reseller_list', 'search_outbound_reseller_list', 'search_counters_account_list','search_configuration_reseller_list','search_fssipdevices_account_list','search_fscdrs_account_list', 'invoice_json', 'ip_json', 'ani_json', 'dids_json', 'chargelist_json', 'account_detail_json', 'iax_sip_json','download_invoice','add_callerid');
+					$reseller_pages = array('account_list', 'create','payment_process','edit','account_detail_add','remove_account_details','account_detail','accountDetailsPopup','view_invoice','remove','search','clearsearchfilter', 'search_callingcard_account_list', 'search_did_account_list', 'search_did_provider_list', 'search_trunks_provider_list', 'search_trunks_reseller_list', 'search_outbound_reseller_list', 'search_counters_account_list','search_configuration_reseller_list','search_fssipdevices_account_list','search_fscdrs_account_list', 'invoice_json', 'ip_json', 'ani_json', 'dids_json', 'chargelist_json', 'account_detail_json', 'iax_sip_json','download_invoice','add_callerid','block_prefix_json','add_block_prefixes','routes_grid','insert_block_prefix','remove_block_details','routes_search','clearsearchfilter_routes','set_selected_prefixes','insert_block_pattern','delete_selected_prefixes');
 				}
 				elseif($controller=="rates"){
-					$reseller_pages = array('periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'clearsearchfilter','pricelists', 'pricelists_grid');
+					$reseller_pages = array('periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'clearsearchfilter','pricelists', 'pricelists_grid','packages_pattern_json','get_action_buttons_patternlist','insert_package_pattern','add_package_patterns','Package_routes_grid','Package_routes_search','Package_clearsearchfilter_routes','add_pckg_pattern','remove_package_details','delete_selected_rates','remove_selected_package_details');
 				}
 				elseif($controller=="callingcards"){
 					$reseller_pages = array('add', 'brands', 'brands_add','brands_search', 'clearsearchfilter', 'brands_grid','cdrs','brands_cdrs_search', 'clearsearchfilter_brands_cdrs', 'brands_cdrs_grid', 'cclist', 'refill', 'remove', 'reset_card', 'update_status', 'view', 'cards_search', 'clearsearchfilter_cards', 'manage_json','add_callerid','export_cc_cdr_pdf','export_cc_cdr_xls');
@@ -51,10 +46,10 @@ if( !function_exists( 'validate_access' ) )
 					$reseller_pages = array('periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'clearsearchfilter', 'pricelists_grid', 'pricelists');
 				}
 				elseif($controller=="adminreports"){
-					$reseller_pages = array('reseller_search', 'clearsearchfilter_reseller', 'resellerReport', 'reseller_list', 'userReport', 'user_list', 'user_search', 'clearsearchfilter_reseller');
+					$reseller_pages = array('reseller_search', 'clearsearchfilter_reseller', 'resellerReport', 'reseller_list', 'userReport', 'user_list', 'user_search', 'clearsearchfilter_reseller', 'clearsearchfilter_reseller','paymentReport','pyament_report_list','payment_search','clearsearchfilter_payment');
 				}
 				elseif($controller=="accounting"){
-					$reseller_pages = array('get_action_buttons_taxes','account_taxes','account_taxes_grid','valid_account_tax','invoice_list','account_invoice_grid','get_action_buttons_invoice','get_account_details','search','clearsearchfilter','search_taxes','clearsearchfilter_taxes');
+					$reseller_pages = array('get_action_buttons_taxes','account_taxes','account_taxes_grid','valid_account_tax','invoice_list','account_invoice_grid','get_action_buttons_invoice','get_account_details','search','clearsearchfilter','search_taxes','clearsearchfilter_taxes','delete_invoice');
                                     
                                 }
                                 elseif($controller=="systems"){
@@ -71,10 +66,10 @@ if( !function_exists( 'validate_access' ) )
 			break;
 			case '2':
 				if($controller=="accounts"){
-					$admin_pages = array('account_list', 'create','payment_process','edit','account_detail_add','remove_account_details','account_detail','accountDetailsPopup','view_invoice','remove','search','clearsearchfilter', 'search_callingcard_account_list', 'search_did_account_list', 'search_did_provider_list', 'search_trunks_provider_list', 'search_trunks_reseller_list', 'search_outbound_reseller_list', 'search_counters_account_list','search_configuration_reseller_list','search_fssipdevices_account_list','search_fscdrs_account_list', 'invoice_json', 'ip_json', 'ani_json', 'dids_json', 'chargelist_json', 'account_detail_json', 'iax_sip_json','download_invoice','add_callerid');
+					$admin_pages = array('account_list', 'create','payment_process','edit','account_detail_add','remove_account_details','account_detail','accountDetailsPopup','view_invoice','remove','search','clearsearchfilter', 'search_callingcard_account_list', 'search_did_account_list', 'search_did_provider_list', 'search_trunks_provider_list', 'search_trunks_reseller_list', 'search_outbound_reseller_list', 'search_counters_account_list','search_configuration_reseller_list','search_fssipdevices_account_list','search_fscdrs_account_list', 'invoice_json', 'ip_json', 'ani_json', 'dids_json', 'chargelist_json', 'account_detail_json', 'iax_sip_json','download_invoice','add_callerid','block_prefix_json','add_block_prefixes','routes_grid','insert_block_prefix','remove_block_details','routes_search','clearsearchfilter_routes','set_selected_prefixes','insert_block_pattern','delete_selected_prefixes');
 				}
 				elseif($controller=="rates"){
-					$admin_pages = array('periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'clearsearchfilter', 'pricelists_grid', 'pricelists');
+					$admin_pages = array('periodiccharges', 'calccharge', 'counters', 'counters_search', 'clearsearchfilter_counters', 'counters_grid', 'importroutes', 'packages', 'packages_search', 'clearsearchfilter_packages', 'packages_grid', 'periodiccharges_search', 'clearsearchfilter_periodiccharges', 'periodiccharges_grid', 'routes_search', 'clearsearchfilter_routes', 'routes_grid', 'routes', 'pricelist_search', 'clearsearchfilter', 'pricelists_grid', 'pricelists','packages_pattern_json','get_action_buttons_patternlist','insert_package_pattern','add_package_patterns','Package_routes_grid','Package_routes_search','Package_clearsearchfilter_routes','add_pckg_pattern','remove_package_details','delete_selected_rates','remove_selected_package_details');
 				}
 				elseif($controller=="systems"){
 					$admin_pages = array( 'configuration', 'update_brands_select', 'configuration_search', 'clearsearchfilter_configuration', 'configuration_grid', 'purgedeactivated', 'taxes', 'taxes_search','clearsearchfilter_taxes','taxes_grid','template','template_grid','get_action_buttons_tem','get_action_button','search','clearsearchfilter');
@@ -86,22 +81,22 @@ if( !function_exists( 'validate_access' ) )
 					$admin_pages = array('manage', 'build_dids_reseller', 'build_dids', 'did_search', 'clearsearchfilter_did', 'manage_json', 'import');
 				}
 				elseif($controller=="lcr"){
-					$admin_pages = array('providers', 'provider_search', 'clearsearchfilter', 'providers_grid', 'trunks', 'trunks_search', 'clearsearchfilter_trunks', 'trunks_grid', 'outbound_search', 'clearsearchfilter_outbound', 'outbound', 'outbound_grid', 'import_outbound');
+					$admin_pages = array('providers', 'provider_search', 'clearsearchfilter', 'providers_grid', 'trunks', 'trunks_search', 'clearsearchfilter_trunks', 'trunks_grid', 'outbound_search', 'clearsearchfilter_outbound', 'outbound', 'outbound_grid', 'import_outbound','delete_selected_outbound_rates');
 				}
 				elseif($controller=="statistics"){
 					$admin_pages = array('error_search','clearsearchfilter_error', 'listerrors', 'trunkstats_search', 'clearsearchfilter_trunkstats', 'trunkstats', 'viewcdrs', 'fscdrs_search', 'clearsearchfilter_fscdrs', 'viewfscdrs');
 				}
 				elseif($controller=="switchconfig"){
-					$admin_pages = array('fssipdevices_search', 'clearsearchfilter_fssipdevices', 'fssipdevices','fssipdevices_grid', 'acl_list', 'acl_grid', '');
+					$admin_pages = array('fssipdevices_search', 'clearsearchfilter_fssipdevices', 'fssipdevices','fssipdevices_grid', 'acl_list', 'acl_grid', 'live_call_report_grid','live_call_report');
 				}
 				elseif($controller=="adminreports"){
-					$admin_pages = array('reseller_search', 'clearsearchfilter_reseller', 'reseller_list', 'resellerReport', 'provider_search', 'clearsearchfilter_provider', 'provider_list', 'providerReport');
+					$admin_pages = array('reseller_search', 'clearsearchfilter_reseller', 'reseller_list', 'resellerReport', 'provider_search', 'clearsearchfilter_provider', 'provider_list', 'providerReport','userReport', 'user_list', 'user_search', 'clearsearchfilter_reseller','paymentReport','pyament_report_list','payment_search','clearsearchfilter_payment');
 				}
 				elseif($controller=="callshops"){
 					$admin_pages = array('add','listAll', 'remove', 'boothReport', 'booths_list', 'manage_booths_json', 'remove_callshop_booth', 'booth_detail', 'booth_action', 'add_booth');
 				}
 				elseif($controller=="accounting"){
-				      $admin_pages = array('get_action_buttons_taxes','account_taxes','account_taxes_grid','valid_account_tax','invoice_list','account_invoice_grid','get_action_buttons_invoice','get_account_details','search','clearsearchfilter','search_taxes','clearsearchfilter_taxes');
+				      $admin_pages = array('get_action_buttons_taxes','account_taxes','account_taxes_grid','valid_account_tax','invoice_list','account_invoice_grid','get_action_buttons_invoice','get_account_details','search','clearsearchfilter','search_taxes','clearsearchfilter_taxes','delete_invoice');
                                 }
                                 elseif($controller=="opensipsconfig"){
 					$admin_pages = array('opensipdevice','opensipdevice_grid','get_action_buttons','dispatcher','dispatcher_grid','get_action_button_dispatcher');

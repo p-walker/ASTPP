@@ -94,8 +94,9 @@ class Did extends CI_Controller
 					$_POST['monthlycost']=$this->common_model->add_calculate_currency($_POST['monthlycost'],'','',false,false);  
 					$_POST['connectcost']=$this->common_model->add_calculate_currency($_POST['connectcost'],'','',false,false);  
 					$_POST['cost']=$this->common_model->add_calculate_currency($_POST['cost'],'','',false,false); 
-					$this->did_model->add_did($_REQUEST);
-					$this->session->set_userdata('astpp_notification', 'DID added successfully!');
+					$response = $this->did_model->add_did($_REQUEST);
+					//$this->session->set_userdata('astpp_notification', 'DID added successfully!');
+					$this->common_model->status_message($response);
 					redirect(base_url().'did/manage/');				
 				}
 				else 
@@ -124,8 +125,9 @@ class Did extends CI_Controller
 					$_POST['monthlycost']=$this->common_model->add_calculate_currency($_POST['monthlycost'],'','',false,false);  
 					$_POST['connectcost']=$this->common_model->add_calculate_currency($_POST['connectcost'],'','',false,false);  
 					$_POST['cost']=$this->common_model->add_calculate_currency($_POST['cost'],'','',false,false);			
-						$this->did_model->edit_did($_REQUEST);
-						$this->session->set_userdata('astpp_notification', 'DID updated successfully!');
+						$response = $this->did_model->edit_did($_REQUEST);
+						//$this->session->set_userdata('astpp_notification', 'DID updated successfully!');
+						$this->common_model->status_message($response);
 						redirect(base_url().'did/manage/');				
 					}
 					else 
@@ -178,8 +180,9 @@ class Did extends CI_Controller
 		{	
 			if($did = $this->did_model->get_did_by_number($id))
 			{
-				$this->did_model->remove_did($did);
-				$this->session->set_userdata('astpp_notification', 'DID deleted successfully!');
+				$response = $this->did_model->remove_did($did);
+				//$this->session->set_userdata('astpp_notification', 'DID deleted successfully!');
+				$this->common_model->status_message($response);
 				redirect(base_url().'did/manage/');				
 			}
 			else 
@@ -193,14 +196,9 @@ class Did extends CI_Controller
 	
 	function get_action_buttons($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
-		$import_style = 'style="text-decoration:none;background-image:url(/images/import.png);"';
-		$url = '';
 		$ret_url = '';
-
-		$ret_url = '<a href="/did/manage/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/did/manage/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/did/manage/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/did/manage/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 
 		return $ret_url;
 	}
@@ -257,8 +255,6 @@ class Did extends CI_Controller
 						$record = $this->Astpp_common->get_did_reseller_new($did['number'], $this->session->userdata('username') );
 						$success = 1;
 					}
-					
-					
 					
 					if($success >0){
 						
@@ -429,133 +425,6 @@ class Did extends CI_Controller
 		}
 	}
 	
-	/*function manage_json2()
-	{
-		if($this->session->userdata('logintype')==1)
-		{
-			$this->build_dids_reseller();
-		}
-		else
-		{
-			$this->build_dids();	
-		}
-		
-		if($query->num_rows() > 0)
-		{
-			if($this->session->userdata('logintype')==1){
-				foreach($query->result_array() as $did)
-				{
-					 $record = array();
-					 $didinfo = array();
-					 $didinfo = $this->did_model->get_did_by_number($did['number'] );
-					
-					 $success=0;
-					if ( $didinfo['account'] != "" ) {
-						
-						$accountinfo = $this->Astpp_common->get_account($didinfo['account']);
-						
-						if ( $accountinfo['reseller'] ==$this->session->userdata('username') || $didinfo['account'] == $this->session->userdata('username') )
-						{
-							$record = $this->Astpp_common->get_did_reseller( $did['number'], $this->session->userdata('username') );
-							$success = 1;
-						}
-					}
-					else {
-						$record = $this->Astpp_common->get_did_reseller($did['number'], $this->session->userdata('username') );
-						$success = 1;
-					}
-					
-					if($success >0){
-						
-						if($did['limittime']==0){
-							$limittime= 'No';
-						}
-						else{
-							$limittime = 'Yes';
-						}
-						
-						if($did['chargeonallocation']==0){
-						$chargeonallocation = 'No';
-						}
-						else{
-							$chargeonallocation = 'Yes';
-						}
-						
-								  	
-						$json_data['rows'][] = array('cell'=>array(
-							$didinfo['number'],
-							$didinfo['country'],
-							$didinfo['province'],
-							$didinfo['city'],
-							$didinfo['provider'],
-							$didinfo['account'],
-							$limittime,
-							@$record['extensions'],
-							@$record['setup'],
-							@$record['disconnectionfee'],
-							@$record['monthlycost'],
-							@$record['prorate'],
-							@$record['connectcost'],
-							@$record['includedseconds'],
-							@$record['cost'],
-							@$record['inc'],
-							@$did['variables'],
-							$chargeonallocation,
-							@$record['maxchannels'],
-							$this->get_action_buttons($did['number'])
-						));
-				  
-					}
-				
-				}
-			}
-			else{
-				foreach ($query->result_array() as $row)
-				{
-							
-					if($row['limittime']==0){
-						$limittime= 'No';
-					}
-					else{
-						$limittime = 'Yes';
-					}
-					
-					if($row['chargeonallocation']==0){
-						$chargeonallocation = 'No';
-					}
-					else{
-						$chargeonallocation = 'Yes';
-					}
-					
-					$json_data['rows'][] = array('cell'=>array(
-						$row['number'],
-						$row['country'],
-						$row['province'],
-						$row['city'],
-						$row['provider'],
-						$row['account'],
-						$limittime,
-						$row['extensions'],
-						$row['setup'],
-						$row['disconnectionfee'],
-						$row['monthlycost'],
-						$row['prorate'],
-						$row['connectcost'],
-						$row['includedseconds'],
-						$row['cost'],
-						$row['inc'],
-						$row['variables'],
-						$chargeonallocation,
-						$row['maxchannels'],
-						$this->get_action_buttons($row['number'])
-					));
-			   }
-			}
- 		}	
-		echo json_encode($json_data);
-		
-	}*/
-	
 	/**
 	 * -------Here we write code for controller did functions import------
 	 * Import all did data
@@ -568,8 +437,5 @@ class Did extends CI_Controller
 		$data['cur_menu_no'] = 5;
 		$this->load->view('view_did_import',$data);		
 	}
-
 }
-
-
 ?>

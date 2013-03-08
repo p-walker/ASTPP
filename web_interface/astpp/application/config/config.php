@@ -345,7 +345,7 @@ $config['time_reference'] = 'local';
 |
 */
 $config['rewrite_short_tags'] = TRUE;
-
+$config['payment_type'] = array("0"=>"Cash","1"=>"Cheque","2"=>"Transfer");
 
 /*
 |--------------------------------------------------------------------------

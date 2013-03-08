@@ -156,15 +156,10 @@ class Userdid extends CI_Controller
 	}
 	
 	function get_action_buttons($id)
-	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
-		$import_style = 'style="text-decoration:none;background-image:url(/images/import.png);"';
-		$url = '';
+	{		
 		$ret_url = '';
-
-		$ret_url = '<a href="/userdid/manage/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/userdid/manage/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/userdid/manage/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/userdid/manage/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 
 		return $ret_url;
 	}

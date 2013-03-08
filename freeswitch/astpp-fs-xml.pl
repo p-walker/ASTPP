@@ -152,6 +152,22 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 	print $void_xml;
         exit(0);
     }
+
+    if($carddata->{number} ne "" && ($astppdid ne "ASTPP-DID"))
+    {
+      my $blocked_call = &search_for_block_prefixes($astpp_db,$params->{'Caller-Destination-Number'},$params->{variable_accountcode});
+	if(scalar($blocked_call) > 0){
+	  $ASTPP->debug( debug => "CALLSTATUS 2" );
+	  $ASTPP->debug( debug => "Blocked Prefixes" );
+	  $xml .=
+	    "<action application=\"hangup\" data=\"Blocked Prefixes\"/>\n";
+	  $xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
+	  $ASTPP->debug( debug => "Returning nothing so dialplan can continue." );
+	  $ASTPP->debug( debug => $void_xml );
+	  print $void_xml;
+	  exit(0);
+	}  
+    }
     
     #Calculating in use count for account 
     if($carddata->{number} ne "" && $carddata->{maxchannels} ne '0' && ($astppdid ne "ASTPP-DID"))
@@ -330,38 +346,47 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 	      $xml .= "<extension name=\"" . $params->{'Caller-Destination-Number'} . "\">\n";
 	      $xml .= "<condition field=\"destination_number\" expression=\"" . $params->{'Caller-Destination-Number'} . "\">\n";
 	      $xml .= $returned_data;
-
 	} else {
 		# Get the list of routes for the phone number.
-		my @outboundroutes = &get_outbound_routes( $astpp_db, $params->{'Caller-Destination-Number'},
-			$carddata, $routeinfo, @reseller_list );
+		my @outboundroutes = &get_outbound_routes( $astpp_db, $params->{'Caller-Destination-Number'},$carddata, $routeinfo, @reseller_list );
 		
 		if(@outboundroutes)
 		{
-			#Fetch outbound callerid for accounts & If exist and active then override it
-			my $outboundcallerid = &get_outbound_callerid($astpp_db,$cust_accountid,'accounts_callerid','accountid');
-			$xml .= $ASTPP->fs_dialplan_xml_bridge_start(
-				    origination_caller_id_name => $outboundcallerid->{callerid_name},
-				    origination_caller_id_number => $outboundcallerid->{callerid_number}
-				);
-		}
-		my $count = 0;
-		foreach my $route (@outboundroutes) {
-			$ASTPP->debug( debug => "$route->{trunk}: cost $route->{cost}\t $route->{pattern}" );
-			if ( $route->{cost} > $routeinfo->{cost} ) {
-	       			$ASTPP->debug( debug => "$route->{trunk}: $route->{cost} > $routeinfo->{cost}, skipping" );
-	       		}
-	       		else {
-				$xml .= $ASTPP->fs_dialplan_xml_bridge(
-			                destination_number => $params->{'Caller-Destination-Number'},
-	       			        route_prepend      => $route->{prepend},
-	               			trunk_name         => $route->{trunk},
-	               			route_id	   => $route->{id},
-					count		   => $count	
-	       			);
-			}
-			$count++;
-	    	}
+		      my $count = 0;
+		      my $tmpbrd;
+		      foreach my $route (@outboundroutes) {
+			      $ASTPP->debug( debug => "$route->{trunk}: cost $route->{cost}\t $route->{pattern}" );
+			      if ( $route->{cost} > $routeinfo->{cost} ) {
+				      $ASTPP->debug( debug => "$route->{trunk}: $route->{cost} > $routeinfo->{cost}, skipping" );
+			      }
+			      else {
+				      $tmpbrd .= $ASTPP->fs_dialplan_xml_bridge(
+					      destination_number => $params->{'Caller-Destination-Number'},
+					      route_prepend      => $route->{prepend},
+					      trunk_name         => $route->{trunk},
+					      route_id	   => $route->{id},
+					      count		   => $count	
+				      );
+				      $count++;
+			      }			
+		      }
+		      
+		      if($count == 0)
+		      {
+			  $ASTPP->debug( debug => "NOT OUTBOUND ROUTE FOUND" );
+			  $xml .= "<action application=\"reject\" data=\"NOT OUTBOUND ROUTE FOUND\"/>\n";			  
+			  $ASTPP->debug( debug => $void_xml );
+			  print $void_xml;			  
+			  exit(0);
+		      }
+		      #Fetch outbound callerid for accounts & If exist and active then override it
+		      my $outboundcallerid = &get_outbound_callerid($astpp_db,$cust_accountid,'accounts_callerid','accountid');
+		      my $tmpxml = $ASTPP->fs_dialplan_xml_bridge_start(
+				  origination_caller_id_name => $outboundcallerid->{callerid_name},
+				  origination_caller_id_number => $outboundcallerid->{callerid_number}
+		      );
+		      $xml .= $tmpxml.$tmpbrd;
+		}		
 # 	        $xml .= $ASTPP->fs_dialplan_xml_bridge_end() if @outboundroutes;
 	}
 	$xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml);
@@ -443,6 +468,11 @@ if($data->{variables}->{callingcard} && uri_unescape($data->{variables}->{direct
     $data->{variables}->{outbound_route}='';
 }
 
+if($data->{variables}->{originate_disposition} eq '')
+{
+    $data->{variables}->{originate_disposition} = $data->{variables}->{hangup_cause};
+}
+
 #We are saving calltype (standard,DID,callingcard) in userfield
 my $tmp = "INSERT INTO " . $config->{freeswitch_cdr_table} . "(accountcode,src,dst,dcontext,clid,channel,dstchannel,lastapp,"
 	. "lastdata,calldate,answerdate,enddate,duration,billsec,disposition,amaflags,uniqueid,originator,userfield,read_codec,"
@@ -502,7 +532,8 @@ my $tmp = "INSERT INTO " . $config->{freeswitch_cdr_table} . "(accountcode,src,d
 	. "'"
 	. ","
 	. "'"
-	. uri_unescape($data->{variables}->{hangup_cause})
+# 	. uri_unescape($data->{variables}->{hangup_cause})
+	. uri_unescape($data->{variables}->{originate_disposition})
 	. "'"
 	. ","
 	. "''"
@@ -542,18 +573,17 @@ my (@chargelist);
 push @chargelist, $data->{callflow}->{caller_profile}->{uuid};
 &processlist( $astpp_db, $cdr_db, $config, \@chargelist );
 print STDERR "VENDOR CHARGES: " . $config->{trackvendorcharges} . "\n" if $config->{debug} == 1;
-&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "none",  $data->{callflow}->{caller_profile}->{uuid},"" ) if $config->{trackvendorcharges} == 1 && $config->{debug} == 1;
+# &vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "none",  $data->{callflow}->{caller_profile}->{uuid},"" ) if $config->{trackvendorcharges} == 1 && $config->{debug} == 1;
 
 &process_callingcard_cdr if $data->{variables}->{callingcard};    
 	
 sub process_callingcard_cdr() {
 	my ( $cardinfo, $brandinfo, $numberinfo, $pricelistinfo,$cc,$destination);
 	
-	$destination = (uri_unescape($data->{variables}->{direction}) eq "inbound")?uri_unescape($data->{callflow}->{caller_profile}->{destination_number}):uri_unescape($data->{variables}->{callingcard_destination});
+# 	$destination = (uri_unescape($data->{variables}->{direction}) eq "inbound")?uri_unescape($data->{callflow}->{caller_profile}->{destination_number}):uri_unescape($data->{variables}->{callingcard_destination});
+	$destination = uri_unescape($data->{variables}->{callingcard_destination});
 	$destination =~ s/@.*//g;
-	
-	if(uri_unescape($data->{variables}->{direction}) eq "outbound" || $config->{callingcard_leg_a_cdr} eq '1')
-	{
+		
 	my $uid = uri_unescape($data->{callflow}->{caller_profile}->{uuid});
         my $cardnumber = uri_unescape($data->{variables}->{callingcard});
 	
@@ -636,8 +666,7 @@ sub process_callingcard_cdr() {
                         );
                         &callingcard_set_in_use($astpp_db,$cardinfo,0);
                         &callingcard_update_balance($astpp_db,$cardinfo,$charge);
-            }
-	}
+            }	
       }    
 }
 exit(0);

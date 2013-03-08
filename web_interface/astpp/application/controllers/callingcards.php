@@ -82,8 +82,9 @@ class Callingcards extends CI_Controller
 			if ($errors == "")
 			{			
 				$_POST['value']=$this->common_model->add_calculate_currency($_POST['value'],'','',false,false);
-				$this->cc_model->add_callingcard($_POST);
-				$this->session->set_userdata('astpp_notification', 'Callingcard added successfully!');
+				$response = $this->cc_model->add_callingcard($_POST);
+				//$this->session->set_userdata('astpp_notification', 'Callingcard added successfully!');
+				$this->common_model->status_message($response);
 				redirect(base_url().'callingcards/cclist/');				
 			}
 			else 
@@ -132,8 +133,9 @@ class Callingcards extends CI_Controller
 					$_POST['disconnect_fee_pennies']=$this->common_model->add_calculate_currency($_POST['disconnect_fee_pennies'],'','',false,false);
 					$_POST['minute_fee_pennies']=$this->common_model->add_calculate_currency($_POST['minute_fee_pennies'],'','',false,false);
 					$_POST['min_length_pennies']=$this->common_model->add_calculate_currency($_POST['min_length_pennies'],'','',false,false);
-					$this->cc_model->edit_brand($_POST);
-					$this->session->set_userdata('astpp_notification', 'Brand updated successfully!');
+					$response = $this->cc_model->edit_brand($_POST);
+					//$this->session->set_userdata('astpp_notification', 'Brand updated successfully!');
+					$this->common_model->status_message($response);
 					redirect(base_url().'callingcards/brands/');				
 				}
 				else 
@@ -165,8 +167,9 @@ class Callingcards extends CI_Controller
 				redirect(base_url().'callingcards/brands/');
 			}
 			
-			$this->cc_model->remove_brand($brand);
-			$this->session->set_userdata('astpp_notification', 'Brand removed successfully!');		
+			$response = $this->cc_model->remove_brand($brand);
+			$this->common_model->status_message($response);
+			//$this->session->set_userdata('astpp_notification', 'Brand removed successfully!');		
 			redirect(base_url().'callingcards/brands/');
 		}
 		else
@@ -199,8 +202,9 @@ class Callingcards extends CI_Controller
 				$_POST['min_length_pennies']=$this->common_model->add_calculate_currency($_POST['min_length_pennies'],'','',false,false);
 
 				
-				$this->cc_model->add_brand($_POST);
-				$this->session->set_userdata('astpp_notification', 'Brand added successfully!');
+				$response = $this->cc_model->add_brand($_POST);
+				$this->common_model->status_message($response);
+				//$this->session->set_userdata('astpp_notification', 'Brand added successfully!');
 				redirect(base_url().'callingcards/brands/');				
 			}
 			else 
@@ -215,11 +219,11 @@ class Callingcards extends CI_Controller
 	
 	function get_action_buttons_brands($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
+    	
 		$ret_url = '';
-		$ret_url = '<a href="/callingcards/brands/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/callingcards/brands/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/callingcards/brands/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/callingcards/brands/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -474,8 +478,9 @@ class Callingcards extends CI_Controller
 			if($errors != "")
 			{
 				$_POST['pennies']=$this->common_model->add_calculate_currency($_POST['pennies'],'','',false,false);
-				$this->cc_model->refill_card($_POST);
-				$this->session->set_userdata('astpp_notification', 'Card refilled successfully!');
+				$response = $this->cc_model->refill_card($_POST);
+				//$this->session->set_userdata('astpp_notification', 'Card refilled successfully!');
+				$this->common_model->status_message($response);
 				redirect(base_url().'callingcards/cclist/');				
 			}
 			else 
@@ -509,8 +514,9 @@ class Callingcards extends CI_Controller
 	{
 		if($cc = $this->cc_model->get_card_by_number($card_number))
 		{
-			$this->cc_model->remove_card($cc);
-			$this->session->set_userdata('astpp_notification', 'Card deleted successfully!');
+			$response = $this->cc_model->remove_card($cc);
+			$this->common_model->status_message($response);
+			//$this->session->set_userdata('astpp_notification', 'Card deleted successfully!');
 			redirect(base_url().'callingcards/cclist/');				
 		}
 		else 
@@ -530,8 +536,9 @@ class Callingcards extends CI_Controller
 	{
 		if($cc = $this->cc_model->get_card_by_number($card_number))
 		{
-			$this->cc_model->reset_card($cc);
-			$this->session->set_userdata('astpp_notification', 'Card reset successfully!');
+			$response = $this->cc_model->reset_card($cc);
+			$this->common_model->status_message($response);
+			//$this->session->set_userdata('astpp_notification', 'Card reset successfully!');
 			redirect(base_url().'callingcards/cclist/');				
 		}
 		else 
@@ -557,8 +564,9 @@ class Callingcards extends CI_Controller
 			
 			if($errors == "")
 			{
-				$this->cc_model->update_status_card($_POST);
-				$this->session->set_userdata('astpp_notification', 'Card status updated successfully!');
+				$response = $this->cc_model->update_status_card($_POST);
+				$this->common_model->status_message($response);
+				//$this->session->set_userdata('astpp_notification', 'Card status updated successfully!');
 				redirect(base_url().'callingcards/cclist/');				
 			}
 			else 
@@ -601,8 +609,8 @@ class Callingcards extends CI_Controller
 	
 	function get_action_buttons($page,$id,$action)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
+    	
 		$url = '';
 		$ret_url = '';
 		if($page=='did')
@@ -611,16 +619,16 @@ class Callingcards extends CI_Controller
 		}
 		if($action == 'update')
 		{
-			$ret_url = '<a href="'.$url.'" class="icon" '.$update_style.' title="Update">&nbsp;</a>';
+			$ret_url = '<a href="'.$url.'" class="icon edit_image" title="Update">&nbsp;</a>';
 		}
 		if($action == 'delete')
 		{
-			$ret_url = '<a href="'.$url.'1/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+			$ret_url = '<a href="'.$url.'1/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		}
 		if($action == 'manage')
 		{
-			$ret_url = '<a href="/did/manage/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-			$ret_url .= '<a href="/did/manage/del/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+			$ret_url = '<a href="/did/manage/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+			$ret_url .= '<a href="/did/manage/del/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		}
 		return $ret_url;
 	}
@@ -755,22 +763,14 @@ class Callingcards extends CI_Controller
 	}
 	
 	function get_callingcards_action_buttons($id,$inuse)
-	{
-		$refill_style = 'style="text-decoration:none;background-image:url(/images/payment.png);"';
-		$details_style = 'style="text-decoration:none;background-image:url(/images/details.png);"';
-		$status_style = 'style="text-decoration:none;background-image:url(/images/status.png);"';
-		$add_caller_id = 'style="text-decoration:none;background-image:url(/images/callerid.png);"';
-		$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';		
-		$reset_style = 'style="text-decoration:none;background-image:url(/images/reset_icon.png);"';
-		$url = '';
-		
-		$ret_url = '<a href="/callingcards/refill/'.$id.'/" class="icon" '.$refill_style.' rel="facebox" title="Refill">&nbsp;</a>';
-		$ret_url .= '<a href="/callingcards/view/'.$id.'/" class="icon" '.$details_style.' rel="facebox" title="View Details">&nbsp;</a>';
-		//$ret_url .= '<a href="/callingcards/update_status/'.$id.'/" class="icon" '.$status_style.' rel="facebox" title="Update Status">&nbsp;</a>';
-		$ret_url .= '<a href="'.base_url().'callingcards/add_callerid/'.$id.'/" class="icon" '.$add_caller_id.' title="Add CallerID" rel="facebox" >&nbsp;</a>';
-		$ret_url .= '<a href="/callingcards/remove/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg(\'delete\');">&nbsp;</a>';
+	{	
+		$ret_url = '';
+		$ret_url = '<a href="/callingcards/refill/'.$id.'/" class="icon payment_image"  rel="facebox" title="Refill">&nbsp;</a>';
+		$ret_url .= '<a href="/callingcards/view/'.$id.'/" class="icon details_image" rel="facebox" title="View Details">&nbsp;</a>';		
+		$ret_url .= '<a href="'.base_url().'callingcards/add_callerid/'.$id.'/" class="icon callerid_image" title="Add CallerID" rel="facebox" >&nbsp;</a>';
+		$ret_url .= '<a href="/callingcards/remove/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg(\'delete\');">&nbsp;</a>';
 		if($inuse == 1)
-		$ret_url .= '<a href="/callingcards/reset_card/'.$id.'/" class="icon" '.$reset_style.' title="Reset" onClick="return get_alert_msg(\'reset\');">&nbsp;</a>';
+		$ret_url .= '<a href="/callingcards/reset_card/'.$id.'/" class="icon reset_icon_image" title="Reset" onClick="return get_alert_msg(\'reset\');">&nbsp;</a>';
 		
 		return $ret_url;
 	}
@@ -782,7 +782,7 @@ class Callingcards extends CI_Controller
 	 * @card_number : Card Number
 	*/
 	function add_callerid($card_number="")
-    {
+	{
 		$data['app_name'] = 'ASTPP - Open Source Billing Solution | CallingCards | Add CC Caller ID';
 		$data['username'] = $this->session->userdata('user_name');	
 		$data['page_title'] = 'Caller ID';	
@@ -892,6 +892,5 @@ class Callingcards extends CI_Controller
 	    $dimensions = $this->fpdf->export_pdf($cc_array, "5");
 	    $this->fpdf->Output('CallingCard_CDR_'.date("Y-m-d").'.pdf',"D");
 	}
-	
 }
 ?>

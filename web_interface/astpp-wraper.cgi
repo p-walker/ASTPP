@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # ASTPP - Open Source Voip Billing
 #
@@ -41,16 +41,17 @@ use Locale::Language;
 use Locale::gettext_pp qw(:locale_h);
 use Data::Dumper;
 use lib './lib', '../lib';
-use warnings;
+# use warnings;
 use Asterisk::Manager;
 use Text::CSV;
-use HTML::Template;
-use HTML::Template::Expr;
+# use HTML::Template;
+# use HTML::Template::Expr;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Data::Paginate;
 use DateTime;
 use DateTime::TimeZone;
 use ASTPP;
+use JSON;
 # use strict;
 ;    # We use DateTime::TimeZone to show users cdrs in their own timezones.
 require "/usr/local/astpp/astpp-common.pl";
@@ -370,17 +371,11 @@ sub logout() {
 sub build_menu() {
 	my (@items) = @_;
 	my @menu_list;
-# 	my $template = HTML::Template->new(
-# 	        filename          => '/var/lib/astpp/templates/sub_menu.tpl',
-# 	        die_on_bad_params => $config->{template_die_on_bad_params}
-# 	);
 	foreach my $tmp (@items) {
 		my %row;
 	        $row{value} = $tmp;
 	        push( @menu_list,  \%row );
 	}
-#         $template->param( menu => \@menu_list );
-# 	return $template->output;
 }
 
 
@@ -1192,15 +1187,10 @@ sub build_view_cdrs_freeswitch() {
 
 sub build_homepage() {
 
-    my $template = HTML::Template->new(
-        filename          => '/var/lib/astpp/templates/home.tpl',
-        die_on_bad_params => $config->{template_die_on_bad_params}
-    );
-
     if (   $params->{logintype} == 1
         || $params->{logintype} == 5
         || $params->{logintype} == 5 && $astpp_db && $cdr_db )
-    {
+      {
         my @accountlist =
           &list_accounts_selective( $astpp_db, $params->{username}, "-1" );
         my $accounts;
@@ -1213,84 +1203,11 @@ sub build_homepage() {
                 $accounts .= ",";
             }
         }
-
         $ASTPP->debug( user => $params->{username}, debug => $accounts );
-
-        $template->param(
-            customer_count => &count_accounts(
-                $astpp_db, "WHERE type = 0 AND reseller = '$params->{username}'"
-            )
-        );
-
-        $template->param(
-            reseller_count => &count_accounts(
-                $astpp_db, "WHERE type = 1 AND reseller = '$params->{username}'"
-            )
-        );
-
-        $template->param(
-            vendor_count => &count_accounts(
-                $astpp_db, "WHERE type = 3 AND reseller = '$params->{username}'"
-            )
-        );
-
-        $template->param(
-            admin_count => &count_accounts(
-                $astpp_db, "WHERE type = 2 AND reseller = '$params->{username}'"
-            )
-        );
-
-        $template->param(
-            callshop_count => &count_accounts(
-                $astpp_db,
-                "WHERE type = 5  AND reseller = '$params->{username}'"
-            )
-        );
-
-        $template->param( total_owing =>
-              &accounts_total_balance( $astpp_db, $params->{username} ) /
-              1 );
-
-        $template->param(
-            total_due => $ASTPP->accountbalance( account => $params->{username} ) / 1 );
-        $template->param(
-            calling_cards_in_use => &count_callingcards(
-                $astpp_db,
-"WHERE inuse = 1 AND status = 1  AND reseller = '$params->{username}'"
-            )
-        );
-
-        $template->param( dids => &count_dids( $astpp_db, "" ) );
-        $template->param(
-            unbilled_cdrs => &count_unbilled_cdrs( $config, $cdr_db, $accounts )
-        );
     }
-    elsif ( $params->{logintype} == 2 && $astpp_db && $cdr_db ) {
-        $template->param(
-            customer_count => &count_accounts( $astpp_db, "WHERE type = 0" ) );
-        $template->param(
-            reseller_count => &count_accounts( $astpp_db, "WHERE type = 1" ) );
-        $template->param(
-            vendor_count => &count_accounts( $astpp_db, "WHERE type = 3" ) );
-        $template->param(
-            admin_count => &count_accounts( $astpp_db, "WHERE type = 2" ) );
-        $template->param(
-            callshop_count => &count_accounts( $astpp_db, "WHERE type = 5" ) );
-        $template->param(
-            calling_cards_in_use => &count_callingcards(
-                $astpp_db, "WHERE inuse = 1 AND status = 1"
-            )
-        );
+    elsif ( $params->{logintype} == 2 && $astpp_db && $cdr_db ) {        
 
-        $template->param(
-            total_owing => &accounts_total_balance( $astpp_db, "" ) / 1 );
-        $template->param( dids => &count_dids( $astpp_db, "" ) );
-        $template->param(
-            unbilled_cdrs => &count_unbilled_cdrs( $config, $cdr_db, "NULL,''" )
-        );
-
-    }
-    return $template->output;
+    }    
 }
 
 
@@ -1338,14 +1255,15 @@ sub build_account_info() {
         {
             $number = $params->{numberlist};
         }
-        if ( $params->{id} ne "" ) 
-        {
-            $chargeid = $params->{id};
-        }
-        else 
-        {
-            $chargeid = $params->{id_list};
-        }
+#         if ( $params->{id} ne "" ) 
+#         {
+#             $chargeid = $params->{id};
+#         }
+#         else 
+#         {
+#             $chargeid = $params->{id_list};
+#         }
+	$chargeid = $params->{applyable_charges};
 
         if ( $params->{logintype} == 1 || $params->{logintype} == 5 ) 
         {
@@ -1525,21 +1443,12 @@ sub build_account_info() {
 
 sub generatecallingcards() {
     my ( $params, $config ) = @_;
-    my ( $status, $description, $pricelistdata, $number, $count );
+    my ( $status, $description, $pricelistdata, $number, $count,$status_string );
     $status      = "";
     $description = gettext("Account Setup");
     $count       = 0;
-    if ( $config->{email} eq "YES" ) {
-        open( EMAIL, "| $config->{mailprog} -t" )
-          || die "Error - could not write to $config->{mailprog}\n";
-        print EMAIL"From: $config->{company_email}\n";
-        print EMAIL "Subject: $config->{company_name} New Account Created\n";
-        print EMAIL"To: $config->{emailadd}\n";
-        print EMAIL"Content-type: text/plain\n\n";
-        print EMAIL
-"You have added $params->{count} calling cards in the amount of $params->{value} cents. \n\n";
-    }
     my $brandinfo = &get_cc_brand( $astpp_db, $params->{brand} );
+    
     $ASTPP->debug(
         user  => $params->{username},
         debug => "BRAND: $params->{brand}"
@@ -1551,20 +1460,13 @@ sub generatecallingcards() {
             $params->{value},
             $params->{account}, $brandinfo->{pin} );
         $count++;
-
-        if ( $config->{email} eq "YES" ) {
-            print EMAIL"Account: $number Pin: $pin \n";
-        }
+        
         my $cardinfo = &get_callingcard( $astpp_db, $number, $config );
 
-        $status .=
-"Calling Card: $number Pin: $pin Sequence: $cardinfo->{id} added successfully <br>";
+        #$status .="Calling Card: $number Pin: $pin Sequence: $cardinfo->{id} added successfully <br/>";
     }
-
-    if ( $config->{email} eq "YES" ) {
-       close(EMAIL);
-    }
-    return $status;
+    $status_string = { status => "0", message => "$count calling card(s) added successfully" } ;
+    return to_json($status_string);
 }
 
 
@@ -1851,12 +1753,14 @@ sub build_cc_brands() {
         }
         $ASTPP->debug( user => $params->{username}, debug => $tmp );
         if ( $astpp_db->do($tmp) ) {
-            $status .= gettext("Brand Deleted!");
+            #$status .= gettext("Brand Deleted!");
+            $status_string = { status => "0", message => gettext("Brand Deleted Successfully!")} ;
         }
         else 
         {
-            print "$tmp failed";
-            $status .= gettext("Brand Deletion Failed!");
+            #print "$tmp failed";
+            #$status .= gettext("Brand Deletion Failed!");
+            $status_string = { status => "1", message => gettext("Brand Deletion Failed!")} ;
         }
         $params->{action} = gettext("Information...");
     }
@@ -1898,12 +1802,14 @@ sub build_cc_brands() {
         }
         $ASTPP->debug( user => $params->{username}, debug => "sql" );
         if ( $astpp_db->do($sql) ) {
-            $status .= gettext("Brand Added!");
+            #$status .= gettext("Brand Added!");
+            $status_string = { status => "0", message => gettext("Brand Added Successfully!")} ;
         }
         else 
         {
-            print "$sql failed";
-            $status .= gettext("Brand Creation Failed!");
+            #print "$sql failed";
+            #$status .= gettext("Brand Creation Failed!");
+            $status_string = { status => "0", message => gettext("Brand Creation Failed!")} ;
         }
         $params->{action} = gettext("Information...");
     }    
@@ -1964,16 +1870,18 @@ sub build_cc_brands() {
         $ASTPP->debug( user => $params->{username}, debug => $sql );
         if ( $astpp_db->do($sql) ) 
         {
-            $status .= gettext("Brand Updated!");
+            #$status .= gettext("Brand Updated!");
+	    $status_string = { status => "0", message => gettext("Brand Updated Successfully!")} ;
         }
         else 
         {
-            print "$sql failed";
-            $status .= gettext("Brand Update Failed!");
+            #print "$sql failed";
+            #$status .= gettext("Brand Update Failed!");
+            $status_string = { status => "1", message => gettext("Brand Update Failed!")} ;
         }
         $params->{action} = gettext("Information...");
     }
-    return 1;
+    return to_json($status_string);
 }
 
 
@@ -1982,12 +1890,8 @@ sub build_create_card() {
 
     my ( @pricelists, $status, $body, @brands );
 
-    return gettext("Database is NOT configured!") . " \n" unless $astpp_db;
-
     if ( defined($params->{action}) && $params->{action} eq gettext("Generate Card(s)") ) {
-
         $status .= &generatecallingcards( $params, $config );
-
     }
 
     return $status;
@@ -2203,6 +2107,7 @@ sub update_balance() {
       . $brandsql;
 
     $ASTPP->debug( user => $params->{username}, debug => $sql );
+    
 
     $astpp_db->do($sql) || print "$sql " . gettext("FAILED");
 
@@ -2212,8 +2117,7 @@ sub update_balance() {
 sub build_refill_card() {
 
     my ( @pricelists, $status, $body, $count, $cardinfo );
-
-    return gettext("Database is NOT configured!") . "\n" unless $astpp_db;
+    
 
     if ( defined($params->{action}) && $params->{action} eq gettext("Refill") ) {
 
@@ -2637,7 +2541,7 @@ sub default_callback {
 
 
 sub build_edit_account() {
-    my ( $valid, $body, $tmp, $sql, $status, $number, @accountlist,@pricelists );
+    my ( $valid, $body, $tmp, $sql, $status, $number, @accountlist,@pricelists,$status_string );
     if ( defined($params->{action}) && $params->{action} eq gettext("Save...") ) {
         if ( $params->{logintype} == 1 || $params->{logintype} == 5 ) {
             my $accountinfo = &get_account( $astpp_db, $params->{item} );
@@ -2713,19 +2617,14 @@ sub build_edit_account() {
 
         if ( $astpp_db->do($tmp) ) {
 
-            $status .=
-                gettext("Account") . " "
-              . $params->{item} . " "
-              . gettext("Successfully Updated!") . "\n";
+            #$status .=gettext("Account") . " ". $params->{item} . " ". gettext("Successfully Updated!") . "\n";
+	      $status_string = { status => "0", message => gettext("Account") . " ". $params->{item} . " ". gettext("Successfully Updated!") } ;
         }
         else
         {
 
-            $status .=
-                gettext("Account") . " "
-              . $params->{item} . " "
-              . gettext("Failed To Update!") . "\n";
-            print "$tmp failed";
+            #$status .=gettext("Account") . " ". $params->{item} . " ". gettext("Failed To Update!") . "\n";
+	    $status_string = { status => "1", message => gettext("Account") . " ". $params->{item} . " ". gettext("Failed To Update!") } ;
         }
 
        if ( $params->{type} == 1 ) {
@@ -2736,15 +2635,18 @@ sub build_edit_account() {
               . $astpp_db->quote( $params->{item} );
 
             if ( $astpp_db->do($tmp) ) {
-                $status .= gettext("Reseller Updated Successfully!");
+#                 $status .= gettext("Reseller Updated Successfully!");		  
+		  $status_string = { status => "0", message => gettext("Reseller Updated Successfully!") } ;
             }
             else 
             {
-                $status .= gettext("Reseller Update Failed!");
+                #$status .= gettext("Reseller Update Failed!");
+                  $status_string = { status => "1", message => gettext("Reseller Update Failed!") } ;                
             }
         }      
     }
-    return 1;
+    $status_string = to_json($status_string);
+    return $status_string;
 }
 
 
@@ -3052,7 +2954,7 @@ sub build_import_routes() {
 
 sub build_import_dids() {
     my ( $body, $status );
-    return gettext("Cannot import dids until database is configured!")unless $astpp_db;
+    
     if ( defined($params->{action}) && $params->{action} eq gettext("Import...") ) {
         my $csv = Text::CSV->new();
         my $uploaded = upload('didimport');
@@ -3072,13 +2974,11 @@ sub build_import_dids() {
                 if ($astpp_db->do("DELETE FROM dids WHERE number = "
                           . $astpp_db->quote( $columns[0] )))
                 {
-                    $status .= gettext("Dropped DID: ") . " '" . $columns[0] . "'. <br>";
+                    #$status .= gettext("Dropped DID: ") . " '" . $columns[0] . "'. <br>";
                 }
                 else 
                 {
-                    $status .= gettext("Unable to drop DID: ") . " '"
-                      . $columns[0]
-                      . "'.<br>";
+                    #$status .= gettext("Unable to drop DID: ") . " '". $columns[0]. "'.<br>";
                 }
                 
                 my $tmp = "INSERT INTO dids"
@@ -3108,16 +3008,11 @@ sub build_import_dids() {
                 
                 if ( $astpp_db->do($tmp) ) 
                 {
-                    $status .= gettext("DID: ") . " '"
-                      . $columns[0] . "' "
-                      . gettext("has been created.") . "<br>";
+                    $status .= gettext("DID: ") . " '". $columns[0] . "' ". gettext("has been created.") . "<br>";
                 }
                 else 
                 {
-                    $status .= gettext("DID: ") . " '"
-                      . $columns[0] . "' "
-                      . gettext("FAILED to create")
-                      . " ($tmp)!<br>";
+                    $status .= gettext("DID: ") . " '". $columns[0] . "' ". gettext("FAILED to create"). " ($tmp)!<br>";
                 }
 
                 $tmp = "DELETE FROM routes WHERE pattern = "
@@ -3127,15 +3022,15 @@ sub build_import_dids() {
                   
                 if ($astpp_db->do($tmp) ) 
                 {                
-                	$status .= gettext("The old pattern for") . " '"
-                      . $params->{number} . "' "
-                      . gettext("has been removed.");
+                	#$status .= gettext("The old pattern for") . " '"
+                      #. $params->{number} . "' "
+                      #. gettext("has been removed.");
                 }
                 else 
                 {
-                    $status .= gettext("The old pattern for") . " '"
-                      . $params->{number} . "' "
-                      . gettext("FAILED to remove!");
+                    #$status .= gettext("The old pattern for") . " '"
+                    #  . $params->{number} . "' "
+                    #  . gettext("FAILED to remove!");
 
                     $ASTPP->debug( user => $params->{username}, debug => $tmp );
                 }
@@ -3152,13 +3047,13 @@ sub build_import_dids() {
 
                 if ( $astpp_db->do($tmp) ) 
                 {
-                    $status .= gettext("Pattern") . " '". $params->{number} . "' ". gettext("has been created.");
+                    #$status .= gettext("Pattern") . " '". $params->{number} . "' ". gettext("has been created.");
                 }
                 else 
                 {
-                    $status .= gettext("Pattern") . " '"
-                      . $params->{number} . "' "
-                      . gettext("Failed to create.");
+                    #$status .= gettext("Pattern") . " '"
+                    #  . $params->{number} . "' "
+                    #  . gettext("Failed to create.");
                 }
             }
             else 
@@ -3196,14 +3091,14 @@ sub build_remove_account() {
         if ( $params->{logintype} == 1 || $params->{logintype} == 5 ) {
 
             $tmp ="UPDATE accounts SET "
-              . "status = 2 WHERE number = "
+              . "deleted = 1 WHERE number = "
               . $astpp_db->quote($number)
               . " AND reseller = "
               . $astpp_db->quote( $params->{username} );
         }
         else {
             $tmp = "UPDATE accounts SET "
-              . "status = 2 WHERE number ="
+              . "deleted = 1 WHERE number ="
               . $astpp_db->quote($number);
         }
 
@@ -3216,7 +3111,7 @@ sub build_remove_account() {
 
             if ( $accountinfo->{type} == 1 ) {
 
-                my $tmp = "UPDATE resellers SET status = 2 WHERE name = "
+                my $tmp = "UPDATE resellers SET deleted = 1 WHERE name = "
                   . $astpp_db->quote($number);
                 $astpp_db->do($tmp);
 
@@ -3244,13 +3139,6 @@ sub build_process_payment() {
 
     my ( $status, $body, $number, $reseller );
 
-#     my $template = HTML::Template->new(
-#         filename => '/var/lib/astpp/templates/account-process-payment.tpl',
-#         die_on_bad_params => $config->{template_die_on_bad_params}
-#     );
-
-
-    return gettext("Database not configured!") unless $astpp_db;
     if ( $params->{logintype} == 1 || $params->{logintype} == 5 ) {
         $reseller = $params->{username};
     }
@@ -3272,36 +3160,25 @@ sub build_process_payment() {
         if ( $params->{logintype} == 1 || $params->{logintype} == 5 ) {
             $accountinfo = &get_account( $astpp_db, $number );
             if ( $accountinfo->{reseller} eq $params->{username} ) {
-                $status .=
-                  &refill_account( $astpp_db, $number,
-                    $params->{refilldollars});
+		$status = &refill_account( $astpp_db, $number,$params);
+#                 $status = &refill_account( $astpp_db, $number,$params->{refilldollars});
             }
         }
         else {
-            $status .=
-             &refill_account( $astpp_db, $number,
-                $params->{refilldollars} );
+		$status = &refill_account( $astpp_db, $number,$params);
+#             $status = &refill_account( $astpp_db, $number,$params->{refilldollars} );
         }
-    }
-
-    my $accountmenu = popup_menu(
-        -name   => 'accountlist',
-        -values => \@accountlist,
-    );
-
-    $template->param( accountlist => $accountmenu );
-    $template->param( currency    => $config->{currency} );
-    $template->param( status      => $status );
-    return $template->output;
+    }    
+return $status;
 }
 
 
 sub build_pricelists() {
-    my ( $sql, $record, $valid, $count, $tmp, $pagesrequired, $pageno );
-    return gettext("Database is NOT configured!") . "\n" unless $astpp_db;
-
+    my ( $sql, $record, $valid, $count, $tmp, $pagesrequired, $pageno,$status_string );
+            
     if ( defined($params->{action}) && $params->{action} eq gettext("Insert...") ) {
         my $pricelistinfo = &get_pricelist( $astpp_db, $params->{name} );
+	
         if ( $pricelistinfo->{name} ) {
             if ( $params->{logintype} == 1 || $params->{logintype} == 5 ) {
                 if ( $pricelistinfo->{reseller} eq $params->{username} ) 
@@ -3325,20 +3202,20 @@ sub build_pricelists() {
 
                 if ( $astpp_db->do($tmp) ) 
                 {
-                    $status .=  gettext("Pricelist: "). $params->{name}
-                      . gettext(" Reactivated Successfully!");
+                    #$status .=  gettext("Pricelist: "). $params->{name} . gettext(" Reactivated Successfully!");
+		    $status_string = { status => "0", message => gettext("Pricelist: "). $params->{name} . gettext(" Reactivated Successfully!") } ;
                 }
                 else 
                 {
-                    $status .= gettext("Pricelist: ")
-                      . $params->{name}
-                      . gettext(" Failed to Reactivate!");
-                    $ASTPP->debug( user => $params->{username}, debug => $tmp );
+                    #$status .= gettext("Pricelist: ") . $params->{name}. gettext(" Failed to Reactivate!");
+                    #$ASTPP->debug( user => $params->{username}, debug => $tmp );
+		    $status_string = { status => "1", message => gettext("Pricelist: ") . $params->{name}. gettext(" Failed to Reactivate!") } ;
                 }
             }
             else 
             {
-                $status .= gettext("You do not own this pricelist");
+                #$status .= gettext("You do not own this pricelist");
+                $status_string = { status => "1", message => gettext("You do not own this pricelist") } ;
             }
         }
         else 
@@ -3366,16 +3243,14 @@ sub build_pricelists() {
             }
 
             if ( $astpp_db->do($tmp) ) {
-                $status .= gettext("Pricelist: ")
-                  . $params->{name}
-                  . gettext(" Added Successfully!");
+                #$status .= gettext("Pricelist: "). $params->{name}. gettext(" Added Successfully!");
+                $status_string = { status => "0", message => gettext("Pricelist: "). $params->{name}. gettext(" Added Successfully!") } ;
             }
             else 
             {
-                $status .=gettext("Pricelist: ")
-                  . $params->{name}
-                  . gettext(" Failed to Add!");
-                $ASTPP->debug( user => $params->{username}, debug => $tmp );
+                #$status .=gettext("Pricelist: "). $params->{name}. gettext(" Failed to Add!");
+                #$ASTPP->debug( user => $params->{username}, debug => $tmp );
+                $status_string = { status => "1", message => gettext("Pricelist: "). $params->{name}. gettext(" Failed to Add!") } ;
             }
         }        
     }
@@ -3409,23 +3284,20 @@ sub build_pricelists() {
               . " WHERE name = " . $astpp_db->quote( $params->{oldname} );
             if ( $astpp_db->do($tmp) ) 
             {
-                $status .= gettext("Pricelist: ")
-                  . $params->{name}
-                  . gettext(" Updated Successfully!");
+                #$status = gettext("Pricelist: "). $params->{name}. gettext(" Updated Successfully!");
+	      $status_string = { status => "0", message => gettext("Pricelist: "). $params->{name}. gettext(" Updated Successfully!") } ;
             }
             else 
             {
-                $status .= gettext("Pricelist: ")
-                  . $params->{name}
-                  . gettext(" Failed to Update!");
-                $ASTPP->debug( user => $params->{username}, debug => $tmp );
+                #$status .= gettext("Pricelist: "). $params->{name}. gettext(" Failed to Update!");
+                #$ASTPP->debug( user => $params->{username}, debug => $tmp );
+		$status_string = { status => "1", message => gettext("Pricelist: "). $params->{name}. gettext(" Failed to Update!") } ;
             }
         }
         else 
         {
-            $status .= gettext("Pricelist: ")
-              . $params->{name}
-              . gettext(" Does Not Belong to You!");
+            #$status .= gettext("Pricelist: "). $params->{name}. gettext(" Does Not Belong to You!");
+            $status_string = { status => "1", message => gettext("Pricelist: "). $params->{name}. gettext(" Does Not Belong to You!") } ;
         }        
     }
     elsif ( defined($params->{action}) && $params->{action} eq gettext("Deactivate...") ) 
@@ -3452,37 +3324,36 @@ sub build_pricelists() {
               . $astpp_db->quote( $params->{name} );
             if ( $astpp_db->do($tmp) ) 
             {
-                $status .= gettext("Pricelist: ")
-                  . $params->{name}
-                  . gettext(" Deactivated Successfully!");
+                #$status .= gettext("Pricelist: "). $params->{name}. gettext(" Deactivated Successfully!");
+                $status_string = { status => "1", message => gettext("Pricelist: "). $params->{name}. gettext(" Deleted Successfully!") } ;
             }
             else 
             {
-                $status .= gettext("Pricelist: ")
-                  . $params->{name}
-                  . gettext(" Failed to Deactivate!");
-                $ASTPP->debug( user => $params->{username}, debug => $tmp );
+                #$status .= gettext("Pricelist: "). $params->{name}. gettext(" Failed to Deactivate!");
+		$status_string = { status => "1", message => gettext("Pricelist: "). $params->{name}. gettext(" Failed to Deleted!") } ;
+                #$ASTPP->debug( user => $params->{username}, debug => $tmp );
             }
         }       
     }
-    return $status;
+    $status_string = to_json($status_string);
+    return $status_string;
 }
 
 
 
 sub build_dids() {
 
-    my ( $sql, $record, $count, $tmp, $pageno, $pagesrequired, @accountlist,@providerlist );
-
-    return gettext("Database is NOT configured!") . "\n" unless $astpp_db;
+    my ( $sql, $record, $count, $tmp, $pageno, $pagesrequired, @accountlist,@providerlist,$status_string );
+    
 	if($params->{action} eq gettext("Insert...") && $params->{number} ne "" )
-    {
+	{
         if ( !$params->{setup} ) {
             $params->{setup} = 0;
         }
         if ( !$params->{prorate} ) {
             $params->{prorate} = 0;
         }
+        
         $params->{extension} =~ s/###/%/; 
         $tmp = "INSERT INTO dids (number,account,monthlycost,connectcost,includedseconds,cost,inc,extensions,provider,country,city,province,status,setup,prorate,disconnectionfee,limittime,maxchannels,chargeonallocation,variables,dial_as) VALUES ("
           . $astpp_db->quote( $params->{number} ) . ","
@@ -3504,19 +3375,17 @@ sub build_dids() {
           . $astpp_db->quote( $params->{maxchannels} ) . ","
           . $astpp_db->quote( $params->{chargeonallocation} ) . ","
           . $astpp_db->quote( $params->{variables} ) . ","
-          . $astpp_db->quote( $params->{dial_as} ) . ")";
-        
+          . $astpp_db->quote( $params->{dial_as} ) . ")";        
         if ( $astpp_db->do($tmp) ) {
-            $status .= gettext("DID.") . " '"
-              . $params->{number} . "' "
-              . gettext("has been created.");
+            #$status .= gettext("DID.") . " '". $params->{number} . "' ". gettext("has been created.");
+            $status_string = { status => "0", message => gettext("DID ") . $params->{number} . gettext(" has been created.")} ;
         }
 
         else 
         {
 
-            $status .= gettext("DID") . " '".$params->{number} . "' "
-              . gettext("FAILED to create!");
+            #$status .= gettext("DID") . " '".$params->{number} . "' ". gettext("FAILED to create!");
+            $status_string = { status => "1", message => gettext("DID ") . $params->{number} .gettext(" FAILED to create!")} ;
             $ASTPP->debug( user => $params->{username}, debug => $tmp );
 
         }
@@ -3528,15 +3397,11 @@ sub build_dids() {
          
 
         if ( $astpp_db->do($tmp) ) {
-            $status .= gettext("The old pattern for") . " '"
-              . $params->{number} . "' "
-              . gettext("has been removed.");
+            #$status .= gettext("The old pattern for") . " '". $params->{number} . "' ". gettext("has been removed.");
         }
         else 
         {
-            $status .= gettext("The old pattern for") . " '"
-              . $params->{number} . "' "
-             . gettext("FAILED to remove!");
+            #$status .= gettext("The old pattern for") . " '". $params->{number} . "' ". gettext("FAILED to remove!");
             $ASTPP->debug( user => $params->{username}, debug => $tmp );
         }
 
@@ -3554,17 +3419,14 @@ sub build_dids() {
         $ASTPP->debug( user => $params->{username}, debug => $tmp );
 
         if ( $astpp_db->do($tmp) ) {
-            $status .=
-                gettext("Pattern") . " '"
-              . $params->{number} . "' "
-              . gettext("has been created.");
+            #$status .=gettext("Pattern") . " '". $params->{number} . "' ". gettext("has been created.");
+            #$status_string = { status => "0", message => gettext("Pattern") . " '". $params->{number} . "' ". gettext("has been created.")} ;
         }
         else 
-	     {
-            $status .=gettext("Pattern") . " '"
-              . $params->{number} . "' "
-              . gettext("FAILED to create!");
-            $ASTPP->debug( user => $params->{username}, debug => $tmp );
+	{
+	      #$status .=gettext("Pattern") . " '". $params->{number} . "' ". gettext("FAILED to create!");
+	     # $status_string = { status => "1", message => gettext("Pattern") . " '". $params->{number} . "' ". gettext("FAILED to create!")} ;
+	      $ASTPP->debug( user => $params->{username}, debug => $tmp );
         }
 
         $params->{action} = gettext("Information...");
@@ -3612,16 +3474,15 @@ sub build_dids() {
           . $astpp_db->quote( $params->{dial_as} ) . ","
           . " status=1 WHERE number="
           . $astpp_db->quote( $params->{number} );
-
+	  #print STDERR $tmp."\n";
         if ( $astpp_db->do($tmp) ) {
-            $status .=
-               gettext("DID") . " '"
-              . $params->{number} . "' "
-              . gettext("has been updated.");
+           # $status .= gettext("DID") . " '" . $params->{number} . "' ". gettext("has been updated.");
+           $status_string = { status => "0", message => gettext("DID ") . $params->{number} . gettext(" has been updated.")} ;
         }
         else 
         {
-            $status .= gettext("DID") . " '". $params->{number} . "' ". gettext("FAILED to update!");
+            #$status .= gettext("DID") . " '". $params->{number} . "' ". gettext("FAILED to update!");
+            $status_string = { status => "1", message => gettext("DID ") . $params->{number} .gettext(" FAILED to update!")} ;
             $ASTPP->debug( user => $params->{username}, debug => $tmp );
         }
 
@@ -3647,13 +3508,11 @@ sub build_dids() {
 
 
         if ( $astpp_db->do($tmp) ) {
-            $status .= gettext("Pattern") . " '"
-              . $params->{number} . "' "
-              . gettext("has been created.");
+            #$status .= gettext("Pattern") . " '". $params->{number} . "' ". gettext("has been created.");
         }
         else 
         {
-            $status .= gettext("Pattern") . " '". $params->{number} . "' ". gettext("FAILED to create!");
+            #$status .= gettext("Pattern") . " '". $params->{number} . "' ". gettext("FAILED to create!");
             $ASTPP->debug( user => $param->{username}, debug => $tmp );
         }
         $params->{action} = gettext("Information...");
@@ -3663,17 +3522,18 @@ sub build_dids() {
         my $tmp = "DELETE FROM dids WHERE number = ". $astpp_db->quote( $params->{number} );
 
         if ( $astpp_db->do($tmp) ) {
-
-            $status .= gettext("DID: "). $params->{number}. gettext(" Deactivated Successfully!");
+            #$status .= gettext("DID: "). $params->{number}. gettext(" Deleted Successfully!");
+            $status_string = { status => "0", message => gettext("DID "). $params->{number}. gettext(" Deleted Successfully!")} ;
         }
         else 
         {
-            $status .= gettext("DID: ") . $params->{number} . gettext(" Failed to Deactivate!");
+            #$status .= gettext("DID: ") . $params->{number} . gettext(" Failed to Delete!");
+            $status_string = { status => "1", message => gettext("DID ") . $params->{number} . gettext(" Failed to Delete!")} ;
             $ASTPP->debug( user => $param->{username}, debug => $tmp );
         }
         $params->{action} = gettext("Information...");
     }
-
+return to_json($status_string);
 }
 
 
@@ -4607,22 +4467,23 @@ sub build_routes() {
 
 
 sub build_packages() {
-    my ( $sql_select, $sql_count, $pagination, $sql, $record, $count, $tmp, $pageno, $pagesrequired );
-    return gettext("Database is NOT configured!") . "\n" unless $astpp_db;
+    my ( $sql_select, $sql_count, $pagination, $sql, $record, $count, $tmp, $pageno, $pagesrequired,$status_string );    
 
     if ( defined($params->{action}) && $params->{action} eq gettext("Insert...") ) {
-        my $tmp ="INSERT INTO packages (name,pricelist,pattern,includedseconds,status) VALUES ("
+        my $tmp ="INSERT INTO packages (name,pricelist,includedseconds,status) VALUES ("
           . $astpp_db->quote( $params->{name} ) . ", "
           . $astpp_db->quote( $params->{pricelist} ) . ", "
-          . $astpp_db->quote( $params->{pattern} ) . ", "
+#           . $astpp_db->quote( $params->{pattern} ) . ", "
           . $astpp_db->quote( $params->{includedseconds} ) . ",1)";
 
         if ( $astpp_db->do($tmp) ) {
-            $status .= gettext("Package: "). $params->{name}. gettext(" Added Successfully!");
+            #$status .= gettext("Package: "). $params->{name}. gettext(" Added Successfully!");
+            $status_string = { status => "0", message => gettext("Package: "). $params->{name}. gettext(" Added Successfully!") } ;
         }
         else 
         {
-            $status .=gettext("Package: "). $params->{name}. gettext(" Failed to Add!");
+            #$status .=gettext("Package: "). $params->{name}. gettext(" Failed to Add!");
+            $status_string = { status => "1", message => gettext("Package: "). $params->{name}. gettext(" Failed to Add!") } ;
             $ASTPP->debug( user => $param->{username}, debug => $tmp );
         }
     }
@@ -4630,18 +4491,20 @@ sub build_packages() {
     {
         my $tmp = "UPDATE packages SET name= ". $astpp_db->quote( $params->{name} )
           . ", pricelist = ". $astpp_db->quote( $params->{pricelist} )
-          . ", pattern=". $astpp_db->quote( $params->{pattern} )
+#           . ", pattern=". $astpp_db->quote( $params->{pattern} )
           . ", includedseconds=". $astpp_db->quote( $params->{includedseconds})
           . " WHERE id = ". $astpp_db->quote( $params->{id} );
 
         $ASTPP->debug( user => $param->{username}, debug => $tmp );
         if ( $astpp_db->do($tmp) ) 
         {
-            $status .=gettext("Package: "). $params->{name}. gettext(" Updated Successfully!");
+            #$status .=gettext("Package: "). $params->{name}. gettext(" Updated Successfully!");
+            $status_string = { status => "0", message => gettext("Package: "). $params->{name}. gettext(" Updated Successfully!")} ;
         }
         else 
         {
-            $status .=gettext("Package: "). $params->{name}. gettext(" Failed to Update!");
+            #$status .=gettext("Package: "). $params->{name}. gettext(" Failed to Update!");
+            $status_string = { status => "1", message => gettext("Package: "). $params->{name}. gettext(" Failed to Update!")} ;
         }
     }
     elsif ( defined($params->{action}) && $params->{action} eq gettext("Deactivate...") ) 
@@ -4649,15 +4512,17 @@ sub build_packages() {
         my $tmp = "UPDATE packages SET status = 2 WHERE id = ". $astpp_db->quote( $params->{id} );
         if ( $astpp_db->do($tmp) ) 
         {
-            $status .= gettext("Package: ") . $params->{id}. gettext(" Deactivated Successfully!");
+            #$status .= gettext("Package: ") . $params->{id}. gettext(" Deactivated Successfully!");
+            $status_string = { status => "0", message => gettext("Package: ") . gettext(" Deleted Successfully!")} ;
         }
         else 
         {
-            $status .= gettext("Package: "). $params->{id}. gettext(" Failed to Deactivate!");
+            #$status .= gettext("Package: "). $params->{id}. gettext(" Failed to Deactivate!");
+            $status_string = { status => "1", message => gettext("Package: "). gettext(" Failed to Deactivate!")} ;
             $ASTPP->debug( user => $param->{username}, debug => $tmp );
         }
     }
-    return $status;
+    return to_json($status_string);
 }
 
 
@@ -4665,10 +4530,8 @@ sub build_packages() {
 
 sub build_trunks() 
 {
-    my ( $sql, $record, $count, $tmp, $pageno, $pagesrequired );
-    return gettext("Database is NOT configured!") . "\n" unless $astpp_db;
-    my @providerlist = &list_providers($astpp_db);
-    return gettext("No Providers Exist!") . "\n" unless @providerlist;
+    my ( $sql, $record, $count, $tmp, $pageno, $pagesrequired,$status_string );    
+    my @providerlist = &list_providers($astpp_db);    
 
     if ( defined($params->{action}) && $params->{action} eq gettext("Insert...") ) 
     {
@@ -4676,8 +4539,8 @@ sub build_trunks()
         my $resellerlist = "";
         foreach my $reseller (@resellers) {
             my $resellerparam = "reseller-" . $reseller;
-            print "RESELLER: $reseller PARAM = $params->{$resellerparam}"
-            if $config->{debug} == 1;
+#             print "RESELLER: $reseller PARAM = $params->{$resellerparam}"
+#             if $config->{debug} == 1;
             if ( $params->{$resellerparam} == 1 ) {
                 $resellerlist .= "'" . $reseller . "',";
             }
@@ -4696,11 +4559,13 @@ sub build_trunks()
         
         if ( $astpp_db->do($tmp) ) 
         {        	
-            $status .= gettext("Trunk: "). $params->{name}. gettext(" Added Successfully!");
+            #$status .= gettext("Trunk: "). $params->{name}. gettext(" Added Successfully!");
+            $status_string = { status => "0", message => gettext("Trunk: "). $params->{name}. gettext(" Added Successfully!") } ;
         }
         else 
         {
-            $status .= gettext("Trunk: ") . $params->{name} . gettext(" Failed to Add!");
+            #$status .= gettext("Trunk: ") . $params->{name} . gettext(" Failed to Add!");
+            $status_string = { status => "1", message => gettext("Trunk: ") . $params->{name} . gettext(" Failed to Add!") } ;
         }
     }
     elsif ( defined($params->{action}) && $params->{action} eq gettext("Save...") ) 
@@ -4712,8 +4577,8 @@ sub build_trunks()
         foreach my $reseller (@resellers) 
         {
             my $resellerparam = "reseller-" . $reseller;
-            print "RESELLER: $reseller PARAM = $params->{$resellerparam}"
-            if $config->{debug} == 1;
+#             print "RESELLER: $reseller PARAM = $params->{$resellerparam}"
+#             if $config->{debug} == 1;
 
             if ( $params->{$resellerparam} == 1 ) 
             {
@@ -4734,11 +4599,13 @@ sub build_trunks()
         
         if ( $astpp_db->do($tmp) ) 
         {
-            $status .= gettext("Trunk: "). $params->{name}. gettext(" Updated Successfully!");
+            #$status .= gettext("Trunk: "). $params->{name}. gettext(" Updated Successfully!");
+            $status_string = { status => "0", message => gettext("Trunk: "). $params->{name}. gettext(" Updated Successfully!") } ;
         }
         else 
         {
-            $status .= gettext("Trunk: "). $params->{name}. gettext(" Failed to Update!");
+            #$status .= gettext("Trunk: "). $params->{name}. gettext(" Failed to Update!");
+            $status_string = { status => "1", message => gettext("Trunk: "). $params->{name}. gettext(" Failed to Update!")} ;
             $ASTPP->debug( user => $param->{username}, debug => $tmp );
         }
     }
@@ -4747,16 +4614,18 @@ sub build_trunks()
         my $tmp = "UPDATE trunks SET status = 2 WHERE name = ". $astpp_db->quote( $params->{name} );
         if ( $astpp_db->do($tmp) ) 
         {
-            $status .= gettext("Trunk: "). $params->{name}. gettext(" Deactivated Successfully!");
+            #$status .= gettext("Trunk: "). $params->{name}. gettext(" Deactivated Successfully!");
+            $status_string = { status => "0", message => gettext("Trunk: "). $params->{name}. gettext(" Deleted Successfully!")} ;
         }
         else 
         {
-            $status .= gettext("Trunk: "). $params->{name}. gettext(" Failed to Deactivate!");
+            #$status .= gettext("Trunk: "). $params->{name}. gettext(" Failed to Deactivate!");
+            $status_string = { status => "1", message => gettext("Trunk: "). $params->{name}. gettext(" Failed to Delete!")} ;
             $ASTPP->debug( user => $param->{username}, debug => $tmp );
         }
     }
 
-    return $status;
+    return to_json($status_string);
 }
 
 
@@ -4900,8 +4769,10 @@ sub build_calc_charge() {
         my $branddata = &get_pricelist( $astpp_db, $params->{pricelist} );
         my $numdata = &get_route( $astpp_db, $config, $params->{phonenumber},$params->{pricelist} );
         if ( $branddata->{markup} ne "" && $branddata->{markup} != 0 ) {
-            $numdata->{connectcost} =$numdata->{connectcost} *( ( $branddata->{markup} / 1 ) + 1 );
-            $numdata->{cost} = $numdata->{cost} * ( ( $branddata->{markup} / 1 ) + 1 );
+            #$numdata->{connectcost} =$numdata->{connectcost} *( ( $branddata->{markup} / 1 ) + 1 );
+            #$numdata->{cost} = $numdata->{cost} * ( ( $branddata->{markup} / 1 ) + 1 );
+            $numdata->{connectcost} = ($numdata->{connectcost} * $branddata->{markup}) / 100;
+	    $numdata->{cost} = ($numdata->{cost} *  $branddata->{markup}) / 100;
         }
 
         if ($numdata->{inc} > 0 ) 
@@ -4917,12 +4788,12 @@ sub build_calc_charge() {
         $ASTPP->debug(
             user  => $param->{username},
             debug => "$numdata->{connectcost}, $numdata->{cost}, "
-              . $params->{length} * 60
+              . $params->{length}
               . ", $increment, $numdata->{includedseconds}"
         );
 
         my $cost = &calc_call_cost($numdata->{connectcost}, $numdata->{cost},
-						        $params->{length} * 60,  
+						        $params->{length},  
 						        $increment,
 						        $numdata->{includedseconds}
 								);
@@ -4998,7 +4869,7 @@ sub build_taxes() {
 
 
 sub build_configuration() {
-    my ( $action, @brands, @resellerlist, $tmp, $template, @configuration_list );
+    my ( $action, @brands, @resellerlist, $tmp, $template, @configuration_list,$status_string );
 
     if ( defined($params->{action}) && $params->{action} eq "Save Item" ) {
 
@@ -5010,7 +4881,7 @@ sub build_configuration() {
 	$tmp = "UPDATE system SET ";
 	if ($params->{resller}) 
 	{
-	  $tmp .= " reseller = ". $astpp_db->quote( $params->{reseller} ) . ","
+	      $tmp .= " reseller = ". $astpp_db->quote( $params->{reseller} ) . ","
 	}
 	if ($params->{brand}) 
 	{
@@ -5024,11 +4895,13 @@ sub build_configuration() {
 
         if ( $astpp_db->do($tmp) ) 
         {
-            $status .= "Saved Configuration Item!";
+            #$status .= "Saved Configuration Item!";
+            $status_string = { status => "0", message => "Saved Configuration Item!" } ;
         }
         else 
         {
-            $status .= "Failed to Save Configuration Item!";
+            #$status .= "Failed to Save Configuration Item!";
+            $status_string = { status => "1", message => "Failed to Save Configuration Item!" } ;
         }
     }
     elsif ( defined($params->{action}) && $params->{action} eq "Add Item" ) 
@@ -5049,11 +4922,13 @@ sub build_configuration() {
         $ASTPP->debug( user => $param->{username}, debug => $tmp );
 
         if ( $astpp_db->do($tmp) ) {
-            $status .= "Added Configuration Item!";
+            #$status .= "Added Configuration Item!";
+            $status_string = { status => "0", message => "Added Configuration Item!" } ;
         }
         else 
         {
-            $status .= "Failed to Add Configuration Item!";
+            #$status .= "Failed to Add Configuration Item!";
+            $status_string = { status => "1", message => "Failed to Add Configuration Item!" } ;
         }
     }
     elsif ( defined($params->{action}) && $params->{action} eq "Delete" ) 
@@ -5081,26 +4956,22 @@ sub build_configuration() {
               . $astpp_db->quote( $params->{username} )
               . " LIMIT 1";
      }
-
+     print STDERR $tmp;
      $ASTPP->debug( user => $param->{username}, debug => $tmp );
 
         if ( $astpp_db->do($tmp) ) 
         {
-            $status .= "Removed Configuration Item!";
+            #$status .= "Removed Configuration Item!";
+            $status_string = { status => "0", message => "Removed Configuration Item!" } ;
         }
         else 
         {
-            $status .= "Failed to Remove Configuration Item!";
+            #$status .= "Failed to Remove Configuration Item!";
+            $status_string = { status => "0", message => "Failed to Remove Configuration Item!"} ;
         }        
     }
-    return $status;
+    return to_json($status_string);
 }
-
-
-
-
-
-
 
 sub initialize() {
 
@@ -5145,7 +5016,7 @@ sub initialize() {
         push @modes, gettext("Calling Cards");
     }
     @modes = sort @modes;
-    push @currency, $config->{currency};
+    push @currency, $config->{base_currency};
     $ASTPP->set_astpp_db($astpp_db);
     $ASTPP->set_cdr_db($cdr_db);
     if ($config->{softswitch} == 0) {
@@ -5181,30 +5052,35 @@ sub build_freeswitch_sip_devices() {
         my $failure;
         $ASTPP->debug( user => $param->{username}, debug => "Directory ID: " . $params->{directory_id});
         if (!$params->{directory_id} || $params->{directory_id} == 0 || $params->{directory_id} eq "") {
-        	$ASTPP->debug( user => $param->{username}, debug => "Adding User");
-			$params->{domain} = $config->{freeswitch_domain} if !$params->{domain};
-            $params->{context} = $config->{freeswitch_context} if !$params->{context};
-			my ($failure,$name);
-        ($failure, $status, $name) = $ASTPP->fs_add_sip_user(
-        				username	=> $params->{fs_username},
-                        accountcode     => $params->{accountcode},
-                        freeswitch_domain => $params->{domain},
-                        freeswitch_context => $params->{context},
-                        vm_password     => $params->{vm_password},
-                        password        => $params->{fs_password},
-                        sip_ext_prepend => $config->{sip_ext_prepend},
-        );
+	      $ASTPP->debug( user => $param->{username}, debug => "Adding User");
+	      $params->{domain} = $config->{freeswitch_domain} if !$params->{domain};
+	      $params->{context} = $config->{freeswitch_context} if !$params->{context};
+	      my ($failure,$name);
+	      ($failure, $status, $name) = $ASTPP->fs_add_sip_user(
+		  username	=> $params->{fs_username},
+		  accountcode     => $params->{accountcode},
+		  freeswitch_domain => $params->{domain},
+		  freeswitch_context => $params->{context},
+		  vm_password     => $params->{vm_password},
+		  password        => $params->{fs_password},
+		  sip_ext_prepend => $config->{sip_ext_prepend},
+		  effective_caller_id_name        => $params->{effective_caller_id_name},
+		  effective_caller_id_number      => $params->{effective_caller_id_number},
+	      );
 	} 
 	else 
 	{
         	$ASTPP->debug( user => $param->{username}, debug => "Saving User");
         	$ASTPP->fs_save_sip_user( directory_id => $params->{directory_id},
 			username	=> $params->{fs_username},
-            accountcode     => $params->{accountcode},
-            freeswitch_domain => $params->{domain},
-            freeswitch_context => $params->{context},
-            vm_password     => $params->{vm_password},
-            password        => $params->{fs_password},);
+			accountcode     => $params->{accountcode},
+			freeswitch_domain => $params->{domain},
+			freeswitch_context => $params->{context},
+			vm_password     => $params->{vm_password},
+			password        => $params->{fs_password},
+			effective_caller_id_name        => $params->{effective_caller_id_name},
+			effective_caller_id_number      => $params->{effective_caller_id_number},
+		);
 	}
         $status .= "<br>";
     }
@@ -5219,7 +5095,9 @@ sub build_freeswitch_sip_devices() {
 	    .$deviceinfo->{context}."###"
 	    .$deviceinfo->{password}."###"
 	    .$deviceinfo->{vm_password}."###"
-	    .$deviceinfo->{username};
+	    .$deviceinfo->{username}."###"
+	    .$deviceinfo->{effective_caller_id_name}."###"
+	    .$deviceinfo->{effective_caller_id_number};
 
     }
     return $status;
@@ -6270,12 +6148,6 @@ sub build_add_booth() {
 
 sub build_remove_booth() {
 
-#     my $template = HTML::Template->new(
-#         filename          => '/var/lib/astpp/templates/booth-remove.tpl',
-#         die_on_bad_params => $config->{template_die_on_bad_params}
-# 
-#     );
-
     my ( @booth_list, $accountinfo );
 
     ########
@@ -6399,13 +6271,6 @@ sub build_remove_booth() {
         -name   => "booth_list",
         -values => \@booth_list
     );
-
-
-#     $template->param( status => $status );
-
-#     $template->param( booths => $booths );
-
-#     return $template->output;
 
 }
 
@@ -6607,14 +6472,6 @@ sub build_list_booths() {
       $ASTPP->debug( user => $param->{username}, debug => $balance / 1 );
 
     }
-
-
-#     my $template = HTML::Template::Expr->new(
-#         filename          => '/var/lib/astpp/templates/booths-list.tpl',
-#         die_on_bad_params => $config->{template_die_on_bad_params}
-#     );
-#     $template->param( booth_list => \@booths );
-#     return $template->output;
 }
 
 
@@ -6820,30 +6677,12 @@ sub build_view_booth() {
         }
     }
 
-
-#     my $template = HTML::Template->new(
-#         filename          => '/var/lib/astpp/templates/booth-view.tpl',
-#         die_on_bad_params => $config->{template_die_on_bad_params}
-#     );
-# 
-# 
-# 
-#     $template->param( booth_name => $params->{booth_name} );
     my $balance = $ASTPP->accountbalance( account => $params->{booth_name} ) / 1;
 
     my $unrated =
      &count_unrated_cdrs_account( $config, $cdr_db, $accountinfo->{number},
         $accountinfo->{cc} );
     $ASTPP->debug( user => $param->{username}, debug => $balance );
-#     $template->param( unrated_cdrs  => $unrated );
-#     $template->param( booths        => $booths );
-#     $template->param( balance       => $balance );
-#     $template->param( cdr_list      => \@cdrs );
-#     $template->param( sip_username  => $sip_login->{name} );
-#     $template->param( sip_password  => $sip_login->{secret} );
-#     $template->param( iax2_username => $iax2_login->{name} );
-#     $template->param( iax2_password => $iax2_login->{secret} );
-#     return $template->output;
 }
 
 
@@ -6851,16 +6690,6 @@ sub build_view_booth() {
 
 
 &initialize();
-
-if ( !$config->{template_die_on_bad_params} ) {
-
-    $config->{template_die_on_bad_params} = 0;
-}
-
-# my $template = HTML::Template->new(
-#     filename          => '/var/lib/astpp/templates/main.tpl',
-#     die_on_bad_params => $config->{template_die_on_bad_params}
-# );
 
 my $log_call = "astpp-wraper.cgi,";
 

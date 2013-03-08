@@ -1,7 +1,4 @@
 <?php include('header_advance_search.php');?>
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -27,12 +24,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	title: '',
 	useRp: true,
 	rp: 10,
 	showTableToggleBtn: true,
-	height: 300,
+	height: "auto",	
 	width: "auto",	
     pagetext: 'Page',
     outof: 'of',

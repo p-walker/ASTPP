@@ -1,10 +1,6 @@
 <? extend('master.php') ?>
 
 	<? startblock('extra_head') ?>
-		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="/css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="/js/flexigrid.js"></script>
 
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)

@@ -38,7 +38,7 @@ $('#search').change(function() {
         <div class="portlet-header ui-widget-header">Quick Search<span class="ui-icon ui-icon-circle-arrow-s"></span></div>
         <div class="portlet-content">
          <form action="<?=base_url()?>" id="frm_search" method="POST" enctype="multipart/form-data">
-          Please Select Module Name for Search<br><br>
+          Please Select Module Name for Search : 
           <select name="search" id="search">          
           <option value="0">--Select Module--</option>
           <?php 
@@ -144,10 +144,13 @@ $('#search').change(function() {
 	  <option value="25">Account Taxes</option> 
 	  <option value="26">Template</option>  
            <? } ?>        
+           <option value="27">Template</option>  
+           <option value="28">Template</option>  
+           <option value="29">Template</option>  
           </select>
          </form>
          
-         <br><br><br>
+         <br>
          <form action="<?=base_url()?>accounts/search" id="form1" name="form1" method="POST" enctype="multipart/form-data" style="display:none">
          <input type="hidden" name="advance_search" value="1">
          <ul style="width:675px; list-style:none;">
@@ -1218,7 +1221,7 @@ $('#search').change(function() {
         <form action="<?=base_url()?>accounting/search_taxes" id="form25" method="POST" enctype="multipart/form-data" style="display:none">
          <input type="hidden" name="advance_search" value="1">
          <ul style="width:675px; list-style:none;">
-          <fieldset  style="width:660px;">
+          <fieldset  style="width:660px;float:left;">
 
                     <legend><span style="font-size:14px; font-weight:bold; color:#000;">Search Account Taxes</span></legend>
                     <li>  
@@ -1322,14 +1325,203 @@ $('#search').change(function() {
               </li>
                             
             </fieldset>
-             
-            
          </ul>
           <br />
         <input type="submit" class="ui-state-default float-right ui-corner-all ui-button" name="action" value="Search" />
         <br><br>
          </form>
           
+       
+       <form action="<?=base_url()?>cdrReports/resellerReport_search" id="form27" name="form27" method="POST" enctype="multipart/form-data" style="display:none">
+            <input type="hidden" name="ajax_search" value="1">
+         <input type="hidden" name="advance_search" value="1">
+         <ul style="width:1050px; list-style:none;">
+          <fieldset  >
+            <legend><span style="font-size:14px; font-weight:bold; color:#000;">Search Reseller Call Report </span></legend>
+            	<li>
+                     
+                      <div class="float-left" style="width:30%">
+                 	 <span>
+                     	   <label> From date & Time :</label>
+           				   <input size="20" class="text field" name="start_date" id="reseller_cdr_from_date"> &nbsp;<img src="<?=base_url()?>images/calendar.png" border="0"> 
+                     </span>
+                     </div>
+                     
+                      <div class="float-left" style="width:30%">
+                 	 <span>
+                     	   <label >To date & Time :</label>
+            				<input size="20" class="text field" name="end_date" id="reseller_cdr_to_date"> &nbsp;<img src="<?=base_url()?>images/calendar.png" border="0">        
+                     </span>
+                     </div>
+                     
+                      <div class="float-left" style="width:30%">
+                 	 <span>
+                      <label >Caller ID:</label>
+            		  <input size="20" class="text field" name="caller_id"> &nbsp;
+            		  <select name="caller_id_operator" class="field select">
+                      <option value="1">contains</option>
+                      <option value="2">doesn't contain</option>
+                      <option value="3">is equal to</option>
+                      <option value="4">is not equal to</option>
+                      </select>	
+                     </span>
+                     </div>
+                     
+                     
+                </li>
+                <li>
+
+                      <div class="float-left" style="width:30%">
+                 	 <span>
+                       <label >Called Number:</label>
+           			   <input size="20" class="text field" name="dest"  > &nbsp;
+                       <select name="dest_operator" class="field select">
+                       <option value="1">contains</option>
+                       <option value="2">doesn't contain</option>
+                       <option value="3">is equal to</option>
+                       <option value="4">is not equal to</option>
+                       </select>	
+                     </span>
+                     </div>
+                     
+                      <div class="float-left" style="width:30%">
+                 	 <span>
+                     	   <label>Bill Sec  :</label>
+              			   <input size="20" class="text field" name="bill_sec"> &nbsp;
+                           <select name="bill_sec_operator" style="width:132px;" class="field select">
+                           <option value="1">is equal to</option>
+                           <option value="2">is not equal to</option>
+                           <option value="3">greater than</option>
+                           <option value="4">less than</option>
+                           <option value="5">greather or equal than</option>
+                           <option value="6">less or equal than</option>
+                           </select>
+                     </span>
+                     </div>          
+                     <div class="float-left" style="width:30%">
+                 	 <span>
+                     	 <label>Disposition :</label>
+                  <?=form_disposition('disposition','',array("class"=>"select field" , "style"=>"width:307px;"))?>
+                     </span>
+                     
+                </li>
+                <li>
+                	
+                <div class="float-left" style="width:30%">
+					<span>
+                     <label >Account Number:</label>
+                	<input size="20" class="text field" name="reseller" id="reseller">
+                <a onclick="window.open('<?=base_url()?>accounts/search_did_account_list/' , 'AccountList','scrollbars=1,width=650,height=330,top=20,left=100,scrollbars=1');" href="#"><img src="<?=base_url()?>images/icon_arrow_orange.gif" border="0"></a>
+                    </span>
+                    </div>                    		  
+		  
+		  
+		  	 <div class="float-left" style="width:30%">
+                <span>
+                  <label >Trunk</label>
+                  <select class="select field" name="trunk" style="width:307px;" >
+                  <?=$trunks?>
+                  </select>
+                </span>
+                </div>
+		  
+		    <div class="float-left" style="width:30%">
+				      <span>
+		    <label>Provider:</label>
+			<input size="20" class="text field" name="provider" id="provider">
+		    <a onclick="window.open('<?=base_url()?>accounts/search_trunks_provider_list/' , 'ProviderList','scrollbars=1,width=650,height=330,top=20,left=100,scrollbars=1');" href="#"><img src="<?=base_url()?>images/icon_arrow_orange.gif" border="0"></a>
+		  </span>
+		  </div>
+                </li>
+            
+           		<li>
+           		
+           		<div class="float-left" style="width:30%">
+                 	 <span>
+                     	  <label>Debit:</label>
+               			  <input size="20" class="text field" name="debit"> &nbsp;
+                          <select name="debit_operator" class="field select" style="width:132px;">
+                          <option value="1">is equal to</option>
+                          <option value="2">is not equal to</option>
+                          <option value="3">greater than</option>
+                          <option value="4">less than</option>
+                          <option value="5">greather or equal than</option>
+                          <option value="6">less or equal than</option>
+                          </select>                          
+                     </span>
+                     </div>
+                     
+                     <div class="float-left" style="width:30%">
+                 	 <span>
+                     	  <label>Cost:</label>
+               			  <input size="20" class="text field" name="cost"> &nbsp;
+                          <select name="cost_operator" class="field select" style="width:132px;">
+                          <option value="1">is equal to</option>
+                          <option value="2">is not equal to</option>
+                          <option value="3">greater than</option>
+                          <option value="4">less than</option>
+                          <option value="5">greather or equal than</option>
+                          <option value="6">less or equal than</option>
+                          </select>                          
+                     </span>
+                     </div>
+           		
+                	 <div class="float-left" style="width:30%">
+                 	 <span>
+                      <label >Pricelist :</label>
+			  <?=form_select_default('pricelist',@$pricelist,"",array("class"=>"select field", "style"=>"width:307px;"), '--Select PriceList--');?>	
+                     </span>
+                     </div>	
+                   </li>
+                   <li>
+                     
+                      <div class="float-left" style="width:30%">
+			<span>
+                       <label >Pattern:</label>
+            		   <input size="20" class="text field" name="pattern"> &nbsp;
+                       <select name="pattern_operator" class="field select">
+                       <option value="1">contains</option>
+                       <option value="2">doesn't contain</option>
+                       <option value="3">is equal to</option>
+                       <option value="4">is not equal to</option>
+                       </select>	
+                     </span>
+                     </div>
+                     
+                     <div class="float-left" style="width:30%">
+			<span>
+                       <label >Notes:</label>
+            		   <input size="20" class="text field" name="notes"> &nbsp;
+                       <select name="notes_operator" class="field select">
+                       <option value="1">contains</option>
+                       <option value="2">doesn't contain</option>
+                       <option value="3">is equal to</option>
+                       <option value="4">is not equal to</option>
+                       </select>	
+                     </span>
+                     </div>
+                     
+                     <div class="float-left" style="width:30%">
+			<span>
+                       <label>Call Type:</label>            		   
+                       <select name="calltype" class="field select">
+                       <option value="">--Select Call Type--</option>
+                       <option value="STANDARD">STANDARD</option>
+                       <option value="DID">DID</option>                       
+                       </select>	
+                     </span>
+                     </div>
+                     
+                </li>            
+          </fieldset>
+         </ul>
+         
+          <br />
+           <input type="submit" id="id_reset" class="ui-state-default float-right ui-corner-all ui-button" name="reset" value="Clear Search Filter">&nbsp; 
+        <!--<input type="button" class="ui-state-default float-right ui-corner-all ui-button" name="action" value="Search" id="reseller_cdrs_search" style="margin-right:22px;" />-->
+        <br><br>
+        
+        </form>    
        
 
 

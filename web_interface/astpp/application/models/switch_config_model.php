@@ -22,7 +22,8 @@ class Switch_config_model extends CI_Model
 		$url = "astpp-wraper.cgi";
 		$data['mode'] = "Freeswitch(TM) SIP Devices";
 		$data['logintype'] = $this->session->userdata('logintype');
-		$data['username'] = $this->session->userdata('username');		
+		$data['username'] = $this->session->userdata('username');
+		
 		$this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
@@ -40,11 +41,13 @@ class Switch_config_model extends CI_Model
 		$return_array = explode("###",trim($return));
 		$switch = array();
 		$switch['directory_id'] = $return_array[0];
-	    $switch['accountcode'] = $return_array[1];
-	    $switch['context'] = $return_array[2];
-	    $switch['fs_password'] = $return_array[3];
-	    $switch['vm_password'] = $return_array[4];
-	    $switch['fs_username'] = $return_array[5];;
+		$switch['accountcode'] = $return_array[1];
+		$switch['context'] = $return_array[2];
+		$switch['fs_password'] = $return_array[3];
+		$switch['vm_password'] = $return_array[4];
+		$switch['fs_username'] = $return_array[5];
+		$switch['effective_caller_id_name'] = $return_array[6];
+		$switch['effective_caller_id_number'] = $return_array[7];
 		
 		return $switch;
 	}
@@ -116,6 +119,22 @@ class Switch_config_model extends CI_Model
 	if($query4->num_rows()>0) {
 	$row4 = $query4->row_array();
 	$deviceinfo['accountcode'] = $row4['var_value'];
+	}
+	
+	$tmp4 = "SELECT var_value FROM directory_vars WHERE directory_id = '".$directory_id."' AND var_name = 'effective_caller_id_name' LIMIT 1";
+	$query4  = $this->db_fs->query($tmp4);
+	$deviceinfo['effective_caller_id_name'] = "";
+	if($query4->num_rows()>0) {
+	$row4 = $query4->row_array();
+	$deviceinfo['effective_caller_id_name'] = $row4['var_value'];
+	}
+	
+	$tmp4 = "SELECT var_value FROM directory_vars WHERE directory_id = '".$directory_id."' AND var_name = 'effective_caller_id_number' LIMIT 1";
+	$query4  = $this->db_fs->query($tmp4);
+	$deviceinfo['effective_caller_id_number'] = "";
+	if($query4->num_rows()>0) {
+	$row4 = $query4->row_array();
+	$deviceinfo['effective_caller_id_number'] = $row4['var_value'];
 	}
 	
 	return $deviceinfo;

@@ -2,11 +2,6 @@
 
 	<? startblock('extra_head') ?>
 
-		
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
-
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -27,7 +22,8 @@ $("#flex1").flexigrid({
     method: 'GET',
     dataType: 'json',
 	colModel : [
-		{display: 'ID', name: 'Number', width: 50, sortable: false, align: 'center'},
+	{display: '<input type="checkbox" name="chkAll" class="checkall"/>', name : 'chkDelete', width : 45, sortable : false, align: 'left'},
+// 	{display: 'ID', name: 'Number', width: 50, sortable: false, align: 'center'},
         {display: 'Code', name: 'country', width: 100, sortable: false, align: 'center'},
         {display: 'Destination', name: 'province', width: 120, sortable: false, align: 'left'},
         {display: 'Pricelist(s)', name: 'city', width: 80, sortable: false, align: 'center'},
@@ -45,6 +41,8 @@ $("#flex1").flexigrid({
 		{separator: true},
 		{name: 'Refresh', bclass: 'reload', onpress : reload_button},
 		{separator: true},
+		{name: 'Delete Selected', bclass: 'delete', onpress : removeFromList},
+		{separator: true},
 		{name: 'Remove Search Filter', bclass: 'reload', onpress : clear_filter},
 		],
 	nowrap: false,
@@ -53,12 +51,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 20,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 300,
+	height:"auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',
@@ -91,8 +89,58 @@ $("#rates_routes_search").click(function(){
 	$("#show_search").click(function(){
 	$("#search_bar").toggle();
 	});
+    $('.checkall').click(function () {
+        $('.chkRefNos').attr('checked', this.checked); //if you want to select/deselect checkboxes use this
+    });
 
 });
+
+function cickchkbox(chkid){
+  var chk_flg = 0;
+    $(".chkRefNos").each( function () {
+      if(this.checked == false) {     
+        $('.checkall').attr('checked', false);
+	chk_flg++;
+      } 
+    });
+    if(chk_flg == 0){
+      $('.checkall').attr('checked', true);
+    }
+}
+
+  function removeFromList(){
+    var result = "";                        
+    $(".chkRefNos").each( function () {
+      if(this.checked == true) {     
+        result += ",'"+$(this).val()+"'";
+      } 
+    });     
+    result = result.substr(1);
+    if(result){
+      confirm_string = 'Are you sure want to delete selected rates?';
+      var answer = confirm(confirm_string);
+      if(answer){
+	  $.ajax({
+	    type: "POST",
+	    cache    : false,
+	    async    : true,  
+	    url: "/rates/delete_selected_rates/",
+	    data: "deletable_id="+result,
+	    success: function(data){
+		if(data == 1)
+		{
+		    $('#flex1').flexReload();
+		} else{
+		  alert("Problem In delete records.");
+		}
+	      }
+	  });
+      }
+    } else{
+	alert("Please select atleast one rate to delete.");
+    }
+  }
+
 
 function add_button()
 {

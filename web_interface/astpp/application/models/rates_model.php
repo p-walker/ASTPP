@@ -13,7 +13,7 @@ class Rates_model extends CI_Model
 		$data['mode'] = "Pricelists";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_pricelist($data)
@@ -23,7 +23,8 @@ class Rates_model extends CI_Model
 		$data['mode'] = "Pricelists";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);
+		
 	}
 	
 	function get_pricelist_by_name($name)
@@ -46,7 +47,7 @@ class Rates_model extends CI_Model
 		$data['action'] = "Deactivate...";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	
@@ -364,7 +365,8 @@ class Rates_model extends CI_Model
 				}
 			}
 			
-			$this->db->where('pricelist', $periodiccharges_search['pricelist']);
+			if($periodiccharges_search['pricelist']!='')
+			  $this->db->where('pricelist', $periodiccharges_search['pricelist']);
 			
 			$charge_operator = $periodiccharges_search['charge_operator'];
 			if(!empty($periodiccharges_search['charge'])) {
@@ -383,12 +385,16 @@ class Rates_model extends CI_Model
 					break;
 				}
 			}
-			$this->db->where('sweep', $periodiccharges_search['sweep']);
-			$this->db->where('status', $periodiccharges_search['status']);		
+			if($periodiccharges_search['sweep']!='')			  
+			  $this->db->where('sweep', $periodiccharges_search['sweep']);
+			
+			if($periodiccharges_search['status']!='')
+			  $this->db->where('status', $periodiccharges_search['status']);		
 		}
 		
-		$this->db->where('status < ','2');
+// 		$this->db->where('status < ','2');
 		$this->db->from('charges');
+// 		echo "<pre>";print_r($this->db);
 		$trunkcnt = $this->db->count_all_results();
 		//echo $this->db->last_query();
 		return $trunkcnt;
@@ -424,7 +430,8 @@ class Rates_model extends CI_Model
 				}
 			}
 			
-			$this->db->where('pricelist', $periodiccharges_search['pricelist']);
+			if($periodiccharges_search['pricelist']!='')
+			  $this->db->where('pricelist', $periodiccharges_search['pricelist']);
 			
 			$charge_operator = $periodiccharges_search['charge_operator'];
 			if(!empty($periodiccharges_search['charge'])) {
@@ -443,10 +450,13 @@ class Rates_model extends CI_Model
 					break;
 				}
 			}
-			$this->db->where('sweep', $periodiccharges_search['sweep']);
-			$this->db->where('status', $periodiccharges_search['status']);		
+			if($periodiccharges_search['sweep']!='')			  
+			  $this->db->where('sweep', $periodiccharges_search['sweep']);
+			
+			if($periodiccharges_search['status']!='')
+			  $this->db->where('status', $periodiccharges_search['status']);	
 		}
-		$this->db->where('status < ','2');	
+// 		$this->db->where('status < ','2');	
 		$this->db->limit($limit,$start);
 	  	$this->db->from('charges');	
 		$query = $this->db->get();	
@@ -462,7 +472,7 @@ class Rates_model extends CI_Model
 		$data['mode'] = "Packages";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_package($data)
@@ -472,7 +482,7 @@ class Rates_model extends CI_Model
 		$data['mode'] = "Packages";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function get_package_by_id($id)
@@ -495,7 +505,7 @@ class Rates_model extends CI_Model
 		$data['action'] = "Deactivate...";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	
@@ -1087,7 +1097,6 @@ class Rates_model extends CI_Model
 	
 	function getRoutesList($start, $limit)
 	{
-
 		if($this->session->userdata('logintype') == 1 || $this->session->userdata('logintype') == 5) 
 		{
 			if($this->session->userdata('advance_search')==1){
@@ -1534,7 +1543,7 @@ class Rates_model extends CI_Model
 			$this->db->where($where , NULL, FALSE);
 			$query2 = $this->db->get('routes');
 			$join = $this->db->last_query();
-			$query = $this->db->query($join. ' ORDER BY comment limit '.$start.' , '.$limit.' ');
+			$query = $this->db->query($join. ' ORDER BY pattern,comment limit '.$start.' , '.$limit.' ');
 			//$query = "SELECT * FROM routes WHERE ( reseller IS NULL OR reseller = '') AND status < 2 ORDER BY comment limit $start , $limit ";
 		}
 		//$query1 = $this->db->query($query);
@@ -1794,7 +1803,114 @@ class Rates_model extends CI_Model
 	    $routecnt = $this->db->count_all_results();
 	    return $routecnt;
 	}
-	
+	function insert_block($data,$pckgid){
+	  $data = explode(",",$data);
+	  $tmp =array();
+	  foreach($data as $key => $data_value){
+	      $tmp[$key]["package_id"] = $pckgid;
+	      $tmp[$key]["patterns"] = $this->get_pattern_by_id($data_value);
+	  }
+	  $this->db->insert_batch("package_patterns",$tmp);		
+	}
+	function get_pattern_by_id($pattern){
+	  $this->db->select("pattern");
+	  $this->db->where("id",$pattern);
+	  $query = $this->db->get("routes");
+	  $query = $query->result();
+	  return $query[0]->pattern;
+	}
+	function list_package_pattern_count($packgid,$pattern){
+	    $this->db->where('package_id', $packgid);	
+	    $this->db->where('patterns',$pattern);	
+	    $this->db->from('package_patterns');	
+	    $didscnt = $this->db->count_all_results();
+	    return $didscnt;
+	}
+	function list_packages_patterns($flag,$package_id,$start,$perpage){
+	    $this->db->where("package_id",$package_id);
+	    if($flag == true){
+	      $this->db->limit($perpage,$start);
+	      $query = $this->db->get('package_patterns');
+	      return $query;
+	    }else{
+	      $query = $this->db->get('package_patterns');
+	      return $query->num_rows();
+	    }
+	}
+	function build_package_pattern_search(){
+	      if($this->session->userdata('advance_search')==1){
+	      
+	      $routes_search =  $this->session->userdata('routes_search');
+	      $pattern_operator = $routes_search['pattern_operator'];
+	      if(!empty($routes_search['pattern'])) {
+		      switch($pattern_operator){
+			      case "1":
+			      $this->db->like('pattern', $routes_search['pattern']); 
+			      break;
+			      case "2":
+			      $this->db->not_like('pattern', $routes_search['pattern']);
+			      break;
+			      case "3":
+			      $this->db->where('pattern', $routes_search['pattern']);
+			      break;
+			      case "4":
+			      $this->db->where('pattern <>', $routes_search['pattern']);
+			      break;
+		      }
+	      }
+	      
+	      $comment_operator = $routes_search['comment_operator'];
+	      
+	      if(!empty($routes_search['comment'])) {
+		      switch($comment_operator){
+			      case "1":
+			      $this->db->like('comment', $routes_search['comment']); 
+			      break;
+			      case "2":
+			      $this->db->not_like('comment', $routes_search['comment']);
+			      break;
+			      case "3":
+			      $this->db->where('comment', $routes_search['comment']);
+			      break;
+			      case "4":
+			      $this->db->where('comment <>', $routes_search['comment']);
+			      break;
+		      }
+	      }
+
+	}
+      }
+      function Package_getRoutesList($flag,$Package_ID,$start,$perpage){
+	$this->build_package_pattern_search();
+	  $where = '(pattern NOT IN (select patterns from package_patterns where package_id = "'.$Package_ID.'"))';
+	  $this->db->where($where);
+	  $this->db->group_by('pattern'); 
+	  $this->db->order_by('comment','asc'); 
+	  if($flag == true){
+	    $this->db->limit($perpage,$start);
+	    $query = $this->db->get('routes');
+	    return $query;
+	  }else{
+	      $query = $this->db->get('routes');
+	      return $query->num_rows();
+	  }
+      }
+      function insert_package_patern($data){
+	  $this->db->insert("package_patterns",$data);		
+	  return true;
+      }
+      function delete_selected_routes($routes_ID){
+	  $where =  "id IN ($routes_ID)";
+	  $this->db->where($where);
+	  $this->db->delete("routes");
+	  return true;
+      }
+      function delete_selected_package($Package_ID){
+	  $where =  "id IN ($Package_ID)";
+	  $this->db->where($where);
+	  $this->db->delete("package_patterns");
+	  return true;
+      }
 	
 	
 				

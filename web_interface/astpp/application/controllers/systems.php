@@ -19,6 +19,10 @@ class Systems extends CI_Controller
 		
 		$this->load->model('system_model');
 		$this->load->model('accounts_model');
+		
+		$this->config->load('astpp_config', TRUE);
+		$this->config->item('system_config_group','astpp_config');
+		
 		if($this->session->userdata('user_login')== FALSE)
 			redirect(base_url().'astpp/login');
 							
@@ -68,6 +72,9 @@ class Systems extends CI_Controller
 		$data['page_title'] = 'System - configuration';	
 		$data['cur_menu_no'] = 10;
 		
+		
+		$data['system_config_group'] = $this->config->item('astpp_config');
+		
 		$this->load->model('cc_model');
 		$data['brands'] =  $this->cc_model->get_cc_brands();
 		
@@ -90,11 +97,10 @@ class Systems extends CI_Controller
 				$errors .= "Value is required<br />";
 								
 				if ($errors == "")
-				{
-					/*$_POST['reseller'] = ($_POST['reseller']=='')?'NULL':$_POST['reseller'];
-					$_POST['brand'] = ($_POST['brand']=='')?'NULL':$_POST['brand'];	*/			
-					$this->system_model->add_config($_POST);
-					$this->session->set_userdata('astpp_notification', 'Configuration item added successfully!');
+				{					
+					$response = $this->system_model->add_config($_POST);
+					//$this->session->set_userdata('astpp_notification', 'Configuration item added successfully!');
+					$this->common_model->status_message($response);
 					redirect(base_url().'systems/configuration/');				
 				}
 				else 
@@ -125,8 +131,9 @@ class Systems extends CI_Controller
 				{
 					$_POST['reseller'] = trim($_POST['reseller']);
 					$_POST['brand'] = trim($_POST['brand']);
-					$this->system_model->edit_config($_POST);
-					$this->session->set_userdata('astpp_notification', 'Configuration Item updated successfully!');
+					$response = $this->system_model->edit_config($_POST);
+					$this->common_model->status_message($response);
+					//$this->session->set_userdata('astpp_notification', 'Configuration Item updated successfully!');
 					redirect(base_url().'systems/configuration/');				
 				}
 				else 
@@ -161,8 +168,9 @@ class Systems extends CI_Controller
 				redirect(base_url().'systems/configuration/');
 			}
 			
-			$this->system_model->remove_config($config);		
-			$this->session->set_userdata('astpp_notification', 'Configuration Item removed successfully!');
+			$response = $this->system_model->remove_config($config);		
+			$this->common_model->status_message($response);
+			//$this->session->set_userdata('astpp_notification', 'Configuration Item removed successfully!');
 			redirect(base_url().'systems/configuration/');
 		}		
 		
@@ -214,194 +222,48 @@ class Systems extends CI_Controller
 	function configuration_grid()
 	{
 		$json_data = array();
-		$json_data['page'] = 0;$json_data['total'] = 0;	
+		$count_all = $this->system_model->systems_configuration(false);
 		
-		if($this->session->userdata('advance_search')==1){
-			$configuration_search =  $this->session->userdata('configuration_search');
+		$config['total_rows'] = $count_all;
+		$config['per_page'] = $_GET['rp'];
+
+		$page_no = $_GET['page'];
+
+		$json_data['page'] = $page_no;
+		$json_data['total'] = ($config['total_rows'] > 0) ? $config['total_rows'] : 0;
+
+		$perpage = $config['per_page'];
+		$start = ($page_no - 1) * $perpage;
+		if ($start < 0)
+		    $start = 0;
 			
-			if(!empty($configuration_search['reseller'])) {				
-				$this->db->where('reseller ', $configuration_search['reseller']);
-			}
-			if(!empty($configuration_search['brand'])) {		
-			$this->db->where('brand', $configuration_search['brand']);
-			}
-			
-			$name_operator = $configuration_search['name_operator'];
-			
-			if(!empty($configuration_search['name'])) {
-				switch($name_operator){
-					case "1":
-					$this->db->like('name', $configuration_search['name']); 
-					break;
-					case "2":
-					$this->db->not_like('name', $configuration_search['name']);
-					break;
-					case "3":
-					$this->db->where('name', $configuration_search['name']);
-					break;
-					case "4":
-					$this->db->where('name <>', $configuration_search['name']);
-					break;
-				}
-			}
-			
-			$value_operator = $configuration_search['value_operator'];
-			
-			if(!empty($configuration_search['value'])) {
-				switch($value_operator){
-					case "1":
-					$this->db->like('value', $configuration_search['value']); 
-					break;
-					case "2":
-					$this->db->not_like('value', $configuration_search['value']);
-					break;
-					case "3":
-					$this->db->where('value', $configuration_search['value']);
-					break;
-					case "4":
-					$this->db->where('value <>', $configuration_search['value']);
-					break;
-				}
-			}
-			
-			$comment_operator = $configuration_search['comment_operator'];
-			
-			if(!empty($configuration_search['comment'])) {
-				switch($comment_operator){
-					case "1":
-					$this->db->like('comment', $configuration_search['comment']); 
-					break;
-					case "2":
-					$this->db->not_like('comment', $configuration_search['comment']);
-					break;
-					case "3":
-					$this->db->where('comment', $configuration_search['comment']);
-					break;
-					case "4":
-					$this->db->where('comment <>', $configuration_search['comment']);
-					break;
-				}
-			}			
-		}
-		
-		$query = $this->db->get('system');
-		
+		$query = $this->system_model->systems_configuration(true,$start, $perpage);
 		if($query->num_rows() > 0)
 		{
-			$perpage = 20;
-			if(isset($_GET['rp']))
-			{
-				$perpage = $_GET['rp'];
-			}
-			
-			if(!isset($_GET['page']))
-			{
-				$json_data['page'] = 1;	
-				$start_from = 0;
-			}
-			else
-			{
-				$json_data['page'] = $_GET['page'];	
-				$start_from = ($json_data['page']-1)*$perpage;
-			}
-			
-			$json_data['total'] = $query->num_rows();
-			
-			if($this->session->userdata('advance_search')==1){
-			$configuration_search =  $this->session->userdata('configuration_search');
-			
-			if(!empty($configuration_search['reseller'])) {				
-				$this->db->where('reseller ', $configuration_search['reseller']);
-			}
-			if(!empty($configuration_search['brand'])) {		
-			$this->db->where('brand', $configuration_search['brand']);
-			}
-			
-			$name_operator = $configuration_search['name_operator'];
-			
-			if(!empty($configuration_search['name'])) {
-				switch($name_operator){
-					case "1":
-					$this->db->like('name', $configuration_search['name']); 
-					break;
-					case "2":
-					$this->db->not_like('name', $configuration_search['name']);
-					break;
-					case "3":
-					$this->db->where('name', $configuration_search['name']);
-					break;
-					case "4":
-					$this->db->where('name <>', $configuration_search['name']);
-					break;
-				}
-			}
-			
-			$value_operator = $configuration_search['value_operator'];
-			
-			if(!empty($configuration_search['value'])) {
-				switch($value_operator){
-					case "1":
-					$this->db->like('value', $configuration_search['value']); 
-					break;
-					case "2":
-					$this->db->not_like('value', $configuration_search['value']);
-					break;
-					case "3":
-					$this->db->where('value', $configuration_search['value']);
-					break;
-					case "4":
-					$this->db->where('value <>', $configuration_search['value']);
-					break;
-				}
-			}
-			
-			$comment_operator = $configuration_search['comment_operator'];
-			
-			if(!empty($configuration_search['comment'])) {
-				switch($comment_operator){
-					case "1":
-					$this->db->like('comment', $configuration_search['comment']); 
-					break;
-					case "2":
-					$this->db->not_like('comment', $configuration_search['comment']);
-					break;
-					case "3":
-					$this->db->where('comment', $configuration_search['comment']);
-					break;
-					case "4":
-					$this->db->where('comment <>', $configuration_search['comment']);
-					break;
-				}
-			}			
-		}
-			$this->db->limit($perpage,$start_from);
-			$query = $this->db->get('system');
-		
+			$system_config_group = $this->config->item('astpp_config');
 			foreach ($query->result_array() as $row)
-			{
+			{			  
 				$json_data['rows'][] = array('cell'=>array(
 					$row['id'],
-					$row['reseller'],
-					$row['brand'],
 					$row['name'],
 					$row['value'],
 					$row['comment'],
+					$system_config_group['system_config_group'][$row['group_title']],
+					$row['reseller'],
+					$row['brand'],
 					$this->get_action_buttons($row['id'])
 				));
 			}
 		}
-		
 		echo json_encode($json_data);			
 	}
 	
 	
 	function get_action_buttons($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
 		$ret_url = '';
-		$ret_url = '<a href="'.base_url().'systems/configuration/edit/'.$id.'/" class="icon" rel="facebox" '.$update_style.' title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="'.base_url().'systems/configuration/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="'.base_url().'systems/configuration/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+// 		$ret_url .= '<a href="'.base_url().'systems/configuration/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}	
 	
@@ -590,14 +452,14 @@ class Systems extends CI_Controller
 			{
 		
 				$json_data['rows'][] = array('cell'=>array(
-										$row['taxes_priority'],
-										$this->common_model->calculate_currency($row['taxes_amount']),
-										$this->common_model->format_currency($row['taxes_rate']),
-										$row['taxes_description'],
-										$row['last_modified'],
-										$row['date_added'],
-										$this->get_action_buttons_taxes($row['taxes_id'])
-									));
+								  $row['taxes_priority'],
+								  $this->common_model->calculate_currency($row['taxes_amount']),
+								  $this->common_model->format_currency($row['taxes_rate']),
+								  $row['taxes_description'],
+								  $row['last_modified'],
+								  $row['date_added'],
+								  $this->get_action_buttons_taxes($row['taxes_id'])
+							  ));
 			}
 		}
 		echo json_encode($json_data);			
@@ -605,12 +467,10 @@ class Systems extends CI_Controller
 	
 	
 	function get_action_buttons_taxes($id)
-	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+	{		    	
 		$ret_url = '';
-		$ret_url = '<a href="/systems/taxes/edit/'.$id.'/" class="icon" '.$update_style.' rel="facebox" title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/systems/taxes/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/systems/taxes/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/systems/taxes/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -762,11 +622,9 @@ class Systems extends CI_Controller
         
         
         function get_action_buttons_tem($id)
-	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-                $delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+	{		
 		$ret_url = '';
-		$ret_url = '<a href="'.base_url().'systems/template/edit/'.$id.'/" class="icon"  '.$update_style.' title="Update">&nbsp;</a>';
+		$ret_url = '<a href="'.base_url().'systems/template/edit/'.$id.'/" class="icon edit_image" title="Update">&nbsp;</a>';
 		return $ret_url;
 	}
         function get_action_button($accountid)

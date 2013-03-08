@@ -26,7 +26,7 @@
     <form action="<?=base_url()?><?=isset($did)?"did/manage/edit":"did/manage/add"?>" id="frm_manage_did" method="POST" enctype="multipart/form-data">
       <ul>
         <div style="width:400px; float:left; padding:5px;">
-          <fieldset  style="width:400px;">
+          <fieldset  style="width:370px;">
             <legend><span style="font-size:14px; font-weight:bold; color:#000;">DID Information</span></legend>
             <li>
               <label class="desc">Number:</label>
@@ -92,7 +92,7 @@
           </fieldset>
         </div>
         <div style="width:400px; float:left; padding:5px; margin-left:10px;">
-          <fieldset  style="width:385px;">
+          <fieldset  style="width:370px;">
             <legend><span style="font-size:14px; font-weight:bold; color:#000;">DID Billing</span></legend>
             <?php if($this->session->userdata('logintype') != 1){?>
             <li>
@@ -145,10 +145,11 @@
                 <option value="0" <?php if(@$did['limittime'] == "0"){ echo "selected='selected'";}?> >NO</option>
               </select>
             </li>
-            <li>
+            <!--<li>
               <label class="desc">Variables:</label>
               <input type="text" class="text field medium" name="variables"  size="60"  value="<?=@$did['variables']?>"/>
-            </li>
+            </li>-->
+            <input type="hidden" class="text field medium" name="variables"  size="60"  value=""/>
             <li>
               <label class="desc">Bill on Allocation:</label>
               <select name="chargeonallocation" class="select field medium" >
@@ -158,8 +159,8 @@
             </li>
           </fieldset>
         </div>
-        <div style="width:400px; float:left; padding:5px; margin-top:-165px;">
-          <fieldset  style="width:400px;">
+        <div style="width:400px; float:left; padding:5px; margin-top:-220px;">
+          <fieldset  style="width:370px;">
             <legend><span style="font-size:14px; font-weight:bold; color:#000;">DID Setting</span></legend>
             <li>
               <label class="desc">Dialstring:</label>
@@ -179,10 +180,11 @@
               </select>
             </li>
             <?php }?>
-            <li>
+            <input type="hidden" class="text field medium" name="dial_as"   value=""/>
+            <!--<li>
               <label class="desc">Dial As:</label>
               <input type="text" class="text field medium" name="dial_as"   value="<?=@$did['dial_as']?>"/>
-            </li>
+            </li>-->
           </fieldset>
         </div>
       </ul>

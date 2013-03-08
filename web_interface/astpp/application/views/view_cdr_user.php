@@ -2,10 +2,6 @@
 
 	<? startblock('extra_head') ?>
 
-<!--flexigrid css & js-->
-<link rel="stylesheet" href="<?=base_url()?>css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="<?=base_url()?>js/flexigrid.js"></script>
-
 <script type="text/javascript" language="javascript">
 function get_alert_msg(id)
 {
@@ -47,12 +43,12 @@ $("#flex1").flexigrid({
     sortname: "id",
 	sortorder: "asc",
 	usepager: true,
-	resizable: false,
+	resizable: true,
 	useRp: true,
 	rp: 10,
 	showTableToggleBtn: false,
 	width: "auto",
-	height: 250,
+	height: "auto",	
     pagetext: 'Page',
     outof: 'of',
     nomsg: 'No items',
@@ -250,7 +246,7 @@ function reload_button()
     </form>
     </div>
 </div>
-<div style="float:right;"><strong><a href="/userReports/export_cdr_user_xls">Export XLS <img src="/images/file_tree/xls.png" alt='XLS'/></a> | <a href="/userReports/export_cdr_user_pdf">Export PDF <img src="/images/file_tree/pdf.png" alt='PDF'/></a></strong></div>
+<div style="float:right;"><strong><a href="/userReports/export_cdr_user_xls">Export XLS <img src="/assets/images/file_tree/xls.png" alt='XLS'/></a> | <a href="/userReports/export_cdr_user_pdf">Export PDF <img src="/assets/images/file_tree/pdf.png" alt='PDF'/></a></strong></div>
 <br/><br/>
 <?php 
 	//echo $form;

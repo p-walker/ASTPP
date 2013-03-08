@@ -18,7 +18,7 @@ class Curl
 	
 	//public $perl_base_url = "http://vm8.pssvoip.co.za/cgi-bin/astpp-admin/";	
 	//$this->config->base_url();
-	public $perl_base_url = "cgi-bin/astpp-admin/";
+	public $perl_base_url = "/cgi-bin/astpp-admin/";
    
 	/**
 	* Adds a cURL session to stack
@@ -61,6 +61,7 @@ class Curl
 		}
 		
 		$this->setOpts($opts);
+		
 	}
 	
 	/**
@@ -292,19 +293,20 @@ class Curl
 		$this->ci =& get_instance();
     	$this->ci->config->load('config');
 	    $this->perl_url = $this->ci->config->item('perl_url');		
+		$this->perl_url = "http://localhost/cgi-bin/astpp-admin/";
 		//echo $perl_base_url = $this->config->item('perl_url', 'perl_auth');
 		//exit;
 		//$url = base_url().$this->perl_base_url . $function;	
 			
 		$url = $this->perl_url . $function;
-		
 		$post_data = "";
 		foreach($data as $filed=>$value)
 		{
 			$post_data .= "&".$filed."=".$value;
 		}
 
-		$post_data = substr($post_data,1);
+		$post_data = substr($post_data,1);	
+//echo $url.$post_data;exit;	
 		$this->addSession($url,'POST',false,false,$post_data);
 	   	$result = $this->exec();
 		$this->clear();

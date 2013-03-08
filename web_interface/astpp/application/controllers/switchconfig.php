@@ -10,7 +10,7 @@ class Switchconfig extends CI_Controller
 		$this->load->helper('form');
 		$this->load->helper('romon');
 		$this->load->library('astpp');	
-
+		$this->load->library('freeswitch');	
 		$this->load->library('session');
 		$this->load->library('form_builder');
 		
@@ -18,7 +18,7 @@ class Switchconfig extends CI_Controller
 		
 		$this->load->model('switch_config_model');
 		$this->load->model('Astpp_common');
-        $this->load->model('accounts_model');
+		$this->load->model('accounts_model');
 		
 		if($this->session->userdata('user_login')== FALSE)
 			redirect(base_url().'astpp/login');
@@ -142,12 +142,12 @@ class Switchconfig extends CI_Controller
 				{				
 					$this->switch_config_model->edit_switch($_POST);
 					$this->session->set_userdata('astpp_notification', 'Switch Configuration updated successfully!');
-					redirect(base_url().'switchconfig/fssipdevices');				
+					redirect(base_url().'switchconfig/fssipdevices');
 				}
 				else 
 				{
 					$this->session->set_userdata('astpp_errormsg', $errors);
-					redirect(base_url().'switchconfig/fssipdevices');				
+					redirect(base_url().'switchconfig/fssipdevices');
 				}
 			}	
 			else
@@ -250,6 +250,8 @@ class Switchconfig extends CI_Controller
 				$row['fs_password']     = $deviceinfo['password'];
 				$row['vm_password']   = $deviceinfo['vm_password'];
 				$row['accountcode']  = $deviceinfo['accountcode'];
+				$row['effective_caller_id_name']  = $deviceinfo['effective_caller_id_name'];
+				$row['effective_caller_id_number']  = $deviceinfo['effective_caller_id_number'];
 				$row['context']      = $deviceinfo['context'];
 				
 				array_push($device_list, $row);				
@@ -266,6 +268,8 @@ class Switchconfig extends CI_Controller
 					$value['fs_password'],
 					$value['vm_password'],
 					$value['accountcode'],
+					$value['effective_caller_id_name'],
+					$value['effective_caller_id_number'],
 					$value['context'],
 					$this->get_action_buttons_fssipdevices($value['directory_id'])
 				));
@@ -276,11 +280,9 @@ class Switchconfig extends CI_Controller
 	
 	function get_action_buttons_fssipdevices($id)
 	{
-		$update_style = 'style="text-decoration:none;background-image:url(/images/page_edit.png);"';
-    	$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
 		$ret_url = '';
-		$ret_url = '<a href="/switchconfig/fssipdevices/edit/'.$id.'/" class="icon" rel="facebox" '.$update_style.' title="Update">&nbsp;</a>';
-		$ret_url .= '<a href="/switchconfig/fssipdevices/delete/'.$id.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url = '<a href="/switchconfig/fssipdevices/edit/'.$id.'/" class="icon edit_image" rel="facebox" title="Update">&nbsp;</a>';
+		$ret_url .= '<a href="/switchconfig/fssipdevices/delete/'.$id.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 		return $ret_url;
 	}
 	
@@ -319,9 +321,9 @@ class Switchconfig extends CI_Controller
         
 	function get_action_buttons_acl_list($id, $account)
 	{
-		$delete_style = 'style="text-decoration:none;background-image:url(/images/delete.png);"';
+		
 		$ret_url = '';
-		$ret_url .= '<a href="/switchconfig/acl_list/delete/'.$id.'/'.$account.'/" class="icon" '.$delete_style.' title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
+		$ret_url .= '<a href="/switchconfig/acl_list/delete/'.$id.'/'.$account.'/" class="icon delete_image" title="Delete" onClick="return get_alert_msg();">&nbsp;</a>';
 				return $ret_url;
 	}
 	
@@ -348,7 +350,7 @@ class Switchconfig extends CI_Controller
 	$page_no = $_GET['page']=1; 
 	
 	$json_data = array();
-	$json_data['page'] = $page_no;			
+	$json_data['page'] = $page_no;
 	$json_data['total'] = ($config['total_rows']>0) ? $config['total_rows'] : 0;	
 				
 	$perpage = $config['per_page'];
@@ -379,15 +381,83 @@ class Switchconfig extends CI_Controller
 	
 	foreach($acl_list as $key => $value)	{
 				$json_data['rows'][] = array('cell'=>array(
-									$value['account'],		
-									$value['ip'],
-				$value['prefix'],
-				$value['context'],
-									$value['created_date'],    
-									$this->get_action_buttons_acl_list($value['ip'],$value['account'])
-			));
+				    $value['account'],		
+				    $value['ip'],
+				    $value['prefix'],
+				    $value['context'],
+				    $value['created_date'],    
+				    $this->get_action_buttons_acl_list($value['ip'],$value['account'])
+			      ));
 	}
 	echo json_encode($json_data);			
-}
+    }
+    
+    function live_call_report()
+    {
+	  $data['app_name'] = 'ASTPP - Open Source Billing Solution | Freeswitch | Live Call reports';
+	  $data['username'] = $this->session->userdata('user_name');
+	  $data['page_title'] = 'Live Call Reports';	
+			  
+	  $this->load->view('view_switchconf_livecall_report',$data);
+    }
+    
+    function live_call_report_grid()
+    {	
+	$fp = $this->freeswitch->event_socket_create(COMMON_MODEL::$global_config['system_config']['freeswitch_host'], COMMON_MODEL::$global_config['system_config']['freeswitch_port'], COMMON_MODEL::$global_config['system_config']['freeswitch_password']); 
+	$cmd = "api show channels";
+	$response = $this->freeswitch->event_socket_request($fp, $cmd); 	
+	$data = explode ("\n",$response);
+	$calls = array();
+	$calls_final = array();
+	$data_header = array();
+	$k=0;
+	for($i=0;$i<count($data)-2;$i++)
+	{
+	    if(trim($data[$i])!='')
+	    {
+		if($i==1)
+		{
+		    $data_header = explode (",",$data[$i]);
+		}else{
+		    $data_call = explode (",",$data[$i]);		    
+		    for($j=0;$j<count($data_call);$j++)
+		    {
+			$calls[$k][$data_header[$j]]=$data_call[$j];
+			$calls_final[$calls[$k]['uuid']] = $calls[$k];
+		    }
+		    $k++;
+		}
+	    }
+	}	
+	
+	$json_data = array();	
+	$count = 0;
+	//for($i=0;$i<count($calls)-1;$i++)
+	foreach($calls as $key => $value)
+	{	    
+	      if(isset($value['state']) && $value['state']=='CS_EXCHANGE_MEDIA')
+	      {		    
+		    $calls[$i]['application'] = $calls_final[$value['call_uuid']]['application'];
+		    $calls[$i]['application_data'] = $calls_final[$value['call_uuid']]['application_data'];		    
+		    $json_data['rows'][] = array('cell'=>array(
+			$value['created'],
+			$value['cid_name'],
+			$value['cid_num'],
+			$value['ip_addr'],
+			$value['dest'],
+			$calls[$i]['application_data'],
+			$value['read_codec'],
+			$value['write_codec'],
+			$value['callstate']
+		  ));
+		  $count++;
+	      }else{
+		    unset($calls[$i]);
+	      }
+	}
+	$json_data['total'] = $count;
+	fclose($fp);
+	echo json_encode($json_data);	
+    }	
 }
 ?>

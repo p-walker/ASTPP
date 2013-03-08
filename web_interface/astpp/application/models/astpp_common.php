@@ -1135,7 +1135,7 @@ class Astpp_common extends CI_Model
 		
 	function get_charge($chargeid)
 	{
-    	$tmp = "SELECT * FROM charges WHERE id = ". $this->quote($chargeid). " AND status < 2 LIMIT 1";
+    	$tmp = "SELECT * FROM charges WHERE id = ". $this->quote($chargeid). " AND status < 2 LIMIT 1";	
 		
     	return $this->db_get_arrays($tmp);
 	}
@@ -1260,7 +1260,7 @@ class Astpp_common extends CI_Model
 		$resellerdidlist_second = $this->list_dids_number_account($accountinfo['reseller']);
 		//$didlist  += $resellerdidlist;
 		
-		$didlist = array_merge($didlist_ist, $resellerdidlist_second);
+		//$didlist = array_merge($didlist_ist, $resellerdidlist_second);
 		
 		$availabledids = array();
 		if ($accountinfo['reseller']  != "") 
@@ -1290,7 +1290,7 @@ class Astpp_common extends CI_Model
 		}
 	    else 
 	    {
-			$didlist[] = array_merge($didlist_ist, $resellerdidlist_second);
+			$didlist[] = array_unique(array_merge($didlist_ist, $resellerdidlist_second));
 			return $didlist;
 		}		
 	}

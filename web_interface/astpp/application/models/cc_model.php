@@ -13,7 +13,7 @@ class Cc_model extends CI_Model
 		$data['mode'] = "Add Cards";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function add_brand($data)
@@ -23,7 +23,7 @@ class Cc_model extends CI_Model
 		$data['mode'] = "CC Brands";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function refill_card($data)
@@ -33,7 +33,7 @@ class Cc_model extends CI_Model
 		$data['mode'] = "Refill Card";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function remove_card($data)
@@ -44,7 +44,7 @@ class Cc_model extends CI_Model
 		$data['action'] = "Delete";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function reset_card($data)
@@ -55,7 +55,7 @@ class Cc_model extends CI_Model
 		$data['action'] = "Reset";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function update_status_card($data)
@@ -65,17 +65,18 @@ class Cc_model extends CI_Model
 		$data['mode'] = "Update Card(s) Status";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}			
 	
 	function get_brand_by_name($name)
 	{
+		$name = urldecode($name);
 		$this->db->where("name",$name);
 		$query = $this->db->get("callingcardbrands");
 
 		if($query->num_rows() > 0)
 		return $query->row_array();
-		else 
+		  else 
 		return false;
 	}
 	
@@ -139,7 +140,7 @@ class Cc_model extends CI_Model
 		$data['mode'] = "Process Payment";		
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function edit_brand($data)
@@ -149,7 +150,7 @@ class Cc_model extends CI_Model
 		$data['mode'] = "CC Brands";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function remove_brand($data)
@@ -160,7 +161,7 @@ class Cc_model extends CI_Model
 		$data['action'] = "Delete...";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
 	}
 	
 	function getUserCountCC()
@@ -923,7 +924,7 @@ class Cc_model extends CI_Model
 		$data['mode'] = "Add CC CallerID";		
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');
-		$this->curl->sendRequestToPerlScript($url,$data);
+		return $this->curl->sendRequestToPerlScript($url,$data);
             
         }
         function cc_get_callerid($card_number)

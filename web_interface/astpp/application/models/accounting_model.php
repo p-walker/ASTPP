@@ -267,13 +267,10 @@ class Accounting_model extends CI_Model {
             return false;
     }
 
-    /**
-     * -------Here we write code for model accounting functions getAccount_invoiceList------
-     * this function write to get invoice list from database
-     */
-    function getAccount_invoiceList($start, $limit) {
-        $myflag = false;
-        if ($this->session->userdata('advance_search') == 1) {
+    function build_invoicelist_search()
+    {
+	$myflag = false; 
+	if ($this->session->userdata('advance_search') == 1) {
 
             $invoice_search = $this->session->userdata('invoice_search');
 
@@ -322,11 +319,17 @@ class Accounting_model extends CI_Model {
                 }
             }
         }
-
+        return $myflag;
+    }
+    /**
+     * -------Here we write code for model accounting functions getAccount_invoiceList------
+     * this function write to get invoice list from database
+     */
+    function getAccount_invoiceList($flag, $start=0, $limit=0) {
+        
+	$myflag = $this->build_invoicelist_search();
+	
         if ($this->session->userdata['logintype'] == 1 && $myflag == false) {
-//                $account_number = $this->session->userdata['accountinfo']['number'];
-//                $this->db->where('accounts.reseller',$account_number);
-//                $this->db->or_where('accounts.number',$account_number);
             $this->db->where('accounts.number', $this->session->userdata['accountinfo']['number']);
         }
 
@@ -334,9 +337,23 @@ class Accounting_model extends CI_Model {
         $this->db->from('invoice_list_view', 'accounts');
         $this->db->order_by('invoice_list_view.accountid');
         $this->db->join('accounts', 'accounts.accountid = invoice_list_view.accountid');
-        $query = $this->db->get();
-
+        
+        if($flag)
+	{	    
+	    $this->db->limit($limit,$start);
+	    $query = $this->db->get();
+	}else{
+	    $query = $this->db->count_all_results();
+	}
         return $query;
     }
+    function delete_invoice_by_id($invoiceid){
+        $this->db->where('invoiceid',$invoiceid);
+        $this->db->delete('invoices');
 
+        $this->db->where('invoices_id',$invoiceid);
+        $this->db->delete('invoices_total');
+
+        return true;
+    }
 }

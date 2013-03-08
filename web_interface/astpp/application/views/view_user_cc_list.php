@@ -1,7 +1,6 @@
 <? extend('user_master.php') ?>
 	<? startblock('extra_head') ?>
-<link rel="stylesheet" href="/css/flexigrid.css" type="text/css" />
-<script type="text/javascript" src="/js/flexigrid.js"></script>
+
 <script type="text/javascript" language="javascript">
 function get_alert_msg(type)
 {
@@ -63,7 +62,7 @@ $("#flex1").flexigrid({
 
 	usepager: true,
 
-	resizable: false,
+	resizable: true,
 
 	useRp: true,
 
@@ -73,7 +72,7 @@ $("#flex1").flexigrid({
 
 	width: "auto",
 
-	height: 300,
+	height: "auto",	
 
     pagetext: 'Page',
 

@@ -14,7 +14,7 @@ class System_model extends CI_Model
 		$data['action'] = "Add Item";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function edit_config($data)
@@ -25,7 +25,7 @@ class System_model extends CI_Model
 		$data['action'] = "Save Item";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function get_config_by_id($id)
@@ -48,7 +48,7 @@ class System_model extends CI_Model
 		$data['action'] = "Delete";
 		$data['logintype'] = $this->session->userdata('logintype');
 		$data['username'] = $this->session->userdata('username');		
-		$this->curl->sendRequestToPerlScript($url,$data);		
+		return $this->curl->sendRequestToPerlScript($url,$data);		
 	}
 	
 	function add_tax($data)
@@ -351,14 +351,10 @@ class System_model extends CI_Model
 
 			if(!empty($templatesearch['accountid'])) {
 				 $this->db->like('accountid', $templatesearch['accountid']); 
-			}
-                        
-                        
-                   
-                                                             
+			}                                              
         }
     
-        if ($this->session->userdata['userlevel_logintype'] == 1 || $this->session->userdata['userlevel_logintype'] == 4 || $this->session->userdata['userlevel_logintype'] == 5) {
+      if ($this->session->userdata['userlevel_logintype'] == 1 || $this->session->userdata['userlevel_logintype'] == 4 || $this->session->userdata['userlevel_logintype'] == 5) {
             $acountid = $this->session->userdata['accountinfo']['accountid'];
             $this->db->where('accountid', $acountid);
         }
@@ -390,28 +386,95 @@ class System_model extends CI_Model
         $this->db->update('templates', $updatedata);
         return true;
     }
-//
-//    function search() {
-//      
-//        if ($data['template_name'] != 'NULL' && $data['template_name'] != NULL) {
-//            $this->db->like('name', $data['template_name']);
-//            
-//        }
-//          if ($data['subject'] != 'NULL' && $data['subject'] != NULL) {
-//            $this->db->like('subject', $data['subject']);
-//        }
-//
-//          if ($data['template'] != 'NULL' && $data['template'] != NULL) {
-//            $this->db->like('template', $data['template']);
-//        }
-////
-//          if ($data['accountid'] != 'NULL' && $data['accountid'] != NULL) {
-//            $this->db->like('accountid', $data['accountid']);
-//        }
-//        
-//      $query = $this->db->get('templates');
-//      return $query;
-//       
-//    }
+  
+    function build_systems_configuration()
+    {
+	if($this->session->userdata('advance_search')==1){
+		$configuration_search =  $this->session->userdata('configuration_search');
+		
+		if(!empty($configuration_search['reseller'])) {				
+			$this->db->where('reseller ', $configuration_search['reseller']);
+		}
+		if(!empty($configuration_search['brand'])) {		
+		    $this->db->where('brand', $configuration_search['brand']);
+		}		
+		if(!empty($configuration_search['group_title'])) {		
+		    $this->db->where('group_title', $configuration_search['group_title']);
+		}
+		
+		$name_operator = $configuration_search['name_operator'];
+		
+		if(!empty($configuration_search['name'])) {
+			switch($name_operator){
+				case "1":
+				$this->db->like('name', $configuration_search['name']); 
+				break;
+				case "2":
+				$this->db->not_like('name', $configuration_search['name']);
+				break;
+				case "3":
+				$this->db->where('name', $configuration_search['name']);
+				break;
+				case "4":
+				$this->db->where('name <>', $configuration_search['name']);
+				break;
+			}
+		}
+		
+		$value_operator = $configuration_search['value_operator'];
+		
+		if(!empty($configuration_search['value'])) {
+			switch($value_operator){
+				case "1":
+				$this->db->like('value', $configuration_search['value']); 
+				break;
+				case "2":
+				$this->db->not_like('value', $configuration_search['value']);
+				break;
+				case "3":
+				$this->db->where('value', $configuration_search['value']);
+				break;
+				case "4":
+				$this->db->where('value <>', $configuration_search['value']);
+				break;
+			}
+		}
+		
+		$comment_operator = $configuration_search['comment_operator'];
+		
+		if(!empty($configuration_search['comment'])) {
+			switch($comment_operator){
+				case "1":
+				$this->db->like('comment', $configuration_search['comment']); 
+				break;
+				case "2":
+				$this->db->not_like('comment', $configuration_search['comment']);
+				break;
+				case "3":
+				$this->db->where('comment', $configuration_search['comment']);
+				break;
+				case "4":
+				$this->db->where('comment <>', $configuration_search['comment']);
+				break;
+			}
+		}
+		
+		
+	}
+    }
+    function systems_configuration($flag, $start='', $limit='')
+    {
+	$this->build_systems_configuration();
+	$this->db->from('system');
+	if($flag)
+	{
+	    $this->db->order_by("id ASC"); 
+	    $this->db->limit($limit,$start);
+	    $query = $this->db->get();
+	}else{
+	    $query = $this->db->count_all_results();
+	}	
+	return $query;
+    }
 }
 ?>
