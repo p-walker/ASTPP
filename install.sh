@@ -406,7 +406,7 @@ install_astpp_onCentOS () {
 	git clone https://github.com/ASTPP/ASTPP.git
 
 	# Install ASTPP pre-requisite packages using YUM
-	yum install -y autoconf automake bzip2 cpio curl curl-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel libxml2 libxml2-devel openssl openssl-devel gettext-devel libtool fileutils gcc-c++ httpd httpd-devel
+	yum install -y cpan autoconf automake bzip2 cpio curl curl-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel libxml2 libxml2-devel openssl openssl-devel gettext-devel libtool fileutils gcc-c++ httpd httpd-devel
 
 	
 	cd ${ASTPP_SOURCE_DIR}
