@@ -297,7 +297,7 @@ yum install -y git
 yum clean all
 
 # Install Freeswitch pre-requisite packages using YUM
-yum install -y autoconf automake  expat-devel gnutls-devel libtiff-devel libX11-devel unixODBC-devel python-devel zlib-devel libzrtpcpp-devel alsa-lib-devel libogg-devel libvorbis-devel perl perl-libs gdbm-devel libdb-devel uuid-devel @development-tools gdbm-devel db4-devel libjpeg libjpeg-devel libtermcap libtermcap-devel ncurses ncurses-devel ntp screen sendmail sendmail-cf gcc-c++ libtool
+yum install -y autoconf automake  expat-devel gnutls-devel libtiff-devel libX11-devel unixODBC-devel python-devel zlib-devel libzrtpcpp-devel alsa-lib-devel libogg-devel libvorbis-devel perl perl-libs libdb-devel uuid-devel @development-tools gdbm-devel db4-devel libjpeg libjpeg-devel libtermcap libtermcap-devel ncurses ncurses-devel ntp screen sendmail sendmail-cf gcc-c++ libtool
 apt-get -y install apache2 autoconf automake build-essential chkconfig dmidecode g++ gawk git-core git-core gnutls-bin libapache2-mod-php5 libncurses5 libjpeg62-dev libmyodbc libncurses5-dev libtool libtool libxml2 lua5.1 make bsd-mailx mysql-server php-apc php5 php5-gd php5-mcrypt php5-mhash php5-mysql pkg-config python-dev unixodbc-dev
 
 # i think i need to install also next packages
@@ -406,7 +406,7 @@ install_astpp_onCentOS () {
 	git clone https://github.com/ASTPP/ASTPP.git
 
 	# Install ASTPP pre-requisite packages using YUM
-	yum install -y cpan autoconf automake bzip2 cpio curl curl-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel libxml2 libxml2-devel openssl openssl-devel gettext-devel libtool fileutils gcc-c++ httpd httpd-devel
+	yum install -y cpan autoconf automake bzip2 cpio curl curl-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel libxml2 libxml2-devel openssl openssl-devel gettext-devel libtool fileutils gcc-c++ httpd httpd-devel YAML
 
 	
 	cd ${ASTPP_SOURCE_DIR}

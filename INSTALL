@@ -10,7 +10,7 @@
     
       yum clean all
       
-      yum install autoconf automake  expat-devel gnutls-devel libtiff-devel libX11-devel unixODBC-devel python-devel zlib-devel libzrtpcpp-devel alsa-lib-devel libogg-devel libvorbis-devel perl perl-libs gdbm-devel libdb-devel uuid-devel @development-tools gdbm-devel db4-devel libjpeg libjpeg-devel libtermcap libtermcap-devel ncurses ncurses-devel ntp screen sendmail sendmail-cf gcc-c++
+      yum install cpan autoconf automake  expat-devel gnutls-devel libtiff-devel libX11-devel unixODBC-devel python-devel zlib-devel libzrtpcpp-devel alsa-lib-devel libogg-devel libvorbis-devel perl perl-libs libdb-devel uuid-devel @development-tools gdbm-devel db4-devel libjpeg libjpeg-devel libtermcap libtermcap-devel ncurses ncurses-devel ntp screen sendmail sendmail-cf gcc-c++
     
     * Download latest freeswitch version 
       cd /usr/local/src       
@@ -47,7 +47,7 @@
     
     2. * Install ASTPP pre-requisite packages using YUM
 	      
-	yum install bzip2 cpio curl curl-devel fileutils gettext-devel libtool make nmap openssl openssl-devel libxml2 libxml2-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel
+	yum install bzip2 cpio curl curl-devel fileutils gettext-devel libtool make nmap openssl openssl-devel libxml2 libxml2-devel php php-devel php-common php-cli php-gd php-pear php-mysql php-pdo php-pecl-json mysql mysql-server mysql-devel YAML
     
     3. Goto ASTPP Folder & Run Make Command
 	1. cd ASTPP
