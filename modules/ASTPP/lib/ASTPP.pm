@@ -452,7 +452,10 @@ sub fs_dialplan_xml_bridge() {
 	$dialstring .= "<action application=\"set\" data=\"outbound_route=" . $arg{route_id} . "\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"trunk=" . $trunkdata->{name} . "\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"provider=" . $trunkdata->{provider} . "\"/>\n";
-	$dialstring .= "<action application=\"limit\" data=\"db ".$trunkdata->{path}." gw_".$trunkdata->{path}." ".$trunkdata->{maxchannels}."\"/>\n";
+	if($trunkdata->{maxchannels} > 0)
+	{
+	  $dialstring .= "<action application=\"limit\" data=\"db ".$trunkdata->{path}." gw_".$trunkdata->{path}." ".$trunkdata->{maxchannels}."\"/>\n";
+	}
 	$dialstring .= "<action application=\"bridge\" data=\"";
 	if ( $trunkdata->{tech} eq "Zap" ) {
 		$dialstring .= "openzap/" . $trunkdata->{path} . "/1/" . $arg{route_prepend} . $arg{destination_number}; 
