@@ -438,11 +438,14 @@ sub fs_dialplan_xml_bridge() {
 		}
 	}
 	
-	$callcount = `/usr/local/bin/fs_cli -x 'limit_usage db $trunkdata->{path} gw_$trunkdata->{path}'`;      
-	$callcount = &trim($callcount);
-	if($trunkdata->{maxchannels} > 0 && $callcount >= $trunkdata->{maxchannels})
-	{	  
-	    return "";
+	if($trunkdata->{maxchannels} > 0)
+	{
+	    $callcount = `/usr/local/bin/fs_cli -x 'limit_usage db $trunkdata->{path} gw_$trunkdata->{path}'`;      
+	    $callcount = &trim($callcount);
+	    if($callcount >= $trunkdata->{maxchannels})
+	    {	  
+		return "";
+	    }
 	}
 		
 	$dialstring .= "<action application=\"set\" data=\"calltype=STANDARD\"/>\n";
