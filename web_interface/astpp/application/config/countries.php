@@ -285,8 +285,7 @@ $config['timezone_list'] =  array(
 
 
 $config['timezone1_list'] =  array(
-'America/Panama' => 'America/Panama',
-/*'Africa/Abidjan' => 'Africa/Abidjan',
+'Africa/Abidjan' => 'Africa/Abidjan',
 'Africa/Accra' => 'Africa/Accra',
 'Africa/Addis_Ababa' => 'Africa/Addis_Ababa',
 'Africa/Algiers' => 'Africa/Algiers',
@@ -737,7 +736,7 @@ $config['timezone1_list'] =  array(
 
 'Pacific/Wallis' => 'Pacific/Wallis',
 'UTC' => 'UTC',
-'WET' => 'WET'*/
+'WET' => 'WET'
 );
 
 $config['language_list'] = array(

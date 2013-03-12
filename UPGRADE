@@ -4,21 +4,23 @@
 
 Note : Please make sure to take full backup of your existing setup.
 
+1. Install cpan package
+    cpan -fi JSON
 
-1. Upgrade database :
+2. Upgrade database :
    
    cd <LATEST SOURCE OF ASTPP>/sql
    
    mysql -u <DATABASE USERNAME> --password="<DATABASE PASSWORD>" astpp < astpp-upgrade-1.7.2.sql
 
-2. Upgrade GUI :
+3. Upgrade GUI :
 
   cd <LATEST SOURCE OF ASTPP>/web_interface
     
   cp -rf astpp /var/www/html/
   cp -rf astpp-wraper.cgi /var/www/cgi-bin/astpp-admin/ 
 
-3. Upgrade Scripts :
+4. Upgrade Scripts :
 
   cd <LATEST SOURCE OF ASTPP>
   

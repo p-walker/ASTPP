@@ -15,8 +15,7 @@ class Curl
 					CURLOPT_FOLLOWLOCATION=>1,
 					CURLOPT_RETURNTRANSFER=>1,
 					CURLOPT_AUTOREFERER=> true );	
-	
-	//public $perl_base_url = "http://vm8.pssvoip.co.za/cgi-bin/astpp-admin/";	
+		
 	//$this->config->base_url();
 	public $perl_base_url = "/cgi-bin/astpp-admin/";
    
@@ -287,16 +286,10 @@ class Curl
 	}
 	
 	function sendRequestToPerlScript($function,$data)
-	{
-		//$this->ci =& get_instance();
-		//$this->ci->load->config('perl_auth', TRUE);
+	{		
 		$this->ci =& get_instance();
-    	$this->ci->config->load('config');
-	    $this->perl_url = $this->ci->config->item('perl_url');		
-		$this->perl_url = "http://localhost/cgi-bin/astpp-admin/";
-		//echo $perl_base_url = $this->config->item('perl_url', 'perl_auth');
-		//exit;
-		//$url = base_url().$this->perl_base_url . $function;	
+		$this->ci->config->load('config');
+		$this->perl_url = $this->ci->config->item('perl_url');				
 			
 		$url = $this->perl_url . $function;
 		$post_data = "";
@@ -306,7 +299,6 @@ class Curl
 		}
 
 		$post_data = substr($post_data,1);	
-//echo $url.$post_data;exit;	
 		$this->addSession($url,'POST',false,false,$post_data);
 	   	$result = $this->exec();
 		$this->clear();
