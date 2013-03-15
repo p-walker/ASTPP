@@ -23,7 +23,7 @@ echo "Enter ASTPP Database Name : "
 read astpp_dbname
 
 mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname < astpp-1.7.1.sql
-mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname < astpp-1.7.2.sql
+mysql --user=$astpp_username --password=$astpp_password --host=$astpp_hostname $astpp_dbname < astpp-upgrade-1.7.2.sql
 
 echo "";
 read -n 1 -p "Press 0 For Freeswitch & Press 1 For Asterisk [Default:0]: ";
