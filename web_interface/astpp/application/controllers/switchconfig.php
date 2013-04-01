@@ -333,63 +333,63 @@ class Switchconfig extends CI_Controller
 	 */
 	function acl_grid()
 	{
-	$json_data = array();
-	$json_data['page'] = 1;	
-	$json_data['total'] = 1;
-	
-	$domain = "";
+	    $json_data = array();
+	    $config['per_page'] = $_GET['rp'];
+	    $page_no = $_GET['page']; 	
+	    $domain = "";
 
-			$ip_list = "SELECT * FROM ip_map ";
-			$this->db_astpp = $this->load->database('default',TRUE);
-			$query1 = $this->db_astpp->query($ip_list);
-	$count_all = $query1->num_rows();
-	
-	$config['total_rows'] = $count_all;			
-	$config['per_page'] = $_GET['rp']=10;
+	    $ip_list = "SELECT * FROM ip_map ";
+	    $this->db_astpp = $this->load->database('default',TRUE);
+	    $query1 = $this->db_astpp->query($ip_list);
+	    
+	    $count_all = $query1->num_rows();
+	    
+	    $config['total_rows'] = $count_all;			
+	    $config['per_page'] = $_GET['rp']=10;
 
-	$page_no = $_GET['page']=1; 
+	    $page_no = $_GET['page']=1; 
+	    
+	    $json_data = array();
+	    $json_data['page'] = $page_no;
+	    $json_data['total'] = ($config['total_rows']>0) ? $config['total_rows'] : 0;	
+				    
+	    $perpage = $config['per_page'];
+	    $start = ($page_no-1) * $perpage;
+	    if($start < 0 )
+	    $start = 0;
+	  
+	  
+	  $query = $this->db_astpp->query($ip_list. " limit $start, $perpage");		 
+	  
+	  $acl_list = array();
 	
-	$json_data = array();
-	$json_data['page'] = $page_no;
-	$json_data['total'] = ($config['total_rows']>0) ? $config['total_rows'] : 0;	
-				
-	$perpage = $config['per_page'];
-	$start = ($page_no-1) * $perpage;
-	if($start < 0 )
-	$start = 0;
-	
-	
-	$query = $this->db_astpp->query($ip_list. " limit $start, $perpage");		 
-	
-	$acl_list = array();
-	
-	if($query->num_rows() > 0)
-	{
-		foreach ($query->result_array() as $record)
-		{
-			//$deviceinfo = $this->switch_config_model->fs_retrieve_sip_user($record['id']);
-			$row = array();
-			$row['account']         = $record['account'];
-			$row['ip'] = $record['ip'];
-			$row['prefix']         = $record['prefix'];
-			$row['context']     = $record['context'];
-			$row['created_date']     = $record['created_date'];
-			
-			array_push($acl_list, $row);
-		}
-	}
-	
-	foreach($acl_list as $key => $value)	{
-				$json_data['rows'][] = array('cell'=>array(
-				    $value['account'],		
-				    $value['ip'],
-				    $value['prefix'],
-				    $value['context'],
-				    $value['created_date'],    
-				    $this->get_action_buttons_acl_list($value['ip'],$value['account'])
-			      ));
-	}
-	echo json_encode($json_data);			
+	  if($query->num_rows() > 0)
+	  {
+		  foreach ($query->result_array() as $record)
+		  {
+			  //$deviceinfo = $this->switch_config_model->fs_retrieve_sip_user($record['id']);
+			  $row = array();
+			  $row['account']         = $record['account'];
+			  $row['ip'] = $record['ip'];
+			  $row['prefix']         = $record['prefix'];
+			  $row['context']     = $record['context'];
+			  $row['created_date']     = $record['created_date'];
+			  
+			  array_push($acl_list, $row);
+		  }
+	  }
+	  
+	  foreach($acl_list as $key => $value)	{
+				  $json_data['rows'][] = array('cell'=>array(
+				      $value['account'],		
+				      $value['ip'],
+				      $value['prefix'],
+				      $value['context'],
+				      $value['created_date'],    
+				      $this->get_action_buttons_acl_list($value['ip'],$value['account'])
+				));
+	  }
+	  echo json_encode($json_data);			
     }
     
     function live_call_report()

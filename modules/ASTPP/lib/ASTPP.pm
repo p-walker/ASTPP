@@ -324,7 +324,7 @@ $xml .= $ASTPP->fs_dialplan_xml_timelimit(
 
 sub fs_dialplan_xml_timelimit() {
 	my ($self, %arg) = @_;
-	$arg{xml} .= "<action application=\"sched_hangup\" data=\"+" . $arg{max_length} * 60 . " allotted_timeout\"/>\n";
+	$arg{xml} .= "<action application=\"sched_hangup\" data=\"+" . sprintf( "%.0f", $arg{max_length} * 60 ) . " allotted_timeout\"/>\n";
 	$arg{xml} .= "<action application=\"set\" data=\"accountcode=" . $arg{accountcode} . "\"/>\n";
 	return $arg{xml};
 }
@@ -357,7 +357,6 @@ sub fs_dialplan_xml_did() {
 	$arg{xml} .= "<action application=\"set\" data=\"accountcode=" . $arg{accountcode} . "\"/>\n";
 		$xml .= "<action application=\"set\" data=\"" . $variable . "\"/>\n";
 	}
-	$xml .= "<action application=\"set\" data=\"calltype=DID\"/>\n";
 	
 	if ($diddata->{extensions} =~ m/^("|)(L|l)ocal.*/m) {
 		my ($junk,$ext,$context) = split /,(?!(?:[^",]|[^"],[^"])+")/, $diddata->{extensions};
@@ -447,8 +446,7 @@ sub fs_dialplan_xml_bridge() {
 		return "";
 	    }
 	}
-		
-	$dialstring .= "<action application=\"set\" data=\"calltype=STANDARD\"/>\n";
+			
 	$dialstring .= "<action application=\"set\" data=\"outbound_route=" . $arg{route_id} . "\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"trunk=" . $trunkdata->{name} . "\"/>\n";
 	$dialstring .= "<action application=\"set\" data=\"provider=" . $trunkdata->{provider} . "\"/>\n";

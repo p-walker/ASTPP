@@ -189,15 +189,15 @@ class Accounts extends CI_Controller {
         $data['username'] = $this->session->userdata('user_name');
         $data['flag'] = 'create';
 
-	$uname = (int)rand();
-	$uname = date("Ymd").substr($uname,2,5);
-  	$acc_result = $this->accounts_model->get_account_by_number($uname);
-	while($acc_result){
-	  $uname = (int)rand();
-	  $uname = date("Ymd").substr($uname,2,5);
-	  $acc_result = $this->accounts_model->get_account_by_number($uname);
-	}
-	$data['number'] =$uname;
+// 	$uname = (int)rand();
+// 	$uname = date("Ymd").substr($uname,2,5);
+//   	$acc_result = $this->accounts_model->get_account_by_number($uname);
+// 	while($acc_result){
+// 	  $uname = (int)rand();
+// 	  $uname = date("Ymd").substr($uname,2,5);
+// 	  $acc_result = $this->accounts_model->get_account_by_number($uname);
+// 	}
+// 	$data['number'] =$uname;
 
         if ($type == 3) {
             $data['page_title'] = 'Create Provider';
@@ -266,7 +266,7 @@ class Accounts extends CI_Controller {
         } else {
             if ($account = $this->accounts_model->get_account_by_number(urldecode($account_number))) {
                 $data['account'] = $account;
-//                 $data['pricelist'] = $this->rates_model->get_price_list();
+                $data['pricelist'] = $this->rates_model->get_price_list();
                 $data['resellers'] = $this->common_model->list_resellers_select($account['reseller']);
 
                 $data['sweeplist'] = $this->common_model->get_sweep_list();
@@ -394,9 +394,9 @@ class Accounts extends CI_Controller {
 
             $config['total_rows'] = $count_all;
 
-            $config['per_page'] = $_GET['rp'];
+            $config['per_page'] = $_GET['rp']=10;
 
-            $page_no = $_GET['page'];
+            $page_no = $_GET['page']=1;
 
             $json_data = array();
             $json_data['page'] = $page_no;
@@ -417,19 +417,27 @@ class Accounts extends CI_Controller {
             if ($query->num_rows() > 0) {
                 foreach ($query->result_array() as $row) {
                     $accountinfo = $this->accounts_model->get_account_including_closed($row['number']);                                        
+		    if($row['balance'] != 0){
+			$balance = $this->common_model->calculate_currency($this->Astpp_common->accountbalance($row['number'])*-1);
+		    }else{
+		      $balance = $row['balance'];
+		    }
+
                     $json_data['rows'][] = array('cell' => array(
-                            $accountinfo['cc'],
+//                             $accountinfo['cc'],
                             $row['number'],
                             $accountinfo['pricelist'],
                             $accountinfo['first_name'],
                             $accountinfo['last_name'],
                             $accountinfo['company_name'],
-                            $this->common_model->calculate_currency($this->Astpp_common->accountbalance($row['number'])),
+			    $balance,
+//                             $this->common_model->calculate_currency($this->Astpp_common->accountbalance($row['number'])),
                             $this->common_model->calculate_currency($accountinfo['credit_limit']),
                             ucfirst($sweeplist[$row['sweep']]),
                             ($accountinfo['posttoexternal'] == 1)?'Yes':'No',
                             Common_model::$global_config['userlevel'][$accountinfo['type']],
                             ($accountinfo['status'] == 1) ? 'Active' : 'Inactive',
+			    $this->common_model->calculate_currency($row['earning']),
                             $this->get_action_buttons($row['number'], $row['accountid'])
                             ));
                 }

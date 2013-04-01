@@ -66,8 +66,7 @@ foreach my $param ( param() ) {
 }
 $xml = header( -type => 'text/plain' );
 
-if (defined $params->{section} && $params->{section} eq "dialplan" ) {        
-  
+if (defined $params->{section} && $params->{section} eq "dialplan" ) {         
     $ASTPP->debug(debug => "Destination = $params->{'Caller-Destination-Number'}" );
     
     ##IF opensips then check then get account from $params->{variable_sip_h_P-Accountcode}
@@ -136,16 +135,13 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 
     $ASTPP->debug( debug =>"$params->{variable_accountcode}, $params->{'Caller-Destination-Number'}");
 
-    my $carddata =
-      &get_account( $astpp_db, $params->{variable_accountcode} )
-      ;    # Fetch all the account info from the db.
+    my $carddata = &get_account( $astpp_db, $params->{variable_accountcode} );    # Fetch all the account info from the db.
 
     if ( !$carddata->{number} )
     {      # Check to see if the account exists.  If not then exit.
         $ASTPP->debug( debug => "CALLSTATUS 2" );
         $ASTPP->debug( debug => "CANNOT RETRIEVE CARD" );
-        $xml .=
-          "<action application=\"hangup\" data=\"CANNOT RETRIEVE ACCOUNT\"/>\n";
+        $xml .= "<action application=\"hangup\" data=\"CANNOT RETRIEVE ACCOUNT\"/>\n";
         $xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
         $ASTPP->debug( debug => "Returning nothing so dialplan can continue." );
     	$ASTPP->debug( debug => $void_xml );
@@ -159,8 +155,7 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 	if(scalar($blocked_call) > 0){
 	  $ASTPP->debug( debug => "CALLSTATUS 2" );
 	  $ASTPP->debug( debug => "Blocked Prefixes" );
-	  $xml .=
-	    "<action application=\"hangup\" data=\"Blocked Prefixes\"/>\n";
+	  $xml .= "<action application=\"hangup\" data=\"Blocked Prefixes\"/>\n";
 	  $xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
 	  $ASTPP->debug( debug => "Returning nothing so dialplan can continue." );
 	  $ASTPP->debug( debug => $void_xml );
@@ -219,9 +214,7 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
     }
 
     $ASTPP->debug( debug => "FINDING LIMIT FOR: " . $carddata->{number} );
-    ( $callstatus, $maxlength ) =
-      &max_length( $astpp_db, $config, $carddata,
-        $params->{'Caller-Destination-Number'} );
+    ( $callstatus, $maxlength ) = &max_length( $astpp_db, $config, $carddata,$params->{'Caller-Destination-Number'} );
 
     my $routeinfo = &get_route(
         $astpp_db, $config,
@@ -232,10 +225,12 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
     $ASTPP->debug( debug => "Cost: " . $routeinfo->{cost} );
     $ASTPP->debug( debug => "Pricelist: " . $routeinfo->{pricelist} );
     my $minimumcharge = $routeinfo->{cost};
-    my @reseller_list;
+    my @reseller_list;    
+    my @inc_reseller_list;
     $ASTPP->debug( debug => "CALLSTATUS: $callstatus MAX_LENGTH: $maxlength" );
 
     if (!$routeinfo->{cost} && !$routeinfo->{pricelist}) {
+	&update_inuse($astpp_db,$params->{variable_accountcode},'accounts','-1');
         $ASTPP->debug( debug => "COULD NOT FIND ROUTE.  EXITING SO DIALPLAN CAN TAKE OVER" );
     	$ASTPP->debug( debug => $void_xml );
 	print $void_xml;
@@ -248,9 +243,7 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
         push @reseller_list, $carddata->{number};
         $ASTPP->debug( debug =>	"ADDING $carddata->{number} to the list of resellers for this account");
 	
-        my ( $resellercallstatus, $resellermaxlength ) =
-          &max_length( $astpp_db, $config, $carddata,
-            $params->{'Caller-Destination-Number'} );
+        my ( $resellercallstatus, $resellermaxlength ) =  &max_length( $astpp_db, $config, $carddata, $params->{'Caller-Destination-Number'} );
         my $routeinfo = &get_route(
             $astpp_db, $config,
             $params->{'Caller-Destination-Number'},
@@ -263,9 +256,13 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
         elsif ( $resellermaxlength < $maxlength ) {
             $maxlength = $resellermaxlength;
         }
-        $ASTPP->debug( debug =>"Reseller cost = $routeinfo->{cost} and minimum charge is $minimumcharge"
-        );
+        $ASTPP->debug( debug =>"Reseller cost = $routeinfo->{cost} and minimum charge is $minimumcharge and reseller max length = $resellermaxlength" );
+	
         if ( $resellermaxlength < 1 || $routeinfo->{cost} > $minimumcharge ) {
+	    foreach my $inc_reseller (@inc_reseller_list) {
+		&update_inuse($astpp_db,$inc_reseller,'accounts','-1');
+	    }
+	    &update_inuse($astpp_db,$params->{variable_accountcode},'accounts','-1');  
             $ASTPP->debug( debug =>"Reseller call is priced too cheap!  Call being barred!" );
             $xml .="<action application=\"hangup\" data=\"Reseller call is priced too cheap!  Call being barred!\"/>\n";
             $xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
@@ -281,10 +278,14 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 	    if($carddata->{inuse} < $carddata->{maxchannels})
 	    {
 	      &update_inuse($astpp_db,$carddata->{number},'accounts','+1');
+	      push @inc_reseller_list,$carddata->{number};
 	    }else{	    
+		foreach my $inc_reseller (@inc_reseller_list) {
+		    &update_inuse($astpp_db,$inc_reseller,'accounts','-1');
+		}
+		&update_inuse($astpp_db,$params->{variable_accountcode},'accounts','-1');
 		$ASTPP->debug( debug => "RESELLER : ACCOUNT MAX CALL CHANNEL LIMIT EXECED" );
-		$xml .=
-		  "<action application=\"hangup\" data=\"ACCOUNT MAX CALL CHANNEL LIMIT EXECED\"/>\n";
+		$xml .= "<action application=\"hangup\" data=\"ACCOUNT MAX CALL CHANNEL LIMIT EXECED\"/>\n";
 		$xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
 		$ASTPP->debug( debug => "Returning nothing so dialplan can continue." );
 		$ASTPP->debug( debug => $void_xml );
@@ -292,7 +293,6 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 		exit(0);
 	    }
 	}
-	
     }
 
     if ( $config->{debug} == 1 ) {
@@ -302,18 +302,24 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
         }
     }
 
-    $ASTPP->debug("Max Call Length: $maxlength minutes");
-    $ASTPP->debug("Call Status: $callstatus");
+    $ASTPP->debug(debug => "Max Call Length: $maxlength minutes");
+    $ASTPP->debug(debug => "Call Status: $callstatus");
 
-    if ( $maxlength <= 1 ) {
+    if ( $maxlength <= 0 ) {
+	foreach my $inc_reseller (@inc_reseller_list) {
+	    &update_inuse($astpp_db,$inc_reseller,'accounts','-1');
+	}
+	&update_inuse($astpp_db,$params->{variable_accountcode},'accounts','-1');
         $ASTPP->debug( debug => "NOT ENOUGH CREDIT" );
         $xml .= "<action application=\"hangup\" data=\"NOT ENOUGH CREDIT\"/>\n";
         $xml = $ASTPP->fs_dialplan_xml_footer( xml => $xml );
         print $xml;
         exit(0);
-    } elsif ($config->{call_max_length} && $maxlength < $config->{call_max_length} / 1000){
+    } 
+     elsif ($config->{call_max_length} && $maxlength > $config->{call_max_length} / 1000){
 	$maxlength = $config->{call_max_length} / 1000;
     }
+    $ASTPP->debug(debug => "Max Call Length: $maxlength minutes");
 
     $xml = $ASTPP->fs_dialplan_xml_timelimit(
         xml        => $xml,
@@ -321,11 +327,7 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 # 	accountcode => $carddata->{number}
 	accountcode => $params->{variable_accountcode}
     );
-
-# Set the timelimit as well as other variables which are needed in the dialplan.
-    my $timelimit =
-      "L(" . sprintf( "%.0f", $maxlength * 60 * 1000 ) . ":60000:30000)";
-
+    
     $ASTPP->debug( debug => "Looking for Route" );
     $routeinfo = &get_route(
         $astpp_db, $config,
@@ -337,7 +339,8 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 	      $ASTPP->debug( debug => "THIS IS A DID CALL: $xml");
 	      my ($returned_data) = $ASTPP->fs_dialplan_xml_did(
 		      did=> $params->{'Caller-Destination-Number'}
-	      );
+	      );	      
+	      $xml .= "<action application=\"set\" data=\"calltype=DID\"/>\n";
 	      $xml .= $returned_data;
 	      $xml .= "</condition>\n";
 	      $xml .= "</extension>\n";
@@ -347,6 +350,7 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 	      $xml .= "<condition field=\"destination_number\" expression=\"" . $params->{'Caller-Destination-Number'} . "\">\n";
 	      $xml .= $returned_data;
 	} else {
+		$xml .= "<action application=\"set\" data=\"calltype=STANDARD\"/>\n";
 		# Get the list of routes for the phone number.
 		my @outboundroutes = &get_outbound_routes( $astpp_db, $params->{'Caller-Destination-Number'},$carddata, $routeinfo, @reseller_list );
 		
@@ -355,11 +359,11 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 		      my $count = 0;
 		      my $tmpbrd;
 		      foreach my $route (@outboundroutes) {
-			      $ASTPP->debug( debug => "$route->{trunk}: cost $route->{cost}\t $route->{pattern}" );
+			      $ASTPP->debug( debug => "$route->{trunk}: cost Termination Rate : $route->{cost} \t Origination Rate : $routeinfo->{cost} \t $route->{pattern}" );
 			      if ( $route->{cost} > $routeinfo->{cost} ) {
 				      $ASTPP->debug( debug => "$route->{trunk}: $route->{cost} > $routeinfo->{cost}, skipping" );
 			      }
-			      else {
+			      else {				  
 				      $tmpbrd .= $ASTPP->fs_dialplan_xml_bridge(
 					      destination_number => $params->{'Caller-Destination-Number'},
 					      route_prepend      => $route->{prepend},
@@ -367,24 +371,23 @@ if (defined $params->{section} && $params->{section} eq "dialplan" ) {
 					      route_id	   => $route->{id},
 					      count		   => $count	
 				      );
-				      $count++;
+				      if($tmpbrd ne "")
+				      {
+					$count++;
+				      }
 			      }			
-		      }
-		      
+		      }		      
 		      if($count == 0)
 		      {
-			  $ASTPP->debug( debug => "NOT OUTBOUND ROUTE FOUND" );
-			  $xml .= "<action application=\"reject\" data=\"NOT OUTBOUND ROUTE FOUND\"/>\n";			  
-			  $ASTPP->debug( debug => $void_xml );
-			  print $void_xml;			  
-			  exit(0);
+			  $ASTPP->debug( debug => "NO OUTBOUND ROUTE FOUND" );
+			  $xml .= "<action application=\"hangup\" data=\"NO_ROUTE_DESTINATION\"/>\n";
 		      }
 		      #Fetch outbound callerid for accounts & If exist and active then override it
 		      my $outboundcallerid = &get_outbound_callerid($astpp_db,$cust_accountid,'accounts_callerid','accountid');
 		      my $tmpxml = $ASTPP->fs_dialplan_xml_bridge_start(
 				  origination_caller_id_name => $outboundcallerid->{callerid_name},
 				  origination_caller_id_number => $outboundcallerid->{callerid_number}
-		      );
+		      );		      
 		      $xml .= $tmpxml.$tmpbrd;
 		}		
 # 	        $xml .= $ASTPP->fs_dialplan_xml_bridge_end() if @outboundroutes;
@@ -468,9 +471,10 @@ if($data->{variables}->{callingcard} && uri_unescape($data->{variables}->{direct
     $data->{variables}->{outbound_route}='';
 }
 
-if($data->{variables}->{originate_disposition} eq '')
+# if($data->{variables}->{originate_disposition} eq '')
+if ($data->{variables}->{hangup_cause} eq 'NORMAL_CLEARING' && $data->{variables}->{billsec} == 0)
 {
-    $data->{variables}->{originate_disposition} = $data->{variables}->{hangup_cause};
+     $data->{variables}->{hangup_cause} = $data->{variables}->{originate_disposition};
 }
 
 #We are saving calltype (standard,DID,callingcard) in userfield
@@ -532,8 +536,8 @@ my $tmp = "INSERT INTO " . $config->{freeswitch_cdr_table} . "(accountcode,src,d
 	. "'"
 	. ","
 	. "'"
-# 	. uri_unescape($data->{variables}->{hangup_cause})
-	. uri_unescape($data->{variables}->{originate_disposition})
+ 	. uri_unescape($data->{variables}->{hangup_cause})
+#	. uri_unescape($data->{variables}->{originate_disposition})
 	. "'"
 	. ","
 	. "''"
@@ -573,7 +577,6 @@ my (@chargelist);
 push @chargelist, $data->{callflow}->{caller_profile}->{uuid};
 &processlist( $astpp_db, $cdr_db, $config, \@chargelist );
 print STDERR "VENDOR CHARGES: " . $config->{trackvendorcharges} . "\n" if $config->{debug} == 1;
-# &vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "none",  $data->{callflow}->{caller_profile}->{uuid},"" ) if $config->{trackvendorcharges} == 1 && $config->{debug} == 1;
 
 &process_callingcard_cdr if $data->{variables}->{callingcard};    
 	

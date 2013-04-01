@@ -1134,7 +1134,7 @@ sub calc_call_cost() {
 	my ($total_seconds);
 	$total_seconds = ( $answeredtime - $inc_seconds ) / $increment;
 	#$total_seconds = ( $answeredtime ) / $increment if !$inc_seconds;
-	print STDERR "TOTAL SECONDS : ". $total_seconds."\n";
+#	print STDERR "TOTAL SECONDS : ". $total_seconds."\n";
 	if ( $total_seconds < 0 ) {
 	    $total_seconds = 0;
 	}
@@ -1146,7 +1146,7 @@ sub calc_call_cost() {
 	$cost = ( $billseconds / 60 ) * $cost + $connect;
 	print STDERR "COST : ".$cost."\n";
 	print STDERR "AnsweredTime: $answeredtime Included Sec: $inc_seconds\n" if $config->{debug} == 1;
-	print STDERR "Increment: $increment Total Increments: $total_seconds\n" if $config->{debug} == 1;
+	print STDERR "Increment: $increment Billing Increments: $bill_increments\n" if $config->{debug} == 1;
 	print STDERR "Bill Seconds: $billseconds  Total cost is $cost\n" if $config->{debug} == 1;
 	return $cost;
     } else {
@@ -3851,7 +3851,7 @@ sub max_length() {
 		return (0,0);
 	}
 	if ( $numdata->{cost} > 0 ) {
-		$maxlength = ( ( $credit - $numdata->{connectcost} ) / $numdata->{cost} );
+		$maxlength = int ( ( $credit - $numdata->{connectcost} ) / $numdata->{cost} );
 		if ($config->{call_max_length} && ($maxlength > $config->{call_max_length} / 1000)){
 			print STDERR "LIMITING CALL TO CONFIG MAX LENGTH \n" if $config->{debug} == 1;
 		        $maxlength = $config->{call_max_length} / 1000 / 60;
@@ -3861,7 +3861,7 @@ sub max_length() {
 		print STDERR "CALL IS FREE - ASSIGNING MAX LENGHT \n" if $config->{debug} == 1;
 		$maxlength = $config->{max_free_length};    # If the call is set to be free then assign a max length.
 	}
-	return (1, $maxlength);
+	return (1, sprintf( "%." . $config->{decimalpoints} . "f", $maxlength));
 }
 
 sub hangup_call() {
@@ -4181,8 +4181,7 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 			if ( $branddata->{markup} ne "" && $branddata->{markup} != 0 ) {
 # 				$numdata->{connectcost} = $numdata->{connectcost} * ( ( $branddata->{markup} / 1 ) + 1 );
 # 				$numdata->{cost} = $numdata->{cost} * ( ( $branddata->{markup} / 1 ) + 1 );
-				$numdata->{connectcost} = ($numdata->{connectcost} * $branddata->{markup}) / 100;
-				$numdata->{cost} = ($numdata->{cost} *  $branddata->{markup}) / 100;
+				$numdata->{cost} = $numdata->{cost} + (($numdata->{cost} *  $branddata->{markup}) / 100);
 			}
 			if ( $numdata->{inc} > 0 ) {
 				$increment = $numdata->{inc};

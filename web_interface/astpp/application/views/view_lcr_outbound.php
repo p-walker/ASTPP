@@ -77,9 +77,9 @@ $("#flex1").flexigrid({
     },
 });
 
-$("#lcr_outbound_search").click(function(){
-	$.ajax({type:'POST', url: '<?=base_url()?>lcr/outbound_search', data:$('#form10').serialize(), success: function(response) {
-    $('#flex1').flexReload();
+$("#lcr_outbound_search").click(function(){ 
+	$.ajax({type:'POST', url: '<?=base_url()?>lcr/outbound_search', data:$('#search_form10').serialize(), success: function(response) {
+        $('#flex1').flexReload();
 		}});
 	});
 	
@@ -315,7 +315,7 @@ function reload_button()
               
          </fieldset> 
             <br />
-             <input type="button" id="id_reset" class="ui-state-default float-right ui-corner-all ui-button" name="reset" value="Clear Search Filter">&nbsp;
+             <input type="reset" id="id_reset" class="ui-state-default float-right ui-corner-all ui-button" name="reset" value="Clear Search Filter">&nbsp;
             <input type="button" class="ui-state-default float-right ui-corner-all ui-button" name="action" value="Search" id="lcr_outbound_search" style="margin-right:22px;" />
             <br><br>  
           </ul>

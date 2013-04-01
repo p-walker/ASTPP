@@ -235,7 +235,7 @@ class CdrReports extends CI_Controller
 	
 	function export_cdr_customer_pdf()
 	{
-	    $query = $this->cdr_model->getcustomercdrs(true);
+	    $query = $this->cdr_model->getcustomercdrs(true,'','',false);
 	    $customer_array = array();    
 	    $this->load->library('fpdf');
 	    $this->load->library('pdf');
