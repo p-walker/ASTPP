@@ -189,15 +189,15 @@ class Accounts extends CI_Controller {
         $data['username'] = $this->session->userdata('user_name');
         $data['flag'] = 'create';
 
-// 	$uname = (int)rand();
-// 	$uname = date("Ymd").substr($uname,2,5);
-//   	$acc_result = $this->accounts_model->get_account_by_number($uname);
-// 	while($acc_result){
-// 	  $uname = (int)rand();
-// 	  $uname = date("Ymd").substr($uname,2,5);
-// 	  $acc_result = $this->accounts_model->get_account_by_number($uname);
-// 	}
-// 	$data['number'] =$uname;
+	$uname = (int)rand();
+	$uname = date("Ymd").substr($uname,2,5);
+  	$acc_result = $this->accounts_model->get_account_by_number($uname);
+	while($acc_result){
+	  $uname = (int)rand();
+	  $uname = date("Ymd").substr($uname,2,5);
+	  $acc_result = $this->accounts_model->get_account_by_number($uname);
+	}
+	$data['number'] =$uname;
 
         if ($type == 3) {
             $data['page_title'] = 'Create Provider';
