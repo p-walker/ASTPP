@@ -416,28 +416,22 @@ class Accounts extends CI_Controller {
             $sweeplist = $this->common_model->get_sweep_list();
             if ($query->num_rows() > 0) {
                 foreach ($query->result_array() as $row) {
-                    $accountinfo = $this->accounts_model->get_account_including_closed($row['number']);                                        
-		    if($row['balance'] != 0){
-			$balance = $this->common_model->calculate_currency($this->Astpp_common->accountbalance($row['number'])*-1);
-		    }else{
-		      $balance = $row['balance'];
-		    }
-
+                    $accountinfo = $this->accounts_model->get_account_including_closed($row['number']);                   
+                    $calc_balance = $this->Astpp_common->accountbalance($row['number']);
+                    $calc_balance = ($calc_balance==0)?0:$calc_balance;
                     $json_data['rows'][] = array('cell' => array(
-//                             $accountinfo['cc'],
+                            $accountinfo['cc'],
                             $row['number'],
                             $accountinfo['pricelist'],
                             $accountinfo['first_name'],
                             $accountinfo['last_name'],
                             $accountinfo['company_name'],
-			    $balance,
-//                             $this->common_model->calculate_currency($this->Astpp_common->accountbalance($row['number'])),
+			    $this->common_model->calculate_currency($calc_balance*-1),
                             $this->common_model->calculate_currency($accountinfo['credit_limit']),
                             ucfirst($sweeplist[$row['sweep']]),
                             ($accountinfo['posttoexternal'] == 1)?'Yes':'No',
                             Common_model::$global_config['userlevel'][$accountinfo['type']],
                             ($accountinfo['status'] == 1) ? 'Active' : 'Inactive',
-			    $this->common_model->calculate_currency($row['earning']),
                             $this->get_action_buttons($row['number'], $row['accountid'])
                             ));
                 }

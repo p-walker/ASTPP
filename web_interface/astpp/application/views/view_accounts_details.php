@@ -708,11 +708,7 @@ function get_alert_msg(id)
                 <li>
                   <label class="desc">Zip/Postal Code:</label>
                   <input type="text" name="postal_code" class="text field medium"  size="20"  value="<?=@$account['postal_code']?>"/>
-                </li>
-                <li>
-                  <label class="desc">Tax ID:</label>
-                  <input type="text" name="Tax_ID" class="text field medium"  size="20"  value="<?=@$account['Tax_ID']?>"/>
-                </li>
+                </li>                
                 <li>
                   <label class="desc">Country:</label>
                   <?=form_countries('country',@$account['country'],array("class"=>"select field small"))?>
