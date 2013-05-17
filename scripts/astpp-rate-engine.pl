@@ -193,10 +193,10 @@ else {
 		print STDERR gettext("START ON VENDOR CALL RATING!") . "\n"  if $config->{debug} == 1;
 		if ($config->{softswitch} == 0) {
 			&vendor_process_rating( $astpp_db, $cdr_db, $config, "none", 0 );
-			&vendor_process_rating( $astpp_db, $cdr_db, $config. $config, "error", 0 );
+			&vendor_process_rating( $astpp_db, $cdr_db, $config, "error", 0 );
 		} elsif ($config->{softswitch} == 1) {
 			&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "none", 0 );
-			&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, $config, "error", 0 );
+			&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, "error", 0 );
 		}
 	print STDERR gettext("VENDOR CALLS WHICH HAVE NOT BEEN RATED.") . "\n" if $config->{debug} == 1;
 	# Print a list of calls which have not been rated
