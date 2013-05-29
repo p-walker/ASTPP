@@ -4154,7 +4154,7 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 					my $tmp = "INSERT INTO counters (package,account) VALUES ("
 						. $astpp_db->quote( $package->{id} ) . ", "
 						. $astpp_db->quote( $carddata->{number} ) . ")";
-					print STDERR "/n" . $tmp . "/n" if $config->{debug} == 1;
+					print STDERR "\n" . $tmp . "\n" if $config->{debug} == 1;
 					$astpp_db->do($tmp);
 					$counter = &get_counter( $astpp_db, $package->{id}, $carddata->{number} );
 					print STDERR "JUST CREATED COUNTER: $counter->{id}\n" if $config->{debug} == 1;
@@ -4173,7 +4173,7 @@ sub rating() {  # This routine recieves a specific cdr and takes care of rating 
 						. $astpp_db->quote( $counter->{seconds} + $freeseconds )
 						. " WHERE id = "
 						. $astpp_db->quote( $counter->{id} );
-					print STDERR $tmp . "/n" if $config->{debug} == 1;
+					print STDERR $tmp . "\n" if $config->{debug} == 1;
 					$astpp_db->do($tmp);
 				}
 			}
@@ -4432,7 +4432,7 @@ sub processlist() {  # Deal with a list of calls which have not been rated so fa
 		}
 		my $phrase = "none";
 		if ($config->{trackvendorcharges} == 1) {
-			print STDERR gettext("Vendor Rating Starting") . "/n" if $config->{debug} == 1;
+			print STDERR gettext("Vendor Rating Starting") . "\n" if $config->{debug} == 1;
 			&vendor_process_rating( $astpp_db, $cdr_db, $config, $phrase, $uniqueid, $vars ) if $config->{softswitch} == 0;
 			&vendor_process_rating_fs( $astpp_db, $cdr_db, $config, $phrase, $uniqueid, $vars ) if $config->{softswitch} == 1;
 		}
