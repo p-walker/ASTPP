@@ -244,4 +244,4 @@ function clear_filter()
     Filter by
     <? endblock() ?>
     
-<? end_extend() ?>  
+<? end_extend() ?>

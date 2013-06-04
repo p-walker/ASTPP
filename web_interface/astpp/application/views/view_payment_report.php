@@ -178,5 +178,4 @@ function reload_button()
 	  <br/><br/><br/><br/><br/><br/>    	
     <? endblock() ?>
     
-<? end_extend() ?>  
- 
+<? end_extend() ?>

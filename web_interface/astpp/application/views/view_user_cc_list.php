@@ -297,5 +297,4 @@ function reload_button2()
 
     
 
-<? end_extend() ?>  
-
+<? end_extend() ?>

@@ -112,4 +112,4 @@ function get_alert_msg(id)
 
     <? endblock() ?>
     
-<? end_extend() ?>  
+<? end_extend() ?>

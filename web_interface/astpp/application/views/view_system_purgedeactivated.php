@@ -33,4 +33,4 @@ function confirm_purge()
     Filter by
     <? endblock() ?>
     
-<? end_extend() ?>  
+<? end_extend() ?>

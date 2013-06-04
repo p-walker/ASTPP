@@ -156,5 +156,4 @@ Addres : <?=$accountinfo['address_1']?>
 
     <? endblock() ?>
     
-<? end_extend() ?>  
-
+<? end_extend() ?>

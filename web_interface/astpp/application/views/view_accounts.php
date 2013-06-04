@@ -22,4 +22,4 @@
 	<? startblock('sidebar') ?>
     <? endblock() ?>
     
-<? end_extend() ?>  
+<? end_extend() ?>
