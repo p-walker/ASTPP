@@ -1,7 +1,5 @@
 ALTER TABLE `accounts` ADD `deleted` TINYINT( 1 ) NOT NULL DEFAULT '0' COMMENT '1=deleted'; 
 
-ALTER TABLE `fscdr`.`fscdr` ADD INDEX ( `uniqueid` );
-
 DELETE FROM `system` WHERE `system`.`id` = 28;
 DELETE FROM `system` WHERE `system`.`id` = 58;
 DELETE FROM `system` WHERE `system`.`id` = 52;
@@ -214,3 +212,6 @@ DROP TABLE `callingcard_stats`, `extensions_status`, `extension_list`, `manager_
 DROP VIEW `reseller_cdrs`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reseller_cdrs` AS select `a`.`accountid` AS `accountid`,`a`.`cc` AS `cc`,`a`.`number` AS `number`,`a`.`reseller` AS `reseller`,`b`.`id` AS `cdr_id`,`b`.`uniqueid` AS `uniqueid`,`b`.`callerid` AS `callerid`,`b`.`callednum` AS `callednum`,`b`.`billseconds` AS `billseconds`,`b`.`trunk` AS `trunk`,`b`.`disposition` AS `disposition`,`b`.`callstart` AS `callstart`,`b`.`debit` AS `debit`,`b`.`credit` AS `credit`,`b`.`status` AS `status`,`b`.`notes` AS `notes`,`b`.`provider` AS `provider`,`b`.`cost` AS `cost`,`b`.`pricelist` AS `pricelist`,`b`.`pattern` AS `pattern`,`b`.`calltype` AS `calltype` from (`accounts` `a` join `cdrs` `b`) where ((`a`.`number` = `b`.`cardnum`) and (`a`.`type` = 1) and (`b`.`uniqueid` <> ''));
+
+ALTER TABLE `fscdr`.`fscdr` ADD INDEX ( `uniqueid` );
+
