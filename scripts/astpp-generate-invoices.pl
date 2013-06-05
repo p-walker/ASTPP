@@ -76,6 +76,8 @@ foreach my $param ( param() ) {
 # print $config->{externalbill};exit;
 
 ### Deal with external billing.  This will create the appropriate invoices in the external apps.
+print STDERR "externalbill: " . $config->{externalbill} . "\n";
+
 if ( $config->{externalbill} eq "oscommerce" ) {
     my @cardlist;
     if ( $params->{sweep} ) {
@@ -89,7 +91,7 @@ if ( $config->{externalbill} eq "oscommerce" ) {
 	        foreach my $handle (@output) {
       		      print $handle "Card: $cardno \n";
    		}
-	        &osc_charges($astpp_db, $osc_db, $config, $cardno,$params);
+	        &osc_charges($astpp_db, $osc_db, $config, $cardno, $params);
 	}
     }
 }
@@ -156,6 +158,8 @@ elsif ( $config->{externalbill} eq "internal" ) {
 			text		=> "Total",
 			class		=> "9" #class 9 = total
 			);
+		#PWA - Send an e-mail
+		&email_new_invoice( $astpp_db, "", $config, $carddata, $invoice, $subtotal );
 		}
 	}
     }

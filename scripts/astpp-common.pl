@@ -737,11 +737,16 @@ sub email_del_did() {
 # This needs to be updated and moved to templates which reside in the database and can be
 # configured per reseller.
 sub email_new_invoice() {
-    my ( $astpp_db,$reseller,$config, $email, $invoice, $total ) = @_;
-    my ( $sql,$subject,$mail,$accountdata,$record,$vars );
-    
-    $email = $config->{company_email} if $config->{user_email} == 0;
-    $accountdata = &get_account($astpp_db,$vars->{username});
+    # PWA - old:
+    #my ( $astpp_db,$reseller,$config, $email, $invoice, $total ) = @_;
+    #my ( $sql,$subject,$mail,$accountdata,$record,$vars );
+    # PWA - new:
+    my ( $astpp_db,$reseller,$config, $vars, $invoice, $total ) = @_;
+    my ( $sql,$subject,$mail,$accountdata,$record );
+  
+    my $email = $vars->{email};
+    $vars->{email} = $config->{company_email} if $config->{user_email} == 0;
+    $accountdata = &get_account($astpp_db,$vars->{number});
     
     $sql = $astpp_db->prepare("SELECT * FROM templates WHERE name = 'email_new_invoice' AND accountid='".$accountdata->{accountid}."'");    
     $sql -> execute;
@@ -750,7 +755,7 @@ sub email_new_invoice() {
 	
     
     my %mail = (
-        To         => $email,
+        To         => $vars->{email},
         From       => $config->{company_email},
         Bcc        => $config->{company_email},
         Subject    => $record->{'subject'},
@@ -759,7 +764,7 @@ sub email_new_invoice() {
     $mail{'Message : '} = $record->{'template'};
     if ( sendmail %mail ) { print STDERR "Mail sent OK.\n" }
     else { print STDERR "Error sending mail: $Mail::Sendmail::error \n" }
-    print STDERR "\n\$Mail::Sendmail::log says:\n", $Mail::Sendmail::log;
+    print STDERR "\n\$Mail::Sendmail::log says:\n", $Mail::Sendmail::log , "\n";
 }
 
 # Send an email when an account balance gets low. 
@@ -5065,6 +5070,7 @@ sub osc_charges() {
             $total = sprintf( "%." . $config->{decimalpoints_total} . "f", $total );
             &osc_post_total($osc_db, $config, $invoice_id, "Total:", "<b>\$$total</b>", $total,
                 $sort, "ot_total" );
+            #PWA - "$account" is not correct... (before and after my changes to email_new_invoice)
             &email_new_invoice( $astpp_db, "", $config, $account, $invoice_id,$total );
         }
     }
