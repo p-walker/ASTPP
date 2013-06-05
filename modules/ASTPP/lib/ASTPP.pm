@@ -1327,7 +1327,7 @@ sub invoice_taxes_internal
 		. $self->{_astpp_db}->quote($arg{accountid})
 		. " ORDER BY taxes_priority ASC";
 	$sql = $self->{_astpp_db}->prepare($tmp);
-	print STDERR $tmp . "/n";
+	print STDERR $tmp . "\n";
 	$sql->execute;
 	while ( $row = $sql->fetchrow_hashref ) {
 		push @taxes, $row;
