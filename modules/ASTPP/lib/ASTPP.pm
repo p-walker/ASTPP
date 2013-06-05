@@ -1362,10 +1362,20 @@ sub invoice_taxes_internal
 		print STDERR "Round to: $arg{decimalpoints_tax} \n";
 		$tax_total = sprintf( "%." . $arg{decimalpoints_tax} . "f", $tax_total );
 		print STDERR "Tax Total: $tax_total \n";
+		# PWA - Tax text
+		my $tax_text = "";
+		# PWA - if taxes_rate is not 0 but taxes_amount is 0, use tax % as text (otherwise use "")
+		if (($tax->{taxes_rate} != 0) && ($tax->{taxes_amount} == 0) ) {
+			$tax_text = sprintf( "%." . $arg{decimalpoints_tax} . "f", $tax->{taxes_rate} ) . "%";
+		}
 		my $tmp = "INSERT INTO invoices_total (invoices_id,title,text,value,class,sort_order) VALUES("
 		. $self->{_astpp_db}->quote($arg{invoiceid})
-		. ",'TAX',"
+		# PWA - Tax text / title - use taxes_description as title (was "TAX")
+		#. ",'TAX',"
+		. ","
 		. $self->{_astpp_db}->quote($tax->{taxes_description})
+		. ","
+		. $self->{_astpp_db}->quote($tax_text)
 		. ","
 		. $self->{_astpp_db}->quote($tax_total)
 		. ",2,"

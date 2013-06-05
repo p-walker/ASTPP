@@ -1469,7 +1469,12 @@ class Accounts extends CI_Controller {
             $data_final_total[$key][1] = "";
             $data_final_total[$key][2] = "";
             $data_final_total[$key][3] = $value['title'];
-            $data_final_total[$key][4] = $value['text'];
+            // PWA - totals
+            if ( $value['text'] != $value['title'] ) {
+               $data_final_total[$key][4] = $value['text'];
+            } else {
+               $data_final_total[$key][4] = "";
+            }
             $data_final_total[$key][5] = substr($value['value'], 0, -2) . " " . $currency;
         }
 
