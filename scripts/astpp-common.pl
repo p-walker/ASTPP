@@ -4952,29 +4952,29 @@ sub osc_charges() {
     my ($astpp_db, $osc_db, $config, $account, $params) = @_;
     my ( $invoice_id, $country_id, $zone_id, $tmp, $sql, $row, $cdr_count );
     if ($params->{startdate} && $params->{enddate}) {
-    $tmp =
-        "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")"
-      . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")";
+       $tmp =
+           "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
+         . $astpp_db->quote($account)
+         . " AND status = 0"
+         . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")"
+         . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")";
     } elsif ($params->{startdate}) {
-    $tmp =
-        "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")";
+       $tmp =
+           "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
+         . $astpp_db->quote($account)
+         . " AND status = 0"
+         . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")";
     } elsif ($params->{enddate}) {
-    $tmp =
-        "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")";
+       $tmp =
+           "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
+         . $astpp_db->quote($account)
+         . " AND status = 0"
+         . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")";
     } else {
-    $tmp =
-        "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0";
+       $tmp =
+           "SELECT COUNT(*) FROM cdrs WHERE cardnum = "
+         . $astpp_db->quote($account)
+         . " AND status = 0";
     }
 
     print STDERR "$tmp \n" if $config->{debug} == 1;
@@ -4992,82 +4992,81 @@ sub osc_charges() {
         );
         ( $invoice_id, $country_id, $zone_id ) =
           &osc_create_invoice($astpp_db, $osc_db, $config, $account);
-	  if ($invoice_id) {
-    if ($params->{startdate} && $params->{enddate}) {
-    $tmp =
-        "SELECT * FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")"
-      . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")"
-      . " ORDER BY callstart";
-    } elsif ($params->{startdate}) {
-    $tmp =
-        "SELECT * FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")"
-      . " ORDER BY callstart";
-    } elsif ($params->{enddate}) {
-    $tmp =
-        "SELECT * FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")"
-      . " ORDER BY callstart";
-    } else {
-    $tmp =
-        "SELECT * FROM cdrs WHERE cardnum = "
-      . $astpp_db->quote($account)
-      . " AND status = 0"
-      . " ORDER BY callstart";
-    }
-	print STDERR $tmp;
-        $sql = $astpp_db->prepare($tmp);
-        $sql->execute;
-        while ( $row = $sql->fetchrow_hashref ) {
-            &osc_post_charge($osc_db, $config, $invoice_id, $row );
-            &markbilled( $astpp_db, $row->{id}, 1 );
-        }
-        $subtotal = &osc_order_subtotal($osc_db, $config, $invoice_id);
-        $subtotal = sprintf( "%." . $config->{decimalpoints_total} . "f", $subtotal );
-        print STDERR "ORDER $invoice_id SUBTOTAL: $subtotal";
-        $sort      = 1;
-        $tax_count = 1;
-        &osc_post_total( $osc_db, $config, $invoice_id, "Sub-Total:", "\$$subtotal", $subtotal,
-            $sort, "ot_subtotal" );
-        @taxes = &osc_tax_list($osc_db, $config, $zone_id, $country_id );
-        foreach $tax (@taxes) {
-            my ($tax_amount);
-            if ( $tax_count == 1 ) {
-                $tax_priority = $tax->{tax_priority};
-                $tax_amount = $subtotal * ( $tax->{tax_rate} / 1 );
-                $sort++;
-                $tax_amount = sprintf( "%." . $config->{decimalpoints_tax} . "f", $tax_amount );
-                &osc_post_total( $osc_db, $config, $invoice_id, $tax->{tax_description},
-                    "\$$tax_amount", $tax_amount, $sort, "ot_tax" );
-                $tax_count++;
+        if ($invoice_id) {
+            if ($params->{startdate} && $params->{enddate}) {
+               $tmp =
+                   "SELECT * FROM cdrs WHERE cardnum = "
+                 . $astpp_db->quote($account)
+                 . " AND status = 0"
+                 . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")"
+                 . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")"
+                 . " ORDER BY callstart";
+            } elsif ($params->{startdate}) {
+               $tmp =
+                   "SELECT * FROM cdrs WHERE cardnum = "
+                 . $astpp_db->quote($account)
+                 . " AND status = 0"
+                 . " AND callstart >= DATE(" . $astpp_db->quote($params->{startdate}) . ")"
+                 . " ORDER BY callstart";
+            } elsif ($params->{enddate}) {
+               $tmp =
+                   "SELECT * FROM cdrs WHERE cardnum = "
+                 . $astpp_db->quote($account)
+                 . " AND status = 0"
+                 . " AND callstart <= DATE(" . $astpp_db->quote($params->{enddate}) . ")"
+                 . " ORDER BY callstart";
+            } else {
+               $tmp =
+                   "SELECT * FROM cdrs WHERE cardnum = "
+                 . $astpp_db->quote($account)
+                 . " AND status = 0"
+                 . " ORDER BY callstart";
             }
-            else {
-                if ( $tax->{tax_priority} > $tax_priority ) {
-                    $subtotal = &osc_order_total($osc_db, $config, $invoice_id);
+            print STDERR $tmp;
+            $sql = $astpp_db->prepare($tmp);
+            $sql->execute;
+            while ( $row = $sql->fetchrow_hashref ) {
+                &osc_post_charge($osc_db, $config, $invoice_id, $row );
+                &markbilled( $astpp_db, $row->{id}, 1 );
+            }
+            $subtotal = &osc_order_subtotal($osc_db, $config, $invoice_id);
+            $subtotal = sprintf( "%." . $config->{decimalpoints_total} . "f", $subtotal );
+            print STDERR "ORDER $invoice_id SUBTOTAL: $subtotal";
+            $sort      = 1;
+            $tax_count = 1;
+            &osc_post_total( $osc_db, $config, $invoice_id, "Sub-Total:", "\$$subtotal", $subtotal,
+                $sort, "ot_subtotal" );
+            @taxes = &osc_tax_list($osc_db, $config, $zone_id, $country_id );
+            foreach $tax (@taxes) {
+                my ($tax_amount);
+                if ( $tax_count == 1 ) {
+                    $tax_priority = $tax->{tax_priority};
+                    $tax_amount = $subtotal * ( $tax->{tax_rate} / 1 );
+                    $sort++;
+                    $tax_amount = sprintf( "%." . $config->{decimalpoints_tax} . "f", $tax_amount );
+                    &osc_post_total( $osc_db, $config, $invoice_id, $tax->{tax_description},
+                        "\$$tax_amount", $tax_amount, $sort, "ot_tax" );
+                    $tax_count++;
                 }
-                $tax_priority = $tax->{tax_priority};
-                $tax_amount = $subtotal * ( $tax->{tax_rate} / 1 );
-                $sort++;
-                $tax_amount = sprintf( "%." . $config->{decimalpoints_tax} . "f", $tax_amount );
-                &osc_post_total($osc_db, $config, $invoice_id, $tax->{tax_description},
-                    "\$$tax_amount", $tax_amount, $sort, "ot_tax" );
+                else {
+                    if ( $tax->{tax_priority} > $tax_priority ) {
+                        $subtotal = &osc_order_total($osc_db, $config, $invoice_id);
+                    }
+                    $tax_priority = $tax->{tax_priority};
+                    $tax_amount = $subtotal * ( $tax->{tax_rate} / 1 );
+                    $sort++;
+                    $tax_amount = sprintf( "%." . $config->{decimalpoints_tax} . "f", $tax_amount );
+                    &osc_post_total($osc_db, $config, $invoice_id, $tax->{tax_description},
+                        "\$$tax_amount", $tax_amount, $sort, "ot_tax" );
+                }
             }
+            $total = &osc_order_total($osc_db, $config, $invoice_id);
+            $sort++;
+            $total = sprintf( "%." . $config->{decimalpoints_total} . "f", $total );
+            &osc_post_total($osc_db, $config, $invoice_id, "Total:", "<b>\$$total</b>", $total,
+                $sort, "ot_total" );
+            &email_new_invoice( $astpp_db, "", $config, $account, $invoice_id,$total );
         }
-        $total = &osc_order_total($osc_db, $config, $invoice_id);
-        $sort++;
-        $total = sprintf( "%." . $config->{decimalpoints_total} . "f", $total );
-        &osc_post_total($osc_db, $config, $invoice_id, "Total:", "<b>\$$total</b>", $total,
-            $sort, "ot_total" );
-        &email_new_invoice( $astpp_db, "", $config, $account, $invoice_id,
-            $total );
-	    }
     }
     return $invoice_id
 }
