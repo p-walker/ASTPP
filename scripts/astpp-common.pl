@@ -761,7 +761,12 @@ sub email_new_invoice() {
         Subject    => $record->{'subject'},
         'X-Mailer' => "Mail::Sendmail version $Mail::Sendmail::VERSION",
     );
-    $mail{'Message : '} = $record->{'template'};
+    #PWA - Replace strings in $record->{'template'} with their values
+    # ugly! See http://perldoc.perl.org/perlfaq4.html#How-can-I-expand-variables-in-text-strings%3f
+    my $message = $record->{'template'};
+    $message =~ s/(\$\w+)/$1/eeg;
+    $mail{'Message : '} = $message;
+
     if ( sendmail %mail ) { print STDERR "Mail sent OK.\n" }
     else { print STDERR "Error sending mail: $Mail::Sendmail::error \n" }
     print STDERR "\n\$Mail::Sendmail::log says:\n", $Mail::Sendmail::log , "\n";

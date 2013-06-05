@@ -158,8 +158,10 @@ elsif ( $config->{externalbill} eq "internal" ) {
 			text		=> "Total",
 			class		=> "9" #class 9 = total
 			);
+		#PWA - format invoice total
+		$total = sprintf( "%." . $config->{decimalpoints_total} . "f", $subtotal );
 		#PWA - Send an e-mail
-		&email_new_invoice( $astpp_db, "", $config, $carddata, $invoice, $subtotal );
+		&email_new_invoice( $astpp_db, "", $config, $carddata, $invoice, $total );
 		}
 	}
     }
