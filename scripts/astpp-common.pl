@@ -4558,14 +4558,14 @@ sub vendor_process_rating() {  #Rate Vendor calls.
 							$cdrinfo->{src},         $cdrinfo->{dst},
 							$cdrinfo->{disposition}, $cdrinfo->{billsec},
 							$cost * -1,              $cdrinfo->{calldate},
-							"",                      $cdrinfo->{trunk},
+							"",                      $trunk->{name},
 							$pricerecord->{comment},$pricerecord->{name},$pricerecord->{pattern},
-							$cdrinfo->{userfield}, $cdrinfo->{provider}
+							$cdrinfo->{userfield}, $trunk->{provider}
 							) if $config->{posttoastpp} == 1;
 					&save_cdr_vendor( $config, $cdr_db, $cdrinfo->{uniqueid}, $cost,$cdrinfo->{dst} );
 					my $tmp = "UPDATE cdrs SET cost = '" . $cost . "' WHERE uniqueid = '" .
 						$cdrinfo->{uniqueid} . "' AND cost = 0 "
-						. " AND cardnum != '" . $trunk->{provider} . "' AND dst = "
+						. " AND cardnum != '" . $trunk->{provider} . "' AND callednum = "
 						. $astpp_db->quote($cdrinfo->{dst}) . " LIMIT 1";
 					print STDERR "$tmp\n" if $config->{debug} == 1;
 					$astpp_db->do($tmp);
@@ -4598,13 +4598,13 @@ sub vendor_process_rating() {  #Rate Vendor calls.
 						$cdrinfo->{src},         $cdrinfo->{dst},
 						$cdrinfo->{disposition}, $cdrinfo->{billsec},
 						$cost * -1,              $cdrinfo->{calldate},
-						"",                      $cdrinfo->{trunk},
+						"",                      $trunk->{name},
 						$pricerecord->{comment},$pricerecord->{name},$pricerecord->{pattern},
-						$cdrinfo->{userfield}, $cdrinfo->{provider}
+						$cdrinfo->{userfield}, $trunk->{provider}
 						) if $config->{posttoastpp} == 1;
 				my $tmp = "UPDATE cdrs SET cost = '" . $cost . "' WHERE uniqueid = '" .
 					$cdrinfo->{uniqueid} . "' AND cost = 0 "
-					. " AND cardnum != '" . $trunk->{provider} . "' AND dst = "
+					. " AND cardnum != '" . $trunk->{provider} . "' AND callednum = "
 					. $astpp_db->quote($cdrinfo->{dst}) . " LIMIT 1";
 				print STDERR "$tmp\n" if $config->{debug} == 1;
 				$astpp_db->do($tmp);
